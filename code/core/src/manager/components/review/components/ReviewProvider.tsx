@@ -21,8 +21,8 @@ import {
 } from 'storybook/manager-api';
 
 import { AUTO_ENTERED_SESSION_KEY, EVENTS, PRE_REVIEW_RETURN_KEY } from '../constants.ts';
-import { beginReviewCycle, capturePreReviewReturn } from '../review-entry.ts';
 import { navigateOutOfReview } from '../review-actions.ts';
+import { beginReviewCycle, capturePreReviewReturn } from '../review-entry.ts';
 import {
   applyReviewingFiltersForReviewIfNeeded,
   initializeSessionChromeIfNeeded,
