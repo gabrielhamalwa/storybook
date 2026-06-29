@@ -23,6 +23,19 @@ describe('capturePreReviewReturn', () => {
     capturePreReviewReturn('?path=/settings/about');
     expect(sessionStore.read(PRE_REVIEW_RETURN_KEY)).toBeNull();
   });
+
+  it('preserves the first snapshot when called multiple times in one cycle', () => {
+    capturePreReviewReturn('?path=/story/foo--bar');
+    capturePreReviewReturn('?path=/story/baz--qux');
+    expect(sessionStore.read(PRE_REVIEW_RETURN_KEY)).toBe('?path=/story/foo--bar');
+  });
+
+  it('does not overwrite after review mode is active', () => {
+    capturePreReviewReturn('?path=/story/foo--bar');
+    beginReviewCycle();
+    capturePreReviewReturn('?path=/story/baz--qux');
+    expect(sessionStore.read(PRE_REVIEW_RETURN_KEY)).toBe('?path=/story/foo--bar');
+  });
 });
 
 describe('beginReviewCycle', () => {

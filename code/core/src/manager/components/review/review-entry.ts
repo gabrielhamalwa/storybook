@@ -10,7 +10,12 @@ const normalizeSearch = (search: string): string =>
 
 /** Capture the current story/docs URL before entering a new review cycle. */
 export const capturePreReviewReturn = (search: string | null | undefined): void => {
-  if (!search || isReviewReturnSearch(search)) {
+  if (
+    !search ||
+    isReviewReturnSearch(search) ||
+    isReviewModeActive() ||
+    sessionStore.read(PRE_REVIEW_RETURN_KEY)
+  ) {
     return;
   }
 
