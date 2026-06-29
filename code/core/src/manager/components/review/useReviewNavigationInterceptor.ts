@@ -16,7 +16,6 @@ import {
   parseReviewStoryHref,
 } from './review-navigation.ts';
 import { sessionStore } from './session-store.ts';
-import { useReviewFiltersRef } from './useReviewFiltersRef.ts';
 
 const isReviewStoryHref = (href: string) =>
   href.startsWith('?path=/story/') && href.includes(`${REVIEW_COLLECTION_QUERY_PARAM}=`);
@@ -30,7 +29,6 @@ const isReviewSummaryHref = (href: string) => href === buildReviewChangesSummary
 export const useReviewNavigationInterceptor = () => {
   const navigate = useNavigate();
   const api = useStorybookApi();
-  const filtersRef = useReviewFiltersRef();
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -63,7 +61,7 @@ export const useReviewNavigationInterceptor = () => {
       event.preventDefault();
 
       if (isReviewSummaryHref(href)) {
-        navigateToReviewSummary(api, navigate, filtersRef.current);
+        navigateToReviewSummary(api, navigate);
         return;
       }
 
@@ -71,9 +69,9 @@ export const useReviewNavigationInterceptor = () => {
       if (!entry) {
         return;
       }
-      navigateToReviewEntry(api, navigate, entry, filtersRef.current);
+      navigateToReviewEntry(api, navigate, entry);
     };
     document.addEventListener('click', onClick);
     return () => document.removeEventListener('click', onClick);
-  }, [api, navigate, filtersRef]);
+  }, [api, navigate]);
 };

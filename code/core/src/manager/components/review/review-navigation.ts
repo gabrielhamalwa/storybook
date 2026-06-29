@@ -1,3 +1,5 @@
+import { parsePath } from 'storybook/internal/router';
+
 import {
   REVIEW_COLLECTION_QUERY_PARAM,
   isReviewSummaryPath,
@@ -84,6 +86,17 @@ export const parseStoryIdFromPath = (path: string): string | null => {
   }
   const storyId = path.slice('/story/'.length);
   return storyId || null;
+};
+
+/** Story id encoded in a manager return search string (story or docs canvas). */
+export const parseCanvasStoryIdFromReturnSearch = (search: string): string | null => {
+  const path =
+    new URLSearchParams(search.startsWith('?') ? search.slice(1) : search).get('path') ?? '';
+  const { viewMode, storyId } = parsePath(path);
+  if ((viewMode === 'story' || viewMode === 'docs') && storyId) {
+    return storyId;
+  }
+  return null;
 };
 
 export const parseCollectionIndex = (value: string | undefined): number | undefined => {

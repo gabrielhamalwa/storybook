@@ -10,8 +10,7 @@ export const PAGE_ID = `${REVIEW_NAMESPACE}/page`;
 export const REVIEW_CHANGES_URL = '/review/';
 
 // sessionStorage key for the canvas search to return to when leaving review
-// mode (both summary back-to-Storybook and dismiss). Captured while browsing
-// stories/docs outside review mode, so it points at the pre-review canvas.
+// mode. Captured once per review cycle before navigating to the review page.
 export const PRE_REVIEW_RETURN_KEY = `${REVIEW_NAMESPACE}/pre-review-return`;
 
 // sessionStorage marker deduplicating the one-time auto-enter on first landing

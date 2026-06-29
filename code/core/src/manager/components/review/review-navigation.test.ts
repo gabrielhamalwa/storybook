@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ReviewState } from './review-state.ts';
 import {
   REVIEW_COLLECTION_QUERY_PARAM,
   buildFlattenedNavEntries,
@@ -11,12 +10,14 @@ import {
   getAdjacentCollectionFirstStory,
   getAdjacentReviewEntries,
   isReviewSummaryPath,
+  parseCanvasStoryIdFromReturnSearch,
   parseCollectionIndex,
   parseReviewStoryHref,
   parseStoryIdFromPath,
   resolveActiveNavEntry,
   resolveNavIndex,
 } from './review-navigation.ts';
+import type { ReviewState } from './review-state.ts';
 
 const reviewState: ReviewState = {
   title: 'Test review',
@@ -123,6 +124,12 @@ describe('path helpers', () => {
 
   it('builds the summary href', () => {
     expect(buildReviewChangesSummaryHref()).toBe('?path=/review/');
+  });
+
+  it('parses story ids from return searches', () => {
+    expect(parseCanvasStoryIdFromReturnSearch('?path=/story/foo--bar')).toBe('foo--bar');
+    expect(parseCanvasStoryIdFromReturnSearch('?path=/docs/foo--bar')).toBe('foo--bar');
+    expect(parseCanvasStoryIdFromReturnSearch('?path=/review/')).toBeNull();
   });
 });
 

@@ -2,47 +2,51 @@ import type { NavigateFunction } from 'storybook/internal/router';
 import { type API } from 'storybook/manager-api';
 
 import { REVIEW_CHANGES_URL } from './constants.ts';
-import { type ReviewModeFilters, enterReviewMode, exitReviewMode } from './review-mode.ts';
+import { exitReviewMode, isReviewModeActive, markReviewModeActive } from './review-mode.ts';
 import {
   REVIEW_COLLECTION_QUERY_PARAM,
-  type ReviewNavEntry,
   buildReviewStoryTarget,
   isReviewReturnSearch,
+  parseCanvasStoryIdFromReturnSearch,
+  type ReviewNavEntry,
 } from './review-navigation.ts';
 import { reviewStore } from './review-store.ts';
 
 /**
- * Navigate to a curated story, entering review mode. Entering is idempotent, so
- * this is safe whether or not the user is already reviewing. The summary overlay
- * is suppressed synchronously to avoid a flash before the route changes.
+ * Navigate to a curated story within an active review. The summary overlay is
+ * suppressed synchronously to avoid a flash before the route changes.
  */
 export const navigateToReviewEntry = (
   api: API,
   navigate: NavigateFunction,
-  entry: ReviewNavEntry,
-  filters: ReviewModeFilters
+  entry: ReviewNavEntry
 ): void => {
-  void enterReviewMode(api, filters);
+  if (!isReviewModeActive()) {
+    markReviewModeActive();
+  }
   reviewStore.suppressSummaryOverlay();
   api.setQueryParams({ [REVIEW_COLLECTION_QUERY_PARAM]: String(entry.collectionIndex) });
   navigate(buildReviewStoryTarget(entry));
 };
 
-/** Navigate back to the review summary, entering (or staying in) review mode. */
-export const navigateToReviewSummary = (
-  api: API,
-  navigate: NavigateFunction,
-  filters: ReviewModeFilters
-): void => {
-  void enterReviewMode(api, filters);
+/** Navigate back to the review summary. */
+export const navigateToReviewSummary = (api: API, navigate: NavigateFunction): void => {
   api.setQueryParams({ [REVIEW_COLLECTION_QUERY_PARAM]: null });
   navigate(REVIEW_CHANGES_URL);
 };
 
+const isReturnSearchNavigable = (api: API, returnSearch: string): boolean => {
+  const storyId = parseCanvasStoryIdFromReturnSearch(returnSearch);
+  if (!storyId) {
+    return false;
+  }
+  const entry = api.resolveStory(storyId);
+  return entry?.type === 'story' || entry?.type === 'docs';
+};
+
 /**
- * Leave review mode and return to the pre-review canvas. Shared by the summary
- * back-to-Storybook link and review dismissal; restores chrome/filters via
- * {@link exitReviewMode} and navigates to the captured return search.
+ * Leave review mode and return to the pre-review canvas. Restores chrome/filters
+ * via {@link exitReviewMode} and navigates to the captured return search.
  */
 export const navigateOutOfReview = (
   api: API,
@@ -53,7 +57,11 @@ export const navigateOutOfReview = (
   reviewStore.releaseSummaryOverlaySuppression();
   void exitReviewMode(api);
 
-  if (returnSearch && !isReviewReturnSearch(returnSearch)) {
+  if (
+    returnSearch &&
+    !isReviewReturnSearch(returnSearch) &&
+    isReturnSearchNavigable(api, returnSearch)
+  ) {
     navigate(returnSearch.startsWith('?') ? returnSearch : `?${returnSearch}`, { plain: true });
     return;
   }

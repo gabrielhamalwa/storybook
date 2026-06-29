@@ -1,14 +1,14 @@
-import { type MutableRefObject, useRef } from 'react';
+import { useRef, type MutableRefObject } from 'react';
 
-import { useStorybookState } from 'storybook/manager-api';
 import type { StatusValue } from 'storybook/internal/types';
+import { useStorybookState } from 'storybook/manager-api';
 
 import { type ReviewModeFilters } from './review-mode.ts';
 
 /**
  * Keep the current sidebar filters in a ref so click/shortcut handlers can read
- * them without re-binding. enterReviewMode snapshots these and they're restored
- * on exit; the ref is updated on every render to stay in sync with the store.
+ * them without re-binding. The review summary snapshots these once per browser
+ * session and restores them on exit; the ref stays in sync with the store.
  */
 export const useReviewFiltersRef = (): MutableRefObject<ReviewModeFilters> => {
   const { includedStatusFilters, excludedStatusFilters, includedTagFilters, excludedTagFilters } =

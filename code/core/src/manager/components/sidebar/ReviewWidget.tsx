@@ -15,6 +15,7 @@ import {
 import { styled } from 'storybook/theming';
 
 import { EVENTS } from '../review/constants.ts';
+import { beginReviewCycle, capturePreReviewReturn } from '../review/review-entry.ts';
 import { navigateToReviewSummary } from '../review/review-actions.ts';
 import { REVIEWING_STATUS_VALUE as REVIEWING } from '../review/review-status.ts';
 import { useReview } from '../review/review-store.ts';
@@ -74,12 +75,6 @@ export const ReviewWidget = () => {
   const navigate = useNavigate();
   const storyCount = useReviewingStoryCount();
   const reviewTitle = useActiveReviewTitle();
-  const {
-    includedStatusFilters = [],
-    excludedStatusFilters = [],
-    includedTagFilters = [],
-    excludedTagFilters = [],
-  } = useStorybookState();
 
   const emit = useChannel({});
 
@@ -92,12 +87,9 @@ export const ReviewWidget = () => {
   }
 
   const onOpen = () => {
-    navigateToReviewSummary(api, navigate, {
-      includedStatusFilters,
-      excludedStatusFilters,
-      includedTagFilters,
-      excludedTagFilters,
-    });
+    capturePreReviewReturn(window.location.search);
+    beginReviewCycle();
+    navigateToReviewSummary(api, navigate);
   };
 
   const onDismiss = (event: SyntheticEvent) => {

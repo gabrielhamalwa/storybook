@@ -4,9 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StatusValue } from 'storybook/internal/types';
 
 import {
-  enterReviewMode,
+  applyReviewingFiltersForReviewIfNeeded,
   exitReviewMode,
+  initializeSessionChromeIfNeeded,
+  initializeSessionFiltersIfNeeded,
   isReviewModeActive,
+  markReviewModeActive,
   type ReviewModeFilters,
 } from './review-mode.ts';
 
@@ -33,53 +36,72 @@ beforeEach(() => {
   sessionStorage.clear();
 });
 
-describe('enterReviewMode', () => {
-  it('collapses chrome, narrows filters to reviewing, and sets the flag', async () => {
+describe('initializeSessionChromeIfNeeded', () => {
+  it('collapses chrome and snapshots visibility once per browser session', () => {
     const api = makeApi();
-    await enterReviewMode(api, emptyFilters);
+    initializeSessionChromeIfNeeded(api);
+    initializeSessionChromeIfNeeded(api);
 
+    expect(api.toggleNav).toHaveBeenCalledTimes(1);
     expect(api.toggleNav).toHaveBeenCalledWith(false);
+    expect(api.togglePanel).toHaveBeenCalledTimes(1);
     expect(api.togglePanel).toHaveBeenCalledWith(false);
-    expect(api.setAllTagFilters).toHaveBeenCalledWith([], []);
-    expect(api.setAllStatusFilters).toHaveBeenCalledWith(['status-value:reviewing'], []);
-    expect(isReviewModeActive()).toBe(true);
   });
+});
 
-  it('snapshots the pre-review filters only on the first entry', async () => {
+describe('initializeSessionFiltersIfNeeded', () => {
+  it('snapshots filters once per browser session without narrowing', async () => {
     const preReviewFilters: ReviewModeFilters = {
       includedStatusFilters: ['status-value:error' as StatusValue],
       excludedStatusFilters: [],
       includedTagFilters: ['play-fn'],
       excludedTagFilters: [],
     };
-    await enterReviewMode(makeApi(), preReviewFilters);
-    // A second (idempotent) entry with different filters must not overwrite the snapshot.
-    await enterReviewMode(makeApi(), emptyFilters);
-
     const api = makeApi();
+    initializeSessionFiltersIfNeeded(api, preReviewFilters);
+    initializeSessionFiltersIfNeeded(api, emptyFilters);
+
+    expect(api.setAllStatusFilters).not.toHaveBeenCalled();
+    expect(api.setAllTagFilters).not.toHaveBeenCalled();
+
     await exitReviewMode(api);
     expect(api.setAllTagFilters).toHaveBeenCalledWith(['play-fn'], []);
     expect(api.setAllStatusFilters).toHaveBeenCalledWith(['status-value:error'], []);
   });
+});
 
-  it('does not re-collapse chrome or re-apply filters when already in review mode', async () => {
+describe('applyReviewingFiltersForReviewIfNeeded', () => {
+  it('applies the reviewing filter once per review createdAt', async () => {
     const api = makeApi();
-    await enterReviewMode(api, emptyFilters);
-    vi.clearAllMocks();
-    await enterReviewMode(api, emptyFilters);
-    expect(api.toggleNav).not.toHaveBeenCalled();
-    expect(api.togglePanel).not.toHaveBeenCalled();
-    expect(api.setAllTagFilters).not.toHaveBeenCalled();
-    expect(api.setAllStatusFilters).not.toHaveBeenCalled();
+    await applyReviewingFiltersForReviewIfNeeded(api, 100);
+    await applyReviewingFiltersForReviewIfNeeded(api, 100);
+
+    expect(api.setAllStatusFilters).toHaveBeenCalledTimes(1);
+    expect(api.setAllStatusFilters).toHaveBeenCalledWith(['status-value:reviewing'], []);
+  });
+
+  it('re-applies when a new review arrives', async () => {
+    const api = makeApi();
+    await applyReviewingFiltersForReviewIfNeeded(api, 100);
+    await applyReviewingFiltersForReviewIfNeeded(api, 200);
+
+    expect(api.setAllStatusFilters).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('markReviewModeActive', () => {
+  it('persists the review-mode flag', () => {
+    markReviewModeActive();
+    expect(isReviewModeActive()).toBe(true);
   });
 });
 
 describe('exitReviewMode', () => {
-  it('restores only the chrome that was shown before entry and clears the flag', async () => {
-    await enterReviewMode(
-      makeApi({ getIsNavShown: () => true, getIsPanelShown: () => false }),
-      emptyFilters
+  it('restores only the chrome that was shown before the first review visit', async () => {
+    initializeSessionChromeIfNeeded(
+      makeApi({ getIsNavShown: () => true, getIsPanelShown: () => false })
     );
+    markReviewModeActive();
 
     const api = makeApi();
     await exitReviewMode(api);

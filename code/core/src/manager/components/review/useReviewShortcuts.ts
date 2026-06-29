@@ -11,7 +11,6 @@ import {
   type ReviewShortcutHrefs,
 } from './review-navigation.ts';
 import { useReview } from './review-store.ts';
-import { useReviewFiltersRef } from './useReviewFiltersRef.ts';
 
 /**
  * Register review navigation as customizable addon shortcuts and keep their
@@ -22,7 +21,6 @@ export const useReviewShortcuts = () => {
   const navigate = useNavigate();
   const { state, flattenedEntries, activeEntry, activeIndex } = useReview();
   const shortcutHrefsRef = useRef<ReviewShortcutHrefs | null>(null);
-  const filtersRef = useReviewFiltersRef();
 
   const navigateToShortcut = useCallback(
     (target: keyof ReviewShortcutHrefs) => {
@@ -32,7 +30,7 @@ export const useReviewShortcuts = () => {
       }
 
       if (target === 'back') {
-        navigateToReviewSummary(api, navigate, filtersRef.current);
+        navigateToReviewSummary(api, navigate);
         return;
       }
 
@@ -40,9 +38,9 @@ export const useReviewShortcuts = () => {
       if (!entry) {
         return;
       }
-      navigateToReviewEntry(api, navigate, entry, filtersRef.current);
+      navigateToReviewEntry(api, navigate, entry);
     },
-    [api, navigate, filtersRef]
+    [api, navigate]
   );
 
   useEffect(() => {

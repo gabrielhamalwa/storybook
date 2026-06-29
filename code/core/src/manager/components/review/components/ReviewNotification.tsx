@@ -7,6 +7,7 @@ import { useStorybookApi, useStorybookState } from 'storybook/manager-api';
 import { useTheme } from 'storybook/theming';
 
 import { reviewAvailableNotificationId } from '../constants.ts';
+import { beginReviewCycle, capturePreReviewReturn } from '../review-entry.ts';
 import { navigateToReviewSummary } from '../review-actions.ts';
 import {
   acceptReviewNotification,
@@ -17,21 +18,20 @@ import {
   shouldSkipArrivalNotification,
 } from '../review-notification.ts';
 import { reviewStore, useReview } from '../review-store.ts';
-import { useReviewFiltersRef } from '../useReviewFiltersRef.ts';
-
 /** Sidebar notification for unseen review pushes. Does not auto-navigate. */
 export const ReviewNotification: FC = () => {
   const api = useStorybookApi();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { path, customQueryParams } = useStorybookState();
+  const { path, customQueryParams, location } = useStorybookState();
   const { notificationKey, onAcceptPendingUpdate } = useReview();
-  const filtersRef = useReviewFiltersRef();
   const collectionIndex = readCollectionIndex(customQueryParams);
 
   const openReview = useCallback(() => {
-    navigateToReviewSummary(api, navigate, filtersRef.current);
-  }, [api, navigate, filtersRef]);
+    capturePreReviewReturn(location?.search ?? window.location.search);
+    beginReviewCycle();
+    navigateToReviewSummary(api, navigate);
+  }, [api, location?.search, navigate]);
 
   const handleNotificationClick = useCallback(
     (createdAt: number) => {

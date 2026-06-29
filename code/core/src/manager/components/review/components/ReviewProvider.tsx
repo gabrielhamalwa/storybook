@@ -21,13 +21,19 @@ import {
 } from 'storybook/manager-api';
 
 import { AUTO_ENTERED_SESSION_KEY, EVENTS, PRE_REVIEW_RETURN_KEY } from '../constants.ts';
+import { beginReviewCycle, capturePreReviewReturn } from '../review-entry.ts';
 import { navigateOutOfReview } from '../review-actions.ts';
-import { enterReviewMode, isReviewModeActive } from '../review-mode.ts';
+import {
+  applyReviewingFiltersForReviewIfNeeded,
+  initializeSessionChromeIfNeeded,
+  initializeSessionFiltersIfNeeded,
+  isReviewModeActive,
+  markReviewModeActive,
+} from '../review-mode.ts';
 import {
   REVIEW_COLLECTION_QUERY_PARAM,
   buildFlattenedNavEntries,
   buildReviewChangesSummaryHref,
-  isReviewReturnSearch,
   isReviewSummaryPath,
   parseCollectionIndex,
   parseStoryIdFromPath,
@@ -68,17 +74,17 @@ export const ReviewProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const api = useStorybookApi();
   const navigate = useNavigate();
-  const { index, path, viewMode, customQueryParams, location } = useStorybookState();
+  const { index, path, customQueryParams, location } = useStorybookState();
 
   const collectionParam = customQueryParams?.[REVIEW_COLLECTION_QUERY_PARAM] as string | undefined;
 
-  // Current sidebar filters, snapshotted by enterReviewMode and restored on exit.
   const filtersRef = useReviewFiltersRef();
 
-  const enterReview = useCallback(() => {
-    void enterReviewMode(api, filtersRef.current);
-    setIsInReviewMode(true);
-  }, [api, filtersRef]);
+  const onReviewSummaryVisit = useCallback(async () => {
+    initializeSessionChromeIfNeeded(api);
+    initializeSessionFiltersIfNeeded(api, filtersRef.current);
+    await applyReviewingFiltersForReviewIfNeeded(api, state?.createdAt);
+  }, [api, filtersRef, state?.createdAt]);
 
   const getStoryPreviewHref = useCallback(
     (storyId: string) => api.getStoryHrefs(storyId, { freeze: true }).previewHref,
@@ -94,7 +100,6 @@ export const ReviewProvider: FC<{ children: ReactNode }> = ({ children }) => {
         return;
       }
       setPendingReview(null);
-      // A fresh payload re-arms the one-time auto-enter.
       sessionStore.remove(AUTO_ENTERED_SESSION_KEY);
       setState(next);
       setIsStale(!!next.stale);
@@ -135,16 +140,18 @@ export const ReviewProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setIsStale(!!accepted.stale);
     setPendingReview(null);
     sessionStore.remove(AUTO_ENTERED_SESSION_KEY);
-    enterReview();
+    if (!isReviewModeActive()) {
+      capturePreReviewReturn(location?.search ?? window.location.search);
+      beginReviewCycle();
+      setIsInReviewMode(true);
+    }
     navigate(buildReviewChangesSummaryHref(), { plain: true });
-  }, [api, enterReview, navigate]);
+  }, [api, location?.search, navigate]);
 
   useEffect(() => {
     emit(EVENTS.REQUEST_REVIEW);
   }, [emit]);
 
-  // Tag every story in the active review so the sidebar shows reviewing status
-  // and the Quick review widget can count them. Filtering is owned by review mode.
   useEffect(() => {
     if (!state) {
       return;
@@ -180,40 +187,27 @@ export const ReviewProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const isSummaryVisible = isReviewSummaryPath(path);
 
-  // Re-sync the persisted review-mode flag on every navigation. Enter/exit
-  // performed by the nav interceptor and shortcuts toggle it out of band before
-  // navigating, so a route change is the signal to re-read it.
   useEffect(() => {
     setIsInReviewMode(isReviewModeActive());
   }, [path, collectionParam]);
 
-  // First landing on the summary with a clean, newly available review enters
-  // review mode once. Deduplicated so reloads and post-exit returns don't re-enter.
   useEffect(() => {
-    if (!state || !isSummaryVisible || isReviewModeActive()) {
+    if (!state || !isSummaryVisible) {
       return;
     }
-    if (sessionStore.read(AUTO_ENTERED_SESSION_KEY) === '1') {
-      return;
-    }
-    sessionStore.write(AUTO_ENTERED_SESSION_KEY, '1');
-    enterReview();
-  }, [state, isSummaryVisible, enterReview]);
 
-  // Remember the last canvas search outside review mode so leaving review can
-  // return to the pre-review canvas (both summary back and dismiss).
-  useEffect(() => {
-    if (isInReviewMode) {
-      return;
+    if (!isReviewModeActive()) {
+      if (sessionStore.read(AUTO_ENTERED_SESSION_KEY) === '1') {
+        return;
+      }
+      sessionStore.write(AUTO_ENTERED_SESSION_KEY, '1');
+      capturePreReviewReturn(location?.search ?? window.location.search);
+      markReviewModeActive();
+      setIsInReviewMode(true);
     }
-    if (viewMode !== 'story' && viewMode !== 'docs') {
-      return;
-    }
-    const search = location?.search;
-    if (search && !isReviewReturnSearch(search)) {
-      sessionStore.write(PRE_REVIEW_RETURN_KEY, search);
-    }
-  }, [isInReviewMode, viewMode, location?.search]);
+
+    void onReviewSummaryVisit();
+  }, [state, isSummaryVisible, location?.search, onReviewSummaryVisit]);
 
   const value = useMemo<ReviewStoreState>(
     () => ({
@@ -249,7 +243,6 @@ export const ReviewProvider: FC<{ children: ReactNode }> = ({ children }) => {
     ]
   );
 
-  // Sync before paint so toolbar surfaces read current route on first frame.
   useLayoutEffect(() => {
     reviewStore.setState(value, pendingReview);
   }, [value, pendingReview]);
