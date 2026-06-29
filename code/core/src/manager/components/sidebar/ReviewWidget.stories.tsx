@@ -151,6 +151,12 @@ const makeManagerContext = (
   };
 };
 
+const buildInitialEntry = (contextOptions?: Parameters<typeof makeManagerContext>[0]) => {
+  const path = contextOptions?.path ?? '/';
+  const params = new URLSearchParams(contextOptions?.customQueryParams ?? {});
+  return params.size ? `${path}?${params.toString()}` : path;
+};
+
 const deriveViewMode = (path: string): string => {
   if (path.startsWith('/story/') || path.startsWith('/docs/')) {
     return parsePath(path).viewMode;
@@ -203,7 +209,7 @@ const meta = {
   title: 'Sidebar/ReviewWidget',
   decorators: [
     (Story, { parameters }) => (
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={[buildInitialEntry(parameters?.contextOptions)]}>
         <ManagerStateSync contextOptions={parameters?.contextOptions ?? {}}>
           <ReviewProvider>
             <div style={{ padding: '8px', width: '280px' }}>
@@ -307,8 +313,8 @@ export const OpenReview: Story = {
     await expect(setQueryParamsMock).toHaveBeenCalledWith({
       [REVIEW_COLLECTION_QUERY_PARAM]: null,
     });
-    await expect(canvas.getByTestId('router-path')).toHaveTextContent('/review/');
     await waitFor(() => {
+      expect(canvas.getByTestId('router-path')).toHaveTextContent('/review/');
       expect(toggleNavMock).toHaveBeenCalledWith(false);
       expect(togglePanelMock).toHaveBeenCalledWith(false);
       expect(setAllTagFiltersMock).toHaveBeenCalledWith([], []);
