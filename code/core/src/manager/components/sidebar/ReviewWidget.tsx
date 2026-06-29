@@ -15,8 +15,8 @@ import {
 import { styled } from 'storybook/theming';
 
 import { EVENTS } from '../review/constants.ts';
-import { beginReviewCycle, capturePreReviewReturn } from '../review/review-entry.ts';
 import { navigateToReviewSummary } from '../review/review-actions.ts';
+import { beginReviewCycle, capturePreReviewReturn } from '../review/review-entry.ts';
 import { REVIEWING_STATUS_VALUE as REVIEWING } from '../review/review-status.ts';
 import { useReview } from '../review/review-store.ts';
 
@@ -73,6 +73,7 @@ const useActiveReviewTitle = () => {
 export const ReviewWidget = () => {
   const api = useStorybookApi();
   const navigate = useNavigate();
+  const { location } = useStorybookState();
   const storyCount = useReviewingStoryCount();
   const reviewTitle = useActiveReviewTitle();
 
@@ -87,7 +88,7 @@ export const ReviewWidget = () => {
   }
 
   const onOpen = () => {
-    capturePreReviewReturn(window.location.search);
+    capturePreReviewReturn(location?.search ?? window.location.search);
     beginReviewCycle();
     navigateToReviewSummary(api, navigate);
   };
