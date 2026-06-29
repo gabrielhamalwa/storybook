@@ -159,7 +159,7 @@ const buildInitialEntry = (contextOptions?: Parameters<typeof makeManagerContext
 
 const deriveViewMode = (path: string): string => {
   if (path.startsWith('/story/') || path.startsWith('/docs/')) {
-    return parsePath(path).viewMode;
+    return parsePath(path).viewMode ?? 'story';
   }
   if (isReviewSummaryPath(path)) {
     return 'review';
