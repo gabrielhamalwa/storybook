@@ -244,16 +244,16 @@ const LayoutContainer = styled.div<{
     gridTemplateRows: `1fr minmax(0, var(--bottom-panel-height))`,
     gridTemplateAreas: (() => {
       if (!showSidebar && !showPanel) {
-        return `"content content content"
-                "content content content"`;
+        return `"content content"
+                "content content"`;
       }
       if (!showSidebar && showPanel) {
         if (panelPosition === 'right') {
-          return `"content content panel"
-                  "content content panel"`;
+          return `"content panel"
+                  "content panel"`;
         }
-        return `"content content content"
-                "content panel   panel"`;
+        return `"content content"
+                "panel   panel"`;
       }
       if (!showPanel) {
         return `"sidebar content content"
