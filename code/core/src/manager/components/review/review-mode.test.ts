@@ -116,4 +116,27 @@ describe('exitReviewMode', () => {
     expect(api.toggleNav).not.toHaveBeenCalled();
     expect(isReviewModeActive()).toBe(false);
   });
+
+  it('consumes snapshots so a later exit does not restore stale state', async () => {
+    initializeSessionChromeIfNeeded(
+      makeApi({ getIsNavShown: () => true, getIsPanelShown: () => true })
+    );
+    initializeSessionFiltersIfNeeded(makeApi(), {
+      includedStatusFilters: ['status-value:error' as StatusValue],
+      excludedStatusFilters: [],
+      includedTagFilters: ['play-fn'],
+      excludedTagFilters: [],
+    });
+    markReviewModeActive();
+
+    const firstExitApi = makeApi();
+    await exitReviewMode(firstExitApi);
+    expect(firstExitApi.toggleNav).toHaveBeenCalledWith(true);
+
+    const secondExitApi = makeApi();
+    await exitReviewMode(secondExitApi);
+    expect(secondExitApi.toggleNav).not.toHaveBeenCalled();
+    expect(secondExitApi.setAllTagFilters).not.toHaveBeenCalled();
+    expect(secondExitApi.setAllStatusFilters).not.toHaveBeenCalled();
+  });
 });

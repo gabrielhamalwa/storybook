@@ -140,4 +140,6 @@ export const exitReviewMode = async (api: ReviewModeApi): Promise<void> => {
 
   sessionStore.remove(REVIEW_MODE_SESSION_KEY);
   sessionStore.remove(LAST_FILTER_APPLIED_CREATED_AT_KEY);
+  sessionStore.remove(CHROME_SNAPSHOT_SESSION_KEY);
+  sessionStore.remove(FILTERS_SNAPSHOT_SESSION_KEY);
 };
