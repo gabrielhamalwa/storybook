@@ -4,12 +4,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { REVIEW_STATUS_TYPE_ID } from 'storybook/internal/types';
 
-import { Location, MemoryRouter } from 'storybook/internal/router';
+import { Location, MemoryRouter, parsePath, queryFromLocation } from 'storybook/internal/router';
 import { ManagerContext, internal_fullStatusStore } from 'storybook/manager-api';
-import { expect, fn, userEvent } from 'storybook/test';
+import { expect, fn, userEvent, waitFor } from 'storybook/test';
 
 import { ReviewProvider } from '../review/components/ReviewProvider.tsx';
-import { REVIEW_COLLECTION_QUERY_PARAM } from '../review/review-navigation.ts';
+import { REVIEW_COLLECTION_QUERY_PARAM, isReviewSummaryPath } from '../review/review-navigation.ts';
 import { reviewStore } from '../review/review-store.ts';
 import { ReviewWidget } from './ReviewWidget.tsx';
 
@@ -64,6 +64,9 @@ const buildReviewPayload = (reviewTitle: string, storyIds: string[], createdAt =
 
 const makeManagerContext = (
   options: {
+    path?: string;
+    viewMode?: string;
+    customQueryParams?: Record<string, string>;
     storyIds?: string[];
     reviewTitle?: string;
     reviewCreatedAt?: number;
@@ -108,9 +111,9 @@ const makeManagerContext = (
 
   return {
     state: {
-      path: '/',
-      viewMode: 'story',
-      customQueryParams: {},
+      path: options.path ?? '/',
+      viewMode: options.viewMode ?? 'story',
+      customQueryParams: options.customQueryParams ?? {},
       internal_index: {
         v: 5,
         entries: buildIndexEntries(options.storyIds ?? []),
@@ -139,11 +142,61 @@ const makeManagerContext = (
       }),
       addNotification: fn().mockName('api::addNotification'),
       clearNotification: fn().mockName('api::clearNotification'),
-      getUrlState: () => ({ path: '/', queryParams: {} }),
+      getUrlState: () => ({
+        path: options.path ?? '/',
+        queryParams: options.customQueryParams ?? {},
+      }),
       navigate: options.navigate ?? fn().mockName('api::navigate'),
     },
   };
 };
+
+const deriveViewMode = (path: string): string => {
+  if (path.startsWith('/story/') || path.startsWith('/docs/')) {
+    return parsePath(path).viewMode;
+  }
+  if (isReviewSummaryPath(path)) {
+    return 'review';
+  }
+  return 'story';
+};
+
+/** Keep ManagerContext path/viewMode in sync with MemoryRouter navigations in play tests. */
+const ManagerStateSync = ({
+  children,
+  contextOptions = {},
+}: {
+  children: React.ReactNode;
+  contextOptions?: Parameters<typeof makeManagerContext>[0];
+}) => (
+  <Location>
+    {({ location, path }) => {
+      const query = queryFromLocation(location);
+      const customQueryParams: Record<string, string> = {};
+      if (query[REVIEW_COLLECTION_QUERY_PARAM] !== undefined) {
+        customQueryParams[REVIEW_COLLECTION_QUERY_PARAM] = String(
+          query[REVIEW_COLLECTION_QUERY_PARAM]
+        );
+      }
+
+      return (
+        <ManagerContext.Provider
+          value={makeManagerContext({
+            ...contextOptions,
+            path,
+            viewMode: deriveViewMode(path),
+            customQueryParams,
+          })}
+        >
+          <span data-testid="router-path" hidden>
+            {path}
+          </span>
+          {children}
+        </ManagerContext.Provider>
+      );
+    }}
+  </Location>
+);
 
 const meta = {
   component: ReviewWidget,
@@ -151,20 +204,13 @@ const meta = {
   decorators: [
     (Story, { parameters }) => (
       <MemoryRouter initialEntries={['/']}>
-        <ManagerContext.Provider value={makeManagerContext(parameters?.contextOptions ?? {})}>
+        <ManagerStateSync contextOptions={parameters?.contextOptions ?? {}}>
           <ReviewProvider>
-            <Location>
-              {({ path }) => (
-                <span data-testid="router-path" hidden>
-                  {path}
-                </span>
-              )}
-            </Location>
             <div style={{ padding: '8px', width: '280px' }}>
               <Story />
             </div>
           </ReviewProvider>
-        </ManagerContext.Provider>
+        </ManagerStateSync>
       </MemoryRouter>
     ),
   ],
@@ -262,10 +308,12 @@ export const OpenReview: Story = {
       [REVIEW_COLLECTION_QUERY_PARAM]: null,
     });
     await expect(canvas.getByTestId('router-path')).toHaveTextContent('/review/');
-    expect(toggleNavMock).not.toHaveBeenCalled();
-    expect(togglePanelMock).not.toHaveBeenCalled();
-    expect(setAllTagFiltersMock).not.toHaveBeenCalled();
-    expect(setAllStatusFiltersMock).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(toggleNavMock).toHaveBeenCalledWith(false);
+      expect(togglePanelMock).toHaveBeenCalledWith(false);
+      expect(setAllTagFiltersMock).toHaveBeenCalledWith([], []);
+      expect(setAllStatusFiltersMock).toHaveBeenCalledWith(['status-value:reviewing'], []);
+    });
   },
 };
 
