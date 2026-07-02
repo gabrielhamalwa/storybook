@@ -65,6 +65,92 @@ describe('renderToCanvas', () => {
     expect(context.showMain).toHaveBeenCalled();
   });
 
+  it('sends adapter and template overrides to the render endpoint', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({
+          html: '<div class="alert">Hello</div>',
+          assets: { styles: [], scripts: [] },
+        }),
+      } as unknown as Response)
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    const context = createMockContext({
+      storyContext: {
+        args: { message: 'Hello' },
+        parameters: {
+          symfony: {
+            adapter: 'template',
+            template: 'templates/components/Alert.html.twig',
+          },
+        },
+      },
+    });
+
+    await renderToCanvas(context, canvas);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/_storybook/render/button--primary',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          componentId: 'Button',
+          args: { message: 'Hello' },
+          adapter: 'template',
+          template: 'templates/components/Alert.html.twig',
+        }),
+      }
+    );
+  });
+
+  it('sends controller override to the render endpoint', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({
+          html: '<div class="alert">Controller</div>',
+          assets: { styles: [], scripts: [] },
+        }),
+      } as unknown as Response)
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    const context = createMockContext({
+      storyContext: {
+        args: { message: 'Hello' },
+        parameters: {
+          symfony: {
+            adapter: 'controller',
+            controller: 'App\\Controller\\AlertController::fragment',
+          },
+        },
+      },
+    });
+
+    await renderToCanvas(context, canvas);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/_storybook/render/button--primary',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          componentId: 'Button',
+          args: { message: 'Hello' },
+          adapter: 'controller',
+          controller: 'App\\Controller\\AlertController::fragment',
+        }),
+      }
+    );
+  });
+
   it('injects returned assets and removes them on teardown', async () => {
     vi.stubGlobal(
       'fetch',

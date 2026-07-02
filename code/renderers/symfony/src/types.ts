@@ -21,5 +21,9 @@ export interface Parameters {
   symfony?: {
     serverUrl?: string;
     environment?: string;
+    adapter?: 'twig_component' | 'template' | 'controller' | 'live';
+    template?: string;
+    controller?: string;
+    live?: boolean;
   };
 }

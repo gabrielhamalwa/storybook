@@ -24,7 +24,7 @@ export async function renderToCanvas(
 ): Promise<void | TeardownRenderToCanvas> {
   const { componentId } = storyFn();
 
-  const { symfony: { serverUrl } = {} } = parameters;
+  const { symfony: { serverUrl, adapter, template, controller } = {} } = parameters;
 
   const url = serverUrl || (import.meta.env.STORYBOOK_SYMFONY_URL as string);
 
@@ -51,10 +51,21 @@ export async function renderToCanvas(
   }
 
   try {
+    const body: Record<string, unknown> = { componentId, args };
+    if (adapter) {
+      body.adapter = adapter;
+    }
+    if (template) {
+      body.template = template;
+    }
+    if (controller) {
+      body.controller = controller;
+    }
+
     const response = await global.fetch(`${url}/_storybook/render/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ componentId, args }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
