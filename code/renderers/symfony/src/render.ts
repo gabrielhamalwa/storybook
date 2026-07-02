@@ -22,7 +22,7 @@ export async function renderToCanvas(
   }: RenderContext<SymfonyRenderer>,
   canvasElement: SymfonyRenderer['canvasElement']
 ): Promise<void | TeardownRenderToCanvas> {
-  storyFn();
+  const { componentId } = storyFn();
 
   const { symfony: { serverUrl } = {} } = parameters;
 
@@ -39,11 +39,22 @@ export async function renderToCanvas(
     return;
   }
 
+  if (!componentId) {
+    showError({
+      title: `Unable to render story "${name}" of "${title}".`,
+      description: dedent`
+        No Symfony component ID is configured for this story.
+        Set the story's "component" property to the Twig component name.
+      `,
+    });
+    return;
+  }
+
   try {
     const response = await global.fetch(`${url}/_storybook/render/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ args }),
+      body: JSON.stringify({ componentId, args }),
     });
 
     if (!response.ok) {
