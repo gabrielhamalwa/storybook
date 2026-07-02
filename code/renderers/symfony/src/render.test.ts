@@ -74,8 +74,8 @@ describe('renderToCanvas', () => {
         json: vi.fn().mockResolvedValue({
           html: '<div class="component">Hello</div>',
           assets: {
-            styles: [{ url: '/assets/app.css' }],
-            scripts: [{ url: '/assets/app.js', type: 'module' }],
+            styles: [{ url: 'data:text/css,' }],
+            scripts: [{ url: 'data:text/javascript,', type: 'module' }],
           },
         }),
       } as unknown as Response)
@@ -84,13 +84,15 @@ describe('renderToCanvas', () => {
     const canvas = document.getElementById('canvas') as HTMLDivElement;
     const teardown = await renderToCanvas(createMockContext(), canvas);
 
-    expect(document.querySelector('link[href="/assets/app.css"]')).not.toBeNull();
-    expect(document.querySelector('script[src="/assets/app.js"][type="module"]')).not.toBeNull();
+    expect(document.querySelector('link[href="data:text/css,"]')).not.toBeNull();
+    expect(
+      document.querySelector('script[src="data:text/javascript,"][type="module"]')
+    ).not.toBeNull();
 
     teardown?.();
 
-    expect(document.querySelector('link[href="/assets/app.css"]')).toBeNull();
-    expect(document.querySelector('script[src="/assets/app.js"][type="module"]')).toBeNull();
+    expect(document.querySelector('link[href="data:text/css,"]')).toBeNull();
+    expect(document.querySelector('script[src="data:text/javascript,"][type="module"]')).toBeNull();
   });
 
   it('shows an error when the Symfony server URL is missing', async () => {
