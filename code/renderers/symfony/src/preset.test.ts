@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { Indexer, IndexerOptions, IndexInput } from 'storybook/internal/types';
+import type { Indexer, IndexerOptions, IndexInput, Options } from 'storybook/internal/types';
 
 import { experimental_indexers } from './preset.ts';
 
@@ -10,12 +10,35 @@ vi.mock('node:fs/promises', () => ({
 
 const { readFile } = await import('node:fs/promises');
 
-const runIndexers = async (existing: Indexer[] = []): Promise<Indexer[]> => {
-  const options: IndexerOptions = { makeTitle: (title) => title ?? 'Untitled' };
+const createOptions = (features: Record<string, any> = {}): Options => {
+  return {
+    configDir: '/config',
+    presets: {
+      apply: vi.fn(async (key: string) => {
+        if (key === 'features') {
+          return features;
+        }
+        if (key === 'framework') {
+          return {
+            name: '@storybook/symfony-vite',
+            options: { symfony: { server: 'existing', serverUrl: 'http://localhost:9999' } },
+          };
+        }
+        return {};
+      }),
+    },
+  } as unknown as Options;
+};
+
+const runIndexers = async (
+  existing: Indexer[] = [],
+  options: Options = createOptions()
+): Promise<Indexer[]> => {
+  const indexerOptions: IndexerOptions = { makeTitle: (title) => title ?? 'Untitled' };
   const indexers = await (
     experimental_indexers as unknown as (
       existing: Indexer[],
-      options: IndexerOptions
+      options: Options
     ) => Promise<Indexer[]>
   )(existing, options);
 
@@ -60,5 +83,52 @@ describe('experimental_indexers', () => {
 
     expect(indexers).toHaveLength(2);
     expect(indexers[1]).toBe(existing[0]);
+  });
+
+  it('registers the auto-discovery indexer when the feature flag is enabled', async () => {
+    const options = createOptions({ experimental_symfonyAutoDiscovery: true });
+    const indexers = await runIndexers([], options);
+
+    const autoDiscoveryIndexer = indexers.find((entry) =>
+      entry.test.test('src/Twig/Components/Button.php')
+    );
+    expect(autoDiscoveryIndexer).toBeDefined();
+  });
+
+  it('does not register the auto-discovery indexer when the feature flag is disabled', async () => {
+    const options = createOptions({ experimental_symfonyAutoDiscovery: false });
+    const indexers = await runIndexers([], options);
+
+    const autoDiscoveryIndexer = indexers.find((entry) =>
+      entry.test.test('src/Twig/Components/Button.php')
+    );
+    expect(autoDiscoveryIndexer).toBeUndefined();
+  });
+
+  it('uses STORYBOOK_SYMFONY_URL when available', async () => {
+    vi.stubGlobal('fetch', vi.fn());
+    vi.stubEnv('STORYBOOK_SYMFONY_URL', 'http://localhost:8888');
+
+    const mockedFetch = vi.mocked(global.fetch);
+    mockedFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ components: [] }),
+    } as Response);
+
+    const options = createOptions({ experimental_symfonyAutoDiscovery: true });
+    const indexers = await runIndexers([], options);
+    const autoDiscoveryIndexer = indexers.find((entry) =>
+      entry.test.test('src/Twig/Components/Button.php')
+    );
+
+    expect(autoDiscoveryIndexer).toBeDefined();
+    await autoDiscoveryIndexer!.createIndex('/project/src/Twig/Components/Button.php', {
+      makeTitle: (title) => title ?? 'Untitled',
+    });
+
+    expect(mockedFetch).toHaveBeenCalledWith('http://localhost:8888/_storybook/index');
+
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 });

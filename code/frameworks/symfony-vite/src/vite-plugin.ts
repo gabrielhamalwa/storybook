@@ -1,17 +1,20 @@
+import { global } from '@storybook/global';
 import type { Plugin } from 'vite';
 
 import { logger } from 'storybook/internal/node-logger';
 
-import { SymfonyFrameworkError } from './errors.ts';
-import { getServerUrl, resolveSymfonyOptions, type ResolvedSymfonyOptions } from './options.ts';
-import { detectServerType } from './server/detect.ts';
-import { startExistingServer } from './server/existing.ts';
-import { startFrankenPhpServer } from './server/frankenphp.ts';
-import { startPhpServer } from './server/php.ts';
-import { startRoadRunnerServer } from './server/roadrunner.ts';
-import { startSymfonyCliServer } from './server/symfony-cli.ts';
+import { getOrStartServer, stopServer } from './server/manager.ts';
 import type { ServerState } from './server/types.ts';
 import type { SymfonyFrameworkOptions } from './types.ts';
+
+type ComponentMetadata = {
+  id: string;
+  type: 'twig_component' | 'live_component';
+  title: string;
+  template: string;
+  class: string;
+  props: { name: string; type?: string; required?: boolean; default?: unknown }[];
+};
 
 export function symfonyPlugin(options: SymfonyFrameworkOptions): Plugin {
   let serverPromise: Promise<ServerState> | null = null;
@@ -19,13 +22,8 @@ export function symfonyPlugin(options: SymfonyFrameworkOptions): Plugin {
   return {
     name: 'storybook-symfony',
     async config() {
-      const resolved = resolveSymfonyOptions(options.symfony);
-      const serverType = resolved.server === 'auto' ? await detectServerType() : resolved.server;
-
-      serverPromise = startServer(resolved, serverType);
+      serverPromise = getOrStartServer(options.symfony);
       const server = await serverPromise;
-
-      logger.info(`Symfony server ready at ${server.url}`);
 
       return {
         define: {
@@ -35,48 +33,106 @@ export function symfonyPlugin(options: SymfonyFrameworkOptions): Plugin {
     },
     configureServer(viteServer) {
       viteServer.httpServer?.on('close', async () => {
-        if (serverPromise) {
-          const server = await serverPromise;
-          await server.stop();
-        }
+        await stopServer();
       });
     },
     async closeBundle() {
-      if (serverPromise) {
-        const server = await serverPromise;
-        await server.stop();
+      await stopServer();
+    },
+    resolveId(id) {
+      if (isVirtualComponentImport(id)) {
+        return id;
       }
+
+      return null;
+    },
+    async load(id) {
+      const componentId = parseComponentIdFromVirtualImport(id);
+
+      if (!componentId || !serverPromise) {
+        return null;
+      }
+
+      const server = await serverPromise;
+      const metadata = await fetchComponentMetadata(server.url, componentId);
+
+      if (!metadata) {
+        return null;
+      }
+
+      return generateCsfModule(metadata);
     },
   };
 }
 
-async function startServer(
-  options: ResolvedSymfonyOptions,
-  serverType: ResolvedSymfonyOptions['server'] & {}
-): Promise<ServerState> {
-  if (serverType === 'existing') {
-    return startExistingServer({ serverUrl: getServerUrl(options) });
+async function fetchComponentMetadata(
+  serverUrl: string,
+  componentId: string
+): Promise<ComponentMetadata | null> {
+  try {
+    const response = await global.fetch(`${serverUrl}/_storybook/index`);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = (await response.json()) as { components?: ComponentMetadata[] };
+
+    return data.components?.find((component) => component.id === componentId) ?? null;
+  } catch (error) {
+    logger.warn(`Failed to fetch metadata for component ${componentId}: ${String(error)}`);
+
+    return null;
+  }
+}
+
+const VIRTUAL_PREFIX = 'virtual:storybook-symfony-component/';
+
+function isVirtualComponentImport(importPath: string): boolean {
+  return importPath.startsWith(VIRTUAL_PREFIX);
+}
+
+function parseComponentIdFromVirtualImport(importPath: string): string | undefined {
+  if (!isVirtualComponentImport(importPath)) {
+    return undefined;
   }
 
-  const startOptions = {
-    environment: options.environment,
-    projectDir: options.projectDir,
-    publicDir: options.publicDir,
-    port: options.port,
-    phpBinary: options.phpBinary,
-    console: options.console,
-  };
+  return importPath.slice(VIRTUAL_PREFIX.length);
+}
 
-  switch (serverType) {
-    case 'php':
-      return startPhpServer(startOptions);
-    case 'frankenphp':
-      return startFrankenPhpServer(startOptions);
-    case 'roadrunner':
-      return startRoadRunnerServer(startOptions);
-    case 'symfony-cli':
-      return startSymfonyCliServer(startOptions);
-    default:
-      throw new SymfonyFrameworkError(`Unsupported Symfony server backend: ${serverType}`);
+function generateCsfModule(component: ComponentMetadata): string {
+  const adapter = component.type === 'live_component' ? "adapter: 'live',\n" : '';
+
+  return `export default {
+  title: ${JSON.stringify(component.title)},
+  component: ${JSON.stringify(component.id)},
+  parameters: {
+    symfony: {
+      autoDiscovered: true,
+${adapter}    },
+  },
+};
+
+export const Default = {
+  args: ${buildDefaultArgs(component.props)},
+};
+`;
+}
+
+function buildDefaultArgs(
+  props: { name: string; type?: string; required?: boolean; default?: unknown }[]
+): string {
+  const defaults: Record<string, unknown> = {};
+
+  for (const prop of props) {
+    if (!prop.required && prop.default !== undefined) {
+      defaults[prop.name] = prop.default;
+    }
   }
+
+  if (Object.keys(defaults).length === 0) {
+    return '{}';
+  }
+
+  return JSON.stringify(defaults, null, 2);
 }

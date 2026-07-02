@@ -25,5 +25,6 @@ export interface Parameters {
     template?: string;
     controller?: string;
     live?: boolean;
+    autoDiscovered?: boolean;
   };
 }
