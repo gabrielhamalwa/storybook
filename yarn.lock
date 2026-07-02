@@ -10589,6 +10589,33 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@storybook/symfony-vite@workspace:code/frameworks/symfony-vite":
+  version: 0.0.0-use.local
+  resolution: "@storybook/symfony-vite@workspace:code/frameworks/symfony-vite"
+  dependencies:
+    "@storybook/builder-vite": "workspace:*"
+    "@storybook/symfony": "workspace:*"
+    "@types/node": "npm:^22.19.1"
+    typescript: "npm:^5.9.3"
+    vite: "npm:^7.0.4"
+  peerDependencies:
+    storybook: "workspace:^"
+    vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+  languageName: unknown
+  linkType: soft
+
+"@storybook/symfony@workspace:*, @storybook/symfony@workspace:code/renderers/symfony":
+  version: 0.0.0-use.local
+  resolution: "@storybook/symfony@workspace:code/renderers/symfony"
+  dependencies:
+    "@storybook/global": "npm:^5.0.0"
+    ts-dedent: "npm:^2.0.0"
+    typescript: "npm:^5.8.3"
+  peerDependencies:
+    storybook: "workspace:^"
+  languageName: unknown
+  linkType: soft
+
 "@storybook/tanstack-react@workspace:code/frameworks/tanstack-react":
   version: 0.0.0-use.local
   resolution: "@storybook/tanstack-react@workspace:code/frameworks/tanstack-react"
