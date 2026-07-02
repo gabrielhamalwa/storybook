@@ -10,8 +10,8 @@ Learn more about Storybook at [storybook.js.org](https://storybook.js.org/?ref=r
 
 For each story, the renderer:
 
-1. Reads the Symfony server URL and the story's `component` identifier.
-2. Serializes the story args and posts them to the PHP backend.
+1. Reads the Symfony server URL and the story's `component` identifier and adapter parameters (`adapter`, `template`, `controller`, `live`).
+2. Serializes the story args and posts them to the PHP backend, including any adapter override.
 3. Injects the returned HTML into the preview canvas.
 4. Injects the returned styles and scripts into the preview document.
 5. Dispatches Stimulus lifecycle events so controllers disconnect before the old DOM is removed and reconnect after the new DOM is inserted.
@@ -62,7 +62,7 @@ export const Primary: Story = {
 };
 ```
 
-The `component` field is the Twig component name as registered with `#[AsTwigComponent('Button')]`.
+The `component` field is the component identifier. By default it is the Twig component name registered with `#[AsTwigComponent('Button')]`. You can also set it to a Twig template path (for example `components/Alert.html.twig`) or a controller reference (for example `App\\Controller\\AlertController::fragment`).
 
 ### Exported types
 
@@ -107,6 +107,86 @@ The renderer resolves the server URL in this order:
 2. `import.meta.env.STORYBOOK_SYMFONY_URL`, injected by `@storybook/symfony-vite`.
 
 If neither is set, the renderer shows an error in the canvas.
+
+### Component adapters
+
+You can override the default Twig component adapter per story or per component by setting `parameters.symfony.adapter` to one of the following values:
+
+| Adapter | `parameters.symfony` | Behavior |
+| --- | --- | --- |
+| `twig_component` | `{ component: 'Button' }` | Default. Renders a Symfony UX TwigComponent. |
+| `template` | `{ adapter: 'template', template: 'components/Alert.html.twig' }` | Renders a plain Twig template with the story args as variables. |
+| `controller` | `{ adapter: 'controller', controller: 'App\\Controller\\AlertController::fragment' }` | Renders a Symfony controller fragment. |
+| `live` | `{ adapter: 'live', component: 'Notification' }` | Renders a Symfony UX Live Component. Requires `symfony/ux-live-component`. |
+
+When `adapter` is omitted, the PHP bundle detects the adapter from the `component` identifier: `.twig` paths use the template adapter, `::` references use the controller adapter, and everything else uses the Twig component adapter.
+
+Plain template story:
+
+```ts
+import type { Meta, StoryObj } from '@storybook/symfony';
+
+const meta = {
+  title: 'Templates/Alert',
+  component: 'components/Alert.html.twig',
+} satisfies Meta<{ message: string }>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+Controller fragment story:
+
+```ts
+import type { Meta, StoryObj } from '@storybook/symfony';
+
+const meta = {
+  title: 'Fragments/Alert',
+  component: 'App\\Controller\\AlertController::fragment',
+} satisfies Meta<{ message: string }>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+Live component story:
+
+```ts
+import type { Meta, StoryObj } from '@storybook/symfony';
+
+const meta = {
+  title: 'Live/Notification',
+  component: 'Notification',
+  parameters: {
+    symfony: {
+      adapter: 'live',
+    },
+  },
+} satisfies Meta<{ message: string }>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+If `symfony/ux-live-component` is not installed, the render endpoint returns an error.
 
 ## Asset injection
 

@@ -6,7 +6,7 @@ sidebar:
   title: Symfony (Vite)
 ---
 
-Storybook for Symfony & Vite is a [framework](../../contribute/framework.mdx) that makes it easy to develop and test [Symfony](https://symfony.com/) [Twig components](https://symfony.com/bundles/ux-twig-component) in isolation, with full support for [Stimulus](https://stimulus.hotwired.dev/) and the most common Symfony asset pipelines.
+Storybook for Symfony & Vite is a [framework](../../contribute/framework.mdx) that makes it easy to develop and test [Symfony](https://symfony.com/) [Twig components](https://symfony.com/bundles/ux-twig-component), plain Twig templates, controller fragments, and Symfony UX Live Components in isolation, with full support for [Stimulus](https://stimulus.hotwired.dev/) and the most common Symfony asset pipelines.
 
 ## Install
 
@@ -83,28 +83,132 @@ The component template is rendered by the PHP backend, so any Stimulus controlle
 </button>
 ```
 
-## Supported component types
+## Component adapters
 
-The bundle renders components through Symfony UX TwigComponent. The following identifier patterns are supported:
+The PHP bundle can render four different kinds of components. By default, the `component` identifier is treated as a Symfony UX TwigComponent name, but you can override the adapter with `parameters.symfony.adapter` or let the bundle detect it from the identifier shape.
 
-| Identifier     | Example  | Behavior                                                                                      |
-| -------------- | -------- | --------------------------------------------------------------------------------------------- |
-| Twig component | `Button` | Renders the component registered with `#[AsTwigComponent('Button')]` using the provided args. |
+| Adapter             | `component` / `parameters.symfony`                                                                                                           | Behavior                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Twig component      | `component: 'Button'`                                                                                                                        | Default. Renders the component registered with `#[AsTwigComponent('Button')]` using the provided args. |
+| Plain Twig template | `component: 'components/Alert.html.twig'` or `parameters.symfony.adapter: 'template'` with `parameters.symfony.template`                     | Renders a plain Twig template with the story args as variables.                                        |
+| Controller fragment | `component: 'App\\Controller\\AlertController::fragment'` or `parameters.symfony.adapter: 'controller'` with `parameters.symfony.controller` | Renders a Symfony controller fragment.                                                                 |
+| Live component      | `component: 'Notification'` with `parameters.symfony.adapter: 'live'`                                                                        | Renders a Symfony UX Live Component. Requires `symfony/ux-live-component`.                             |
 
-Plain Twig templates, Symfony UX Live Components, and controller fragments are planned for future releases.
+The default Twig component example renders the `Button` component with the story args:
 
-## Supported asset pipelines
+```ts title="Button.stories.ts"
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
 
-The PHP bundle auto-detects the installed asset pipeline by checking for known Symfony services. You can also override the detection in the bundle configuration.
+type ButtonArgs = {
+  label: string;
+  variant?: 'primary' | 'secondary';
+};
 
-| Pipeline        | Symfony package                 | Notes                                                       |
-| --------------- | ------------------------------- | ----------------------------------------------------------- |
-| Pentatrion Vite | `pentatrion/vite-bundle`        | Reads the `entrypoints.json` for the configured entrypoint. |
-| Webpack Encore  | `symfony/webpack-encore-bundle` | Reads the Encore entrypoint lookup.                         |
-| AssetMapper     | `symfony/asset-mapper`          | Reads the import map and eager entrypoint imports.          |
-| None            | —                               | No styles or scripts are injected.                          |
+const meta = {
+  title: 'Components/Button',
+  component: 'Button',
+} satisfies Meta<ButtonArgs>;
 
-By default, the bundle looks for an entrypoint named `app`. Change it in `config/packages/storybook/storybook.yaml`:
+export default meta;
+type Story = StoryObj<ButtonArgs>;
+
+export const Primary: Story = {
+  args: {
+    label: 'Primary Button',
+    variant: 'primary',
+  },
+};
+```
+
+A plain Twig template story can use the template path as the component identifier:
+
+```ts title="Alert.stories.ts"
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type AlertArgs = {
+  message: string;
+};
+
+const meta = {
+  title: 'Templates/Alert',
+  component: 'components/Alert.html.twig',
+} satisfies Meta<AlertArgs>;
+
+export default meta;
+type Story = StoryObj<AlertArgs>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+A controller fragment story can use the controller reference as the component identifier, or pass it explicitly:
+
+```ts title="AlertFragment.stories.ts"
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type AlertFragmentArgs = {
+  message: string;
+};
+
+const meta = {
+  title: 'Fragments/Alert',
+  component: 'App\\Controller\\AlertController::fragment',
+} satisfies Meta<AlertFragmentArgs>;
+
+export default meta;
+type Story = StoryObj<AlertFragmentArgs>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+A live component story sets the adapter explicitly. The `symfony/ux-live-component` package must be installed; otherwise, the render endpoint returns an error.
+
+```ts title="Notification.stories.ts"
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type NotificationArgs = {
+  message: string;
+};
+
+const meta = {
+  title: 'Live/Notification',
+  component: 'Notification',
+  parameters: {
+    symfony: {
+      adapter: 'live',
+    },
+  },
+} satisfies Meta<NotificationArgs>;
+
+export default meta;
+type Story = StoryObj<NotificationArgs>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+## Asset pipelines
+
+The PHP bundle auto-detects the installed asset pipeline by checking for known Symfony services. You can also override the detection in `config/packages/storybook/storybook.yaml`.
+
+| Pipeline        | `asset_pipeline` value | Symfony package                 | Notes                                                       |
+| --------------- | ---------------------- | ------------------------------- | ----------------------------------------------------------- |
+| Pentatrion Vite | `pentatrion_vite`      | `pentatrion/vite-bundle`        | Reads the `entrypoints.json` for the configured entrypoint. |
+| Webpack Encore  | `encore`               | `symfony/webpack-encore-bundle` | Reads the Encore entrypoint lookup.                         |
+| AssetMapper     | `asset_mapper`         | `symfony/asset-mapper`          | Reads the import map and eager entrypoint imports.          |
+| None            | `none`                 | —                               | No styles or scripts are injected.                          |
+
+The default `asset_pipeline: auto` setting detects the pipeline in this order: Pentatrion Vite, Webpack Encore, AssetMapper, then none. The bundle looks for an entrypoint named `app` by default:
 
 ```yaml title="config/packages/storybook/storybook.yaml"
 storybook:

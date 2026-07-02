@@ -137,6 +137,155 @@ yarn storybook
 
 The framework starts the PHP server, boots the Symfony kernel in the `storybook` environment, and renders your components in the Storybook canvas.
 
+## Component adapters
+
+Stories render through the PHP bundle. The default adapter is Symfony UX TwigComponent, but you can also render plain Twig templates, controller fragments, and Symfony UX Live Components by setting `parameters.symfony.adapter` (or by letting the bundle detect the adapter from the component identifier).
+
+### Twig component (default)
+
+The `component` property is the Twig component name registered with `#[AsTwigComponent('Button')]`. The bundle renders it with the story args as props.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type ButtonArgs = {
+  label: string;
+  variant?: 'primary' | 'secondary';
+};
+
+const meta = {
+  title: 'Components/Button',
+  component: 'Button',
+} satisfies Meta<ButtonArgs>;
+
+export default meta;
+type Story = StoryObj<ButtonArgs>;
+
+export const Primary: Story = {
+  args: {
+    label: 'Primary Button',
+    variant: 'primary',
+  },
+};
+```
+
+### Plain Twig template
+
+Set the `component` property to a template path, or set `parameters.symfony.adapter` to `'template'` with an explicit `template` path. The story args become Twig variables.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type AlertArgs = {
+  message: string;
+};
+
+const meta = {
+  title: 'Templates/Alert',
+  component: 'components/Alert.html.twig',
+} satisfies Meta<AlertArgs>;
+
+export default meta;
+type Story = StoryObj<AlertArgs>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+Or use an explicit adapter:
+
+```ts
+export const Alert: Story = {
+  parameters: {
+    symfony: {
+      adapter: 'template',
+      template: 'components/Alert.html.twig',
+    },
+  },
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+### Controller fragment
+
+Set the `component` property to a controller reference (`Controller::action`), or use `parameters.symfony.adapter: 'controller'` with an explicit `controller` value. The story args are passed to the controller action.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type AlertFragmentArgs = {
+  message: string;
+};
+
+const meta = {
+  title: 'Fragments/Alert',
+  component: 'App\\Controller\\AlertController::fragment',
+} satisfies Meta<AlertFragmentArgs>;
+
+export default meta;
+type Story = StoryObj<AlertFragmentArgs>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+Or use an explicit adapter:
+
+```ts
+export const Alert: Story = {
+  parameters: {
+    symfony: {
+      adapter: 'controller',
+      controller: 'App\\Controller\\AlertController::fragment',
+    },
+  },
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+### Live component
+
+Live components require `symfony/ux-live-component`. Set `parameters.symfony.adapter` to `'live'` and keep the `component` property as the live component name. The backend renders the live component markup; reactivity is provided by the component itself.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type NotificationArgs = {
+  message: string;
+};
+
+const meta = {
+  title: 'Live/Notification',
+  component: 'Notification',
+  parameters: {
+    symfony: {
+      adapter: 'live',
+    },
+  },
+} satisfies Meta<NotificationArgs>;
+
+export default meta;
+type Story = StoryObj<NotificationArgs>;
+
+export const Info: Story = {
+  args: {
+    message: 'Saved successfully',
+  },
+};
+```
+
+If `symfony/ux-live-component` is not installed, the render endpoint returns an error.
+
 ## Configuration
 
 ```ts
@@ -214,7 +363,7 @@ When you run `storybook dev`, the framework:
 3. Injects the server URL into the preview bundle as `import.meta.env.STORYBOOK_SYMFONY_URL`.
 4. Stops the PHP server when the Vite dev server shuts down.
 
-When you select a story, the renderer calls `POST /_storybook/render/{storyId}` with the component ID and story args, then injects the returned HTML and assets into the preview canvas.
+When you select a story, the renderer calls `POST /_storybook/render/{storyId}` with the component ID, optional adapter, template, controller, and story args, then injects the returned HTML and assets into the preview canvas.
 
 ## Asset pipeline support
 
@@ -225,13 +374,16 @@ The PHP bundle auto-detects the installed asset pipeline by checking for known S
 - AssetMapper (`symfony/asset-mapper`)
 - None (no CSS or JS extracted)
 
-The bundle reads the `app` entrypoint by default. You can change the entrypoint in the bundle configuration:
+The bundle reads the `app` entrypoint by default. You can change the entrypoint or explicitly set the pipeline in the bundle configuration:
 
 ```yaml
 # config/packages/storybook/storybook.yaml
 storybook:
+  asset_pipeline: auto
   entrypoint: app
 ```
+
+`asset_pipeline` accepts `auto`, `pentatrion_vite`, `encore`, `asset_mapper`, or `none`. The default `auto` setting detects the installed pipeline in this order: Pentatrion Vite, Webpack Encore, AssetMapper, then none.
 
 ## Troubleshooting
 
