@@ -1,0 +1,61 @@
+{
+  "name": "@storybook/symfony",
+  "version": "10.5.0-alpha.9",
+  "description": "Storybook Symfony renderer: Develop, document, and test Symfony/Twig components in isolation",
+  "keywords": [
+    "storybook",
+    "storybook-renderer",
+    "symfony",
+    "twig",
+    "component",
+    "components"
+  ],
+  "homepage": "https://github.com/storybookjs/storybook/tree/next/code/renderers/symfony",
+  "bugs": {
+    "url": "https://github.com/storybookjs/storybook/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/storybookjs/storybook.git",
+    "directory": "code/renderers/symfony"
+  },
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/storybook"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "code": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./entry-preview": "./dist/entry-preview.js",
+    "./entry-preview-docs": "./dist/entry-preview-docs.js",
+    "./package.json": "./package.json",
+    "./preset": "./dist/preset.js"
+  },
+  "files": [
+    "dist/**/*",
+    "template/cli/**/*",
+    "README.md",
+    "*.js",
+    "*.d.ts",
+    "!src/**/*"
+  ],
+  "dependencies": {
+    "@storybook/global": "^5.0.0",
+    "ts-dedent": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "storybook": "workspace:^"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "a8e7fd8a655c69780bc20b9749d2699e45beae1l"
+}
