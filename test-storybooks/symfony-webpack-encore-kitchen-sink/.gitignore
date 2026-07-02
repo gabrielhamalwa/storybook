@@ -9,6 +9,7 @@
 /.env.dev
 /yarn-error.log
 /.cache
+/config/reference.php
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/

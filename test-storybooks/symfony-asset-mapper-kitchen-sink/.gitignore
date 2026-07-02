@@ -9,6 +9,7 @@
 /.env.dev
 /yarn-error.log
 /.cache
+/config/reference.php
 
 ###> symfony/asset-mapper ###
 /public/assets/

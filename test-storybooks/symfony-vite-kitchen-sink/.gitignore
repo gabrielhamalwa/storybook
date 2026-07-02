@@ -9,3 +9,4 @@
 /.env.dev
 /yarn-error.log
 /.cache
+/config/reference.php
