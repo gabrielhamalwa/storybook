@@ -317,6 +317,12 @@ Avoid `console.log`, `console.warn`, and `console.error` unless the file is isol
 
 These usually start long-running development servers and are the wrong default for agents.
 
+## Git Commit Messages
+
+- Do NOT add AI marketing or attribution lines to commit messages. Specifically, never include `Generated with [Devin](https://devin.ai)` or `Co-Authored-By: Devin <...>` / `Co-authored-by: Devin <...>` trailers.
+- Commit messages should only describe the change and its motivation.
+- The `commit-msg` hook will reject any commit message that contains Devin attribution lines.
+
 ## Code Authoring Principles
 
 These are recurring failure modes in agent-authored changes to this repo. Apply them when writing or reviewing code, not just when asked.
