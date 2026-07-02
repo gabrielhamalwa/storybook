@@ -58,7 +58,7 @@ describe('renderToCanvas', () => {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ args: { label: 'Click me' } }),
+        body: JSON.stringify({ componentId: 'Button', args: { label: 'Click me' } }),
       }
     );
     expect(canvas.innerHTML).toBe('<button class="btn">Click me</button>');
@@ -93,6 +93,18 @@ describe('renderToCanvas', () => {
 
     expect(document.querySelector('link[href="data:text/css,"]')).toBeNull();
     expect(document.querySelector('script[src="data:text/javascript,"][type="module"]')).toBeNull();
+  });
+
+  it('shows an error when the Symfony component ID is missing', async () => {
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    const context = createMockContext({
+      storyFn: vi.fn().mockReturnValue({ componentId: undefined }),
+    });
+
+    await renderToCanvas(context, canvas);
+
+    expect(context.showError).toHaveBeenCalled();
+    expect(context.showMain).not.toHaveBeenCalled();
   });
 
   it('shows an error when the Symfony server URL is missing', async () => {
