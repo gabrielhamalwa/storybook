@@ -1,0 +1,16 @@
+/node_modules
+/vendor
+/var
+/public/bundles
+/public/build
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.dev
+/yarn-error.log
+/.cache
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###

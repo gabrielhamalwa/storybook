@@ -1,0 +1,7 @@
+framework:
+  router:
+    utf8: true
+    strict_requirements: ~
+  test: false
+  session:
+    enabled: false

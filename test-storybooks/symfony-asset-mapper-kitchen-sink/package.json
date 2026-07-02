@@ -1,0 +1,27 @@
+{
+  "name": "symfony-asset-mapper-kitchen-sink",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build-storybook": "storybook build",
+    "storybook": "storybook dev -p 6006"
+  },
+  "resolutions": {
+    "@storybook/builder-vite": "file:../../code/builders/builder-vite",
+    "@storybook/csf-plugin": "file:../../code/lib/csf-plugin",
+    "@storybook/symfony": "file:../../code/renderers/symfony",
+    "@storybook/symfony-vite": "file:../../code/frameworks/symfony-vite",
+    "storybook": "file:../../code/core"
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2"
+  },
+  "devDependencies": {
+    "@storybook/symfony": "*",
+    "@storybook/symfony-vite": "*",
+    "storybook": "*",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.4"
+  }
+}
