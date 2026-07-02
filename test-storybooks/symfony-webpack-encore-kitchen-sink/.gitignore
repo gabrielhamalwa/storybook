@@ -1,0 +1,18 @@
+/node_modules
+/vendor
+/var
+/public/bundles
+/public/build
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.dev
+/yarn-error.log
+/.cache
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
