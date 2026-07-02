@@ -1,12 +1,10 @@
-import type { ArgsStoryFn, RenderContext } from 'storybook/internal/types';
+import type { ArgsStoryFn, RenderContext, TeardownRenderToCanvas } from 'storybook/internal/types';
 
 import { global } from '@storybook/global';
-import { simulateDOMContentLoaded } from 'storybook/preview-api';
 import { dedent } from 'ts-dedent';
 
+import { injectAssets, manageStimulus, type RenderResponse } from './assets/index.ts';
 import type { SymfonyRenderer } from './types.ts';
-
-const { fetch } = global;
 
 export const render: ArgsStoryFn<SymfonyRenderer> = (args, context) => {
   return { componentId: context.component };
@@ -23,7 +21,7 @@ export async function renderToCanvas(
     storyContext: { args, parameters },
   }: RenderContext<SymfonyRenderer>,
   canvasElement: SymfonyRenderer['canvasElement']
-) {
+): Promise<void | TeardownRenderToCanvas> {
   storyFn();
 
   const { symfony: { serverUrl } = {} } = parameters;
@@ -42,7 +40,7 @@ export async function renderToCanvas(
   }
 
   try {
-    const response = await fetch(`${url}/_storybook/render/${id}`, {
+    const response = await global.fetch(`${url}/_storybook/render/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ args }),
@@ -56,12 +54,22 @@ export async function renderToCanvas(
       return;
     }
 
-    const data = await response.json();
-    const { html } = data;
+    const data = (await response.json()) as RenderResponse;
+    const { html, assets } = data;
+
+    const stimulus = manageStimulus();
+    stimulus.disconnect();
 
     showMain();
     canvasElement.innerHTML = html;
-    simulateDOMContentLoaded();
+
+    const injected = injectAssets(assets ?? { styles: [], scripts: [] });
+    stimulus.connect();
+
+    return () => {
+      injected.cleanup();
+      stimulus.disconnect();
+    };
   } catch (error) {
     showError({
       title: `Failed to render story "${name}" of "${title}".`,
