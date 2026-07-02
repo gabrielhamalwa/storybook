@@ -2,7 +2,9 @@ import type { WebRenderer } from 'storybook/internal/types';
 
 export type { RenderContext } from 'storybook/internal/types';
 
-export type StoryFnSymfonyReturnType = unknown;
+export interface StoryFnSymfonyReturnType {
+  componentId?: string;
+}
 
 export interface ShowErrorArgs {
   title: string;
