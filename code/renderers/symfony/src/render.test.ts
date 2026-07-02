@@ -2,7 +2,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { RenderContext } from 'storybook/internal/types';
+
 import { renderToCanvas } from './render.ts';
+import type { SymfonyRenderer } from './types.ts';
 
 const createMockContext = (overrides: Record<string, unknown> = {}) =>
   ({
@@ -17,7 +20,7 @@ const createMockContext = (overrides: Record<string, unknown> = {}) =>
       parameters: {},
     },
     ...overrides,
-  }) as any;
+  }) as unknown as RenderContext<SymfonyRenderer>;
 
 describe('renderToCanvas', () => {
   beforeEach(() => {
