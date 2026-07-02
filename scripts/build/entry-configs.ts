@@ -21,9 +21,10 @@ import reactWebpack5FrameworkConfig from '../../code/frameworks/react-webpack5/b
 import serverWebpack5FrameworkConfig from '../../code/frameworks/server-webpack5/build-config.ts';
 import svelteViteFrameworkConfig from '../../code/frameworks/svelte-vite/build-config.ts';
 import sveltekitFrameworkConfig from '../../code/frameworks/sveltekit/build-config.ts';
+import symfonyViteFrameworkConfig from '../../code/frameworks/symfony-vite/build-config.ts';
+import tanstackReactFrameworkConfig from '../../code/frameworks/tanstack-react/build-config.ts';
 import vue3ViteFrameworkConfig from '../../code/frameworks/vue3-vite/build-config.ts';
 import webComponentsViteFrameworkConfig from '../../code/frameworks/web-components-vite/build-config.ts';
-import tanstackReactFrameworkConfig from '../../code/frameworks/tanstack-react/build-config.ts';
 import cliConfig from '../../code/lib/cli-storybook/build-config.ts';
 import codemodConfig from '../../code/lib/codemod/build-config.ts';
 import coreWebpackConfig from '../../code/lib/core-webpack/build-config.ts';
@@ -39,6 +40,7 @@ import preactRendererConfig from '../../code/renderers/preact/build-config.ts';
 import reactRendererConfig from '../../code/renderers/react/build-config.ts';
 import serverRendererConfig from '../../code/renderers/server/build-config.ts';
 import svelteRendererConfig from '../../code/renderers/svelte/build-config.ts';
+import symfonyRendererConfig from '../../code/renderers/symfony/build-config.ts';
 import vue3RendererConfig from '../../code/renderers/vue3/build-config.ts';
 import webComponentsRendererConfig from '../../code/renderers/web-components/build-config.ts';
 import type { BuildEntriesByPackageName } from './utils/entry-utils.ts';
@@ -73,6 +75,7 @@ export const buildEntries = {
   '@storybook/server-webpack5': serverWebpack5FrameworkConfig,
   '@storybook/svelte-vite': svelteViteFrameworkConfig,
   '@storybook/sveltekit': sveltekitFrameworkConfig,
+  '@storybook/symfony-vite': symfonyViteFrameworkConfig,
   '@storybook/vue3-vite': vue3ViteFrameworkConfig,
   '@storybook/web-components-vite': webComponentsViteFrameworkConfig,
   '@storybook/tanstack-react': tanstackReactFrameworkConfig,
@@ -96,6 +99,7 @@ export const buildEntries = {
   '@storybook/preact': preactRendererConfig,
   '@storybook/react': reactRendererConfig,
   '@storybook/server': serverRendererConfig,
+  '@storybook/symfony': symfonyRendererConfig,
   '@storybook/svelte': svelteRendererConfig,
   '@storybook/vue3': vue3RendererConfig,
   '@storybook/web-components': webComponentsRendererConfig,
