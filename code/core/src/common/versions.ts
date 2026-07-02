@@ -23,6 +23,7 @@ export default {
   '@storybook/server-webpack5': '10.6.0-alpha.2',
   '@storybook/svelte-vite': '10.6.0-alpha.2',
   '@storybook/sveltekit': '10.6.0-alpha.2',
+  '@storybook/symfony-vite': '10.6.0-alpha.2',
   '@storybook/tanstack-react': '10.6.0-alpha.2',
   '@storybook/vue3-vite': '10.6.0-alpha.2',
   '@storybook/web-components-vite': '10.6.0-alpha.2',
@@ -42,6 +43,7 @@ export default {
   '@storybook/react': '10.6.0-alpha.2',
   '@storybook/server': '10.6.0-alpha.2',
   '@storybook/svelte': '10.6.0-alpha.2',
+  '@storybook/symfony': '10.6.0-alpha.2',
   '@storybook/vue3': '10.6.0-alpha.2',
   '@storybook/web-components': '10.6.0-alpha.2',
 };
