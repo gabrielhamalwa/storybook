@@ -1,0 +1,126 @@
+/** @vitest-environment happy-dom */
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { renderToCanvas } from './render.ts';
+
+const createMockContext = (overrides: Record<string, unknown> = {}) =>
+  ({
+    id: 'button--primary',
+    title: 'Button',
+    name: 'Primary',
+    showMain: vi.fn(),
+    showError: vi.fn(),
+    storyFn: vi.fn().mockReturnValue({ componentId: 'Button' }),
+    storyContext: {
+      args: { label: 'Click me' },
+      parameters: {},
+    },
+    ...overrides,
+  }) as any;
+
+describe('renderToCanvas', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="canvas"></div>';
+    import.meta.env.STORYBOOK_SYMFONY_URL = 'http://localhost:8000';
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    document.body.innerHTML = '';
+    document.head.innerHTML = '';
+    delete import.meta.env.STORYBOOK_SYMFONY_URL;
+  });
+
+  it('renders HTML returned by the Symfony render endpoint', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({
+          html: '<button class="btn">Click me</button>',
+          assets: { styles: [], scripts: [] },
+        }),
+      } as unknown as Response)
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    const context = createMockContext();
+
+    await renderToCanvas(context, canvas);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/_storybook/render/button--primary',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ args: { label: 'Click me' } }),
+      }
+    );
+    expect(canvas.innerHTML).toBe('<button class="btn">Click me</button>');
+    expect(context.showMain).toHaveBeenCalled();
+  });
+
+  it('injects returned assets and removes them on teardown', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({
+          html: '<div class="component">Hello</div>',
+          assets: {
+            styles: [{ url: '/assets/app.css' }],
+            scripts: [{ url: '/assets/app.js', type: 'module' }],
+          },
+        }),
+      } as unknown as Response)
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    const teardown = await renderToCanvas(createMockContext(), canvas);
+
+    expect(document.querySelector('link[href="/assets/app.css"]')).not.toBeNull();
+    expect(document.querySelector('script[src="/assets/app.js"][type="module"]')).not.toBeNull();
+
+    teardown?.();
+
+    expect(document.querySelector('link[href="/assets/app.css"]')).toBeNull();
+    expect(document.querySelector('script[src="/assets/app.js"][type="module"]')).toBeNull();
+  });
+
+  it('shows an error when the Symfony server URL is missing', async () => {
+    delete import.meta.env.STORYBOOK_SYMFONY_URL;
+
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    const context = createMockContext();
+
+    await renderToCanvas(context, canvas);
+
+    expect(context.showError).toHaveBeenCalled();
+    expect(context.showMain).not.toHaveBeenCalled();
+  });
+
+  it('shows an error when the render endpoint fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        json: vi.fn().mockResolvedValue({}),
+      } as unknown as Response)
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    const context = createMockContext();
+
+    await renderToCanvas(context, canvas);
+
+    expect(context.showError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        description: expect.stringContaining('500'),
+      })
+    );
+  });
+});
