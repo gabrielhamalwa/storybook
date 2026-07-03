@@ -1,7 +1,7 @@
 /** @vitest-environment happy-dom */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-/* eslint-disable @typescript-eslint/no-unused-vars -- useEffect is referenced inside the manual mock below */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- useEffect is referenced inside the manual mock below
 import { emitTransformCode, useEffect, useRef } from 'storybook/preview-api';
 
 import type { StoryContext } from '../public-types.ts';
