@@ -299,6 +299,6 @@ We build everything, but in order so each slice is end-to-end and testable.
 - [x] Write Vitest tests for asset injection helpers.
 - [x] Write Vitest tests for the Vite plugin server lifecycle.
 - [x] Write TypeScript type tests for public story types.
-- [ ] Add E2E test that opens a story in the kitchen-sink and asserts rendered HTML.
-- [ ] Add E2E test for a play function that clicks a Stimulus-controlled button.
+- [x] Add E2E test that opens a story in the kitchen-sink and asserts rendered HTML.
+- [x] Add E2E test for a play function that clicks a Stimulus-controlled button.
 - [x] Add monorepo CI checks for the new packages.

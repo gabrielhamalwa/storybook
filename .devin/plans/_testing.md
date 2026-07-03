@@ -148,10 +148,10 @@ The monorepo CI should:
 - [x] Add AssetMapper setup to the kitchen-sink.
 - [x] Add no-asset setup to the kitchen-sink.
 - [x] Write E2E test: open a story and assert rendered HTML contains expected text.
-- [ ] Write E2E test: change a control and assert the rendered HTML updates.
+- [x] Write E2E test: change a control and assert the rendered HTML updates.
 - [x] Write E2E test: run a play function that clicks a Stimulus-controlled button.
-- [ ] Write E2E test: open docs page and assert Twig source is visible.
-- [ ] Write E2E test: auto-discovered component appears in the sidebar.
+- [x] Write E2E test: open docs page and assert Twig source is visible.
+- [x] Write E2E test: auto-discovered component appears in the sidebar.
 
 ### CI
 
@@ -160,6 +160,6 @@ The monorepo CI should:
 - [x] Add CI step to run `yarn nx run-many -t check` including the new packages.
 - [x] Add CI step to run renderer unit tests.
 - [x] Add CI step to run framework unit tests.
-- [ ] Add CI step to run Composer bundle tests.
+- [x] Add CI step to run Composer bundle tests.
 - [x] Add CI step to build the kitchen-sink.
-- [ ] Add CI step to run E2E tests against the kitchen-sink.
+- [x] Add CI step to run E2E tests against the kitchen-sink.
