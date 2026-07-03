@@ -19,6 +19,7 @@ export const frameworkToRenderer: Record<
   [SupportedFramework.SOLID]: SupportedRenderer.SOLID,
   [SupportedFramework.SVELTE_VITE]: SupportedRenderer.SVELTE,
   [SupportedFramework.SVELTEKIT]: SupportedRenderer.SVELTE,
+  [SupportedFramework.SYMFONY_VITE]: SupportedRenderer.SYMFONY,
   [SupportedFramework.TANSTACK_REACT]: SupportedRenderer.REACT,
   [SupportedFramework.VUE3_VITE]: SupportedRenderer.VUE3,
   [SupportedFramework.WEB_COMPONENTS_VITE]: SupportedRenderer.WEB_COMPONENTS,
@@ -36,6 +37,7 @@ export const frameworkToRenderer: Record<
   [SupportedRenderer.REACT]: SupportedRenderer.REACT,
   [SupportedRenderer.SERVER]: SupportedRenderer.SERVER,
   [SupportedRenderer.SVELTE]: SupportedRenderer.SVELTE,
+  [SupportedRenderer.SYMFONY]: SupportedRenderer.SYMFONY,
   [SupportedRenderer.VUE3]: SupportedRenderer.VUE3,
   [SupportedRenderer.WEB_COMPONENTS]: SupportedRenderer.WEB_COMPONENTS,
 };
@@ -55,6 +57,7 @@ export const frameworkToBuilder: Record<SupportedFramework, SupportedBuilder> = 
   [SupportedFramework.SERVER_WEBPACK5]: SupportedBuilder.WEBPACK5,
   [SupportedFramework.SVELTE_VITE]: SupportedBuilder.VITE,
   [SupportedFramework.SVELTEKIT]: SupportedBuilder.VITE,
+  [SupportedFramework.SYMFONY_VITE]: SupportedBuilder.VITE,
   [SupportedFramework.TANSTACK_REACT]: SupportedBuilder.VITE,
   [SupportedFramework.VUE3_VITE]: SupportedBuilder.VITE,
   [SupportedFramework.WEB_COMPONENTS_VITE]: SupportedBuilder.VITE,

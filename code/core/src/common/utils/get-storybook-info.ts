@@ -34,6 +34,7 @@ export const rendererPackages: Record<string, SupportedRenderer> = {
   '@storybook/preact': SupportedRenderer.PREACT,
   '@storybook/server': SupportedRenderer.SERVER,
   '@storybook/react-native': SupportedRenderer.REACT_NATIVE,
+  '@storybook/symfony': SupportedRenderer.SYMFONY,
 
   // community (outside of monorepo)
   'storybook-framework-qwik': SupportedRenderer.QWIK,
@@ -52,6 +53,7 @@ export const frameworkPackages: Record<string, SupportedFramework> = {
   '@storybook/server-webpack5': SupportedFramework.SERVER_WEBPACK5,
   '@storybook/svelte-vite': SupportedFramework.SVELTE_VITE,
   '@storybook/sveltekit': SupportedFramework.SVELTEKIT,
+  '@storybook/symfony-vite': SupportedFramework.SYMFONY_VITE,
   '@storybook/vue3-vite': SupportedFramework.VUE3_VITE,
   '@storybook/nextjs-vite': SupportedFramework.NEXTJS_VITE,
   '@storybook/react-native-web-vite': SupportedFramework.REACT_NATIVE_WEB_VITE,
