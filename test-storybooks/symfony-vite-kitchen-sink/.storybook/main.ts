@@ -1,7 +1,7 @@
 import type { StorybookConfig } from '@storybook/symfony-vite';
 
 const config: StorybookConfig = {
-  stories: ['../stories/**/*.stories.ts', '../src/Twig/Components/**/*.php'],
+  stories: ['../stories/**/*.stories.ts', '../stories/**/*.mdx', '../src/Twig/Components/**/*.php'],
   addons: ['@storybook/addon-docs'],
   features: {
     experimental_symfonyAutoDiscovery: true,

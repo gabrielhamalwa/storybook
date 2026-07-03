@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/symfony';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import ButtonDocs from './ButtonDocs.tsx';
+
 type ButtonArgs = {
   label: string;
   variant?: 'primary' | 'secondary';
@@ -9,6 +11,12 @@ type ButtonArgs = {
 const meta = {
   title: 'Kitchen Sink/Button',
   component: 'Button',
+  tags: ['autodocs'],
+  parameters: {
+    docs: {
+      page: ButtonDocs,
+    },
+  },
 } satisfies Meta<ButtonArgs>;
 
 export default meta;

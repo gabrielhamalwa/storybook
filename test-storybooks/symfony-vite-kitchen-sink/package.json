@@ -7,7 +7,8 @@
     "build-storybook": "storybook build",
     "postinstall": "prewarm-symfony-storybook-cache",
     "storybook": "storybook dev -p 6006",
-    "test-storybook": "storybook test"
+    "test-storybook": "storybook test",
+    "e2e": "playwright test"
   },
   "resolutions": {
     "@storybook/addon-docs": "file:../../code/addons/docs",
@@ -22,6 +23,7 @@
     "@hotwired/stimulus": "^3.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@storybook/addon-docs": "*",
     "@storybook/symfony": "*",
     "@storybook/symfony-vite": "*",
