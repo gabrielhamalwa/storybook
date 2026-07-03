@@ -201,103 +201,104 @@ We build everything, but in order so each slice is end-to-end and testable.
 
 ### Workflow
 
-- [ ] Write `code/frameworks/symfony-vite/README.md` before any framework code.
-- [ ] Write `code/renderers/symfony/README.md` before any renderer code.
-- [ ] Write `storybook-symfony-bundle/README.md` before any bundle code.
-- [ ] Add a regression test, unit test, or kitchen-sink story for every feature implemented.
-- [ ] Run `yarn nx compile <nx-project-name>` after each package change.
-- [ ] Run `yarn nx run-many -t check` before committing.
-- [ ] Run `cd code && yarn fmt:write` before committing.
-- [ ] Run `yarn --cwd code lint:js:cmd <path> --fix` before committing.
+- [x] Write `code/frameworks/symfony-vite/README.md` before any framework code.
+- [x] Write `code/renderers/symfony/README.md` before any renderer code.
+- [x] Write `storybook-symfony-bundle/README.md` before any bundle code.
+- [x] Add a regression test, unit test, or kitchen-sink story for every feature implemented.
+- [x] Run `yarn nx compile <nx-project-name>` after each package change.
+- [x] Run `yarn nx run-many -t check` before committing.
+- [x] Run `cd code && yarn fmt:write` before committing.
+- [x] Run `yarn --cwd code lint:js:cmd <path> --fix` before committing.
 
 ### Phase 1: Foundation
 
-- [ ] Create `code/renderers/symfony/` with `README.md`, `package.json`, `project.json`, `build-config.ts`, `tsconfig.json`, `vitest.config.ts`, `preset.js`, and `src/`.
-- [ ] Create `code/frameworks/symfony-vite/` with `README.md`, `package.json`, `project.json`, `build-config.ts`, `tsconfig.json`, `vitest.config.ts`, `preset.js`, and `src/`.
-- [ ] Create `storybook-symfony-bundle/` Composer package with `composer.json`, `phpunit.xml`, `src/`, and `README.md`.
-- [ ] Verify the root `package.json` workspaces pick up the new packages (no root change needed).
-- [ ] Verify NX discovers `code/renderers/symfony` and `code/frameworks/symfony-vite` via `project.json`.
-- [ ] Create `StorybookBundle` PHP class and DI extension.
-- [ ] Add `GET /_storybook/health` endpoint returning `{"status":"ok"}`.
-- [ ] Implement `php -S` start/stop in the Vite plugin and wire it into `configureServer`/`close`.
-- [ ] Implement health-check polling until the PHP server responds.
-- [ ] Inject the PHP server URL into the preview bundle via `import.meta.env`.
-- [ ] Implement `renderToCanvas` in `@storybook/symfony` that fetches HTML from the PHP server.
-- [ ] Implement `render` placeholder so CSF decorators work.
-- [ ] Implement `SymfonyRenderer` type and public `Meta`/`StoryObj` types.
-- [ ] Implement `TwigComponentAdapter` in the bundle that renders `#[AsTwigComponent('Button')]`.
-- [ ] Implement `PentatrionViteExtractor` in the bundle and matching client-side asset injection.
-- [ ] Define `.stories.ts` story format and verify TypeScript types compile.
-- [ ] Create `test-storybooks/symfony-vite-kitchen-sink/` with `composer.json`, `package.json`, `.storybook/`, `config/packages/storybook/`, one Twig component, and one `.stories.ts` file.
-- [ ] Verify `yarn storybook` starts the kitchen-sink and renders a story end-to-end.
+- [x] Create `code/renderers/symfony/` with `README.md`, `package.json`, `project.json`, `build-config.ts`, `tsconfig.json`, `vitest.config.ts`, `preset.js`, and `src/`.
+- [x] Create `code/frameworks/symfony-vite/` with `README.md`, `package.json`, `project.json`, `build-config.ts`, `tsconfig.json`, `vitest.config.ts`, `preset.js`, and `src/`.
+- [x] Create `storybook-symfony-bundle/` Composer package with `composer.json`, `phpunit.xml`, `src/`, and `README.md`.
+- [x] Verify the root `package.json` workspaces pick up the new packages (no root change needed).
+- [x] Verify NX discovers `code/renderers/symfony` and `code/frameworks/symfony-vite` via `project.json`.
+- [x] Create `StorybookBundle` PHP class and DI extension.
+- [x] Add `GET /_storybook/health` endpoint returning `{"status":"ok"}`.
+- [x] Implement `php -S` start/stop in the Vite plugin and wire it into `configureServer`/`close`.
+- [x] Implement health-check polling until the PHP server responds.
+- [x] Inject the PHP server URL into the preview bundle via `import.meta.env`.
+- [x] Implement `renderToCanvas` in `@storybook/symfony` that fetches HTML from the PHP server.
+- [x] Implement `render` placeholder so CSF decorators work.
+- [x] Implement `SymfonyRenderer` type and public `Meta`/`StoryObj` types.
+- [x] Implement `TwigComponentAdapter` in the bundle that renders `#[AsTwigComponent('Button')]`.
+- [x] Implement `PentatrionViteExtractor` in the bundle and matching client-side asset injection.
+- [x] Define `.stories.ts` story format and verify TypeScript types compile.
+- [x] Create `test-storybooks/symfony-vite-kitchen-sink/` with `composer.json`, `package.json`, `.storybook/`, `config/packages/storybook/`, one Twig component, and one `.stories.ts` file.
+- [x] Verify `yarn storybook` starts the kitchen-sink and renders a story end-to-end.
 
 ### Phase 2: Asset pipelines
 
-- [ ] Implement `EncoreAssetExtractor` in the bundle.
-- [ ] Implement Encore client-side asset injection in the renderer.
-- [ ] Add Encore example to the kitchen-sink.
-- [ ] Implement `AssetMapperExtractor` in the bundle.
-- [ ] Implement AssetMapper importmap injection in the renderer.
-- [ ] Add AssetMapper example to the kitchen-sink.
-- [ ] Implement `NullAssetExtractor` fallback.
+- [x] Implement `EncoreAssetExtractor` in the bundle.
+- [x] Implement Encore client-side asset injection in the renderer.
+- [x] Add Encore example to the kitchen-sink.
+- [x] Implement `AssetMapperExtractor` in the bundle.
+- [x] Implement AssetMapper importmap injection in the renderer.
+- [x] Add AssetMapper example to the kitchen-sink.
+- [x] Implement `NullAssetExtractor` fallback.
 - [ ] Add no-asset/manual example to the kitchen-sink.
-- [ ] Implement pipeline auto-detection in the bundle.
+- [x] Implement pipeline auto-detection in the bundle.
 
 ### Phase 3: Component types
 
-- [ ] Implement `LiveComponentAdapter` for Symfony UX Live Components.
+- [x] Implement `LiveComponentAdapter` for Symfony UX Live Components.
 - [ ] Add Live Component example to the kitchen-sink.
-- [ ] Implement `TemplateAdapter` for plain Twig templates.
-- [ ] Add plain template example to the kitchen-sink.
-- [ ] Implement `ControllerFragmentAdapter` for controller fragments.
-- [ ] Add controller fragment example to the kitchen-sink.
-- [ ] Implement component adapter selection logic in `StorybookController`.
+- [x] Implement `TemplateAdapter` for plain Twig templates.
+- [x] Add plain template example to the kitchen-sink.
+- [x] Implement `ControllerFragmentAdapter` for controller fragments.
+- [x] Add controller fragment example to the kitchen-sink.
+- [x] Implement component adapter selection logic in `StorybookController`.
 
 ### Phase 4: Discovery and docs
 
-- [ ] Implement `GET /_storybook/index` endpoint returning component metadata.
-- [ ] Implement `experimental_indexer` in the renderer preset that calls the index endpoint.
-- [ ] Implement virtual story module generation for auto-discovered components.
-- [ ] Implement `GET /_storybook/source/{id}` endpoint returning Twig source.
+- [x] Implement `GET /_storybook/index` endpoint returning component metadata.
+- [x] Implement `experimental_indexer` in the renderer preset that calls the index endpoint.
+- [x] Implement virtual story module generation for auto-discovered components.
+- [x] Implement `GET /_storybook/source/{id}` endpoint returning Twig source.
 - [ ] Wire source endpoint into docs parameters so the docs panel shows Twig source.
-- [ ] Implement argType inference from `#[AsTwigComponent]` properties and Twig `{% props %}`.
+- [x] Implement argType inference from `#[AsTwigComponent]` constructor parameters and public properties.
+- [ ] Implement argType inference from Twig `{% props %}` block.
 - [ ] Enable Autodocs for `.stories.ts` files.
 
 ### Phase 5: Performance
 
-- [ ] Scaffold `config/packages/storybook/` environment with minimal framework/twig/twig_component/stimulus config.
+- [x] Scaffold `config/packages/storybook/` environment with minimal framework config.
 - [ ] Add post-install script to pre-warm `var/cache/storybook/`.
-- [ ] Implement FrankenPHP server start/stop in the Vite plugin.
-- [ ] Implement RoadRunner server start/stop in the Vite plugin.
-- [ ] Implement Symfony CLI server start/stop in the Vite plugin.
-- [ ] Implement "existing server" mode.
-- [ ] Implement server auto-detection (`frankenphp` → `rr` → `symfony` → `php`).
-- [ ] Add HMR coordination: re-render story when Twig templates or story files change.
+- [x] Implement FrankenPHP server start/stop in the Vite plugin.
+- [x] Implement RoadRunner server start/stop in the Vite plugin.
+- [x] Implement Symfony CLI server start/stop in the Vite plugin.
+- [x] Implement "existing server" mode.
+- [x] Implement server auto-detection (`frankenphp` → `rr` → `symfony` → `php`).
+- [x] Add HMR coordination: re-render story when Twig templates or story files change.
 
 ### Phase 6: Documentation and release
 
-- [ ] Write `code/frameworks/symfony-vite/README.md`.
-- [ ] Write `code/renderers/symfony/README.md`.
-- [ ] Write `storybook-symfony-bundle/README.md`.
-- [ ] Write `docs/get-started/frameworks/symfony-vite.mdx`.
+- [x] Write `code/frameworks/symfony-vite/README.md`.
+- [x] Write `code/renderers/symfony/README.md`.
+- [x] Write `storybook-symfony-bundle/README.md`.
+- [x] Write `docs/get-started/frameworks/symfony-vite.mdx`.
 - [ ] Write migration guide for users coming from iframe-based integrations.
-- [ ] Add package metadata (keywords, homepage, bugs, repository).
+- [x] Add package metadata (keywords, homepage, bugs, repository).
 - [ ] Prepare RFC for the Storybook core team.
 - [ ] Plan alpha/beta/RC release schedule.
 
 ### Phase 7: Testing
 
-- [ ] Set up PHPUnit or Pest in the Composer bundle.
-- [ ] Write PHPUnit test for `TwigComponentAdapter`.
-- [ ] Write PHPUnit test for `PentatrionViteExtractor`.
-- [ ] Write PHPUnit test for `EncoreAssetExtractor`.
-- [ ] Write PHPUnit test for `AssetMapperExtractor`.
-- [ ] Write PHPUnit test for `StorybookController::render`.
-- [ ] Write Vitest tests for `renderToCanvas` with mocked fetch.
-- [ ] Write Vitest tests for Stimulus disconnect/connect lifecycle.
-- [ ] Write Vitest tests for asset injection helpers.
-- [ ] Write Vitest tests for the Vite plugin server lifecycle.
-- [ ] Write TypeScript type tests for public story types.
+- [x] Set up PHPUnit or Pest in the Composer bundle.
+- [x] Write PHPUnit test for `TwigComponentAdapter`.
+- [x] Write PHPUnit test for `PentatrionViteExtractor`.
+- [x] Write PHPUnit test for `EncoreAssetExtractor`.
+- [x] Write PHPUnit test for `AssetMapperExtractor`.
+- [x] Write PHPUnit test for `StorybookController::render`.
+- [x] Write Vitest tests for `renderToCanvas` with mocked fetch.
+- [x] Write Vitest tests for Stimulus disconnect/connect lifecycle.
+- [x] Write Vitest tests for asset injection helpers.
+- [x] Write Vitest tests for the Vite plugin server lifecycle.
+- [x] Write TypeScript type tests for public story types.
 - [ ] Add E2E test that opens a story in the kitchen-sink and asserts rendered HTML.
 - [ ] Add E2E test for a play function that clicks a Stimulus-controlled button.
 - [ ] Add monorepo CI checks for the new packages.

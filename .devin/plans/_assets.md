@@ -123,34 +123,34 @@ Each pipeline has its own HMR strategy:
 
 ### Workflow
 
-- [ ] Add or update PHPUnit tests for every bundle-side extractor feature.
-- [ ] Add or update Vitest tests for every renderer-side asset injection feature.
-- [ ] Add a kitchen-sink example for every asset pipeline supported.
-- [ ] Run `yarn nx compile symfony-renderer` and `yarn nx compile symfony-vite` after asset changes.
+- [x] Add or update PHPUnit tests for every bundle-side extractor feature.
+- [x] Add or update Vitest tests for every renderer-side asset injection feature.
+- [x] Add a kitchen-sink example for every asset pipeline supported.
+- [x] Run `yarn nx compile symfony-renderer` and `yarn nx compile symfony-vite` after asset changes.
 
 ### Implementation
 
-- [ ] Create `Dto/AssetCollection.php` with `pipeline`, `scripts`, `styles`, `importmap` fields.
-- [ ] Create `Dto/AssetScript.php` with `src`, `type`, `async`, `defer`, `attributes` fields.
-- [ ] Create `Dto/AssetStyle.php` with `href`, `attributes` field.
-- [ ] Create `Asset/AssetExtractorInterface.php`.
-- [ ] Create `Asset/PentatrionViteExtractor.php` reading bundle config and `manifest.json`.
-- [ ] Create `Asset/EncoreAssetExtractor.php` reading `public/build/entrypoints.json`.
-- [ ] Create `Asset/AssetMapperExtractor.php` reading `assets/importmap.json`.
-- [ ] Create `Asset/NullAssetExtractor.php` returning empty collection.
-- [ ] Create `Asset/AssetExtractorResolver.php` checking container services and filesystem.
-- [ ] Add PHPUnit test: resolver picks Pentatrion Vite when service exists.
-- [ ] Add PHPUnit test: resolver picks Encore when entrypoints.json exists.
-- [ ] Add PHPUnit test: resolver picks AssetMapper when importmap.json exists.
-- [ ] Add PHPUnit test: resolver falls back to Null when no pipeline detected.
-- [ ] Create renderer `src/assets/index.ts` with TypeScript asset types.
-- [ ] Create renderer `src/assets/inject.ts` that injects `<link>`, `<script type="importmap">`, and `<script type="module">`.
-- [ ] Implement URL deduplication in `inject.ts`.
-- [ ] Implement cleanup of injected assets on teardown.
-- [ ] Add Vitest test: stylesheets are injected into `<head>`.
-- [ ] Add Vitest test: importmap is injected before module scripts.
-- [ ] Add Vitest test: duplicate script URLs are not injected twice.
-- [ ] Add kitchen-sink example: Pentatrion Vite project.
-- [ ] Add kitchen-sink example: Webpack Encore project.
-- [ ] Add kitchen-sink example: AssetMapper project.
+- [x] Create `Dto/AssetCollection.php` with `pipeline`, `scripts`, `styles`, `importmap` fields.
+- [x] Create `Dto/AssetScript.php` with `src`, `type`, `async`, `defer`, `attributes` fields.
+- [x] Create `Dto/AssetStyle.php` with `href`, `attributes` field.
+- [x] Create `Asset/AssetExtractorInterface.php`.
+- [x] Create `Asset/PentatrionViteExtractor.php` reading bundle config and `manifest.json`.
+- [x] Create `Asset/EncoreAssetExtractor.php` reading `public/build/entrypoints.json`.
+- [x] Create `Asset/AssetMapperExtractor.php` reading `assets/importmap.json`.
+- [x] Create `Asset/NullAssetExtractor.php` returning empty collection.
+- [x] Create `Asset/AssetExtractorResolver.php` checking container services and filesystem.
+- [x] Add PHPUnit test: resolver picks Pentatrion Vite when service exists.
+- [x] Add PHPUnit test: resolver picks Encore when entrypoints.json exists.
+- [x] Add PHPUnit test: resolver picks AssetMapper when importmap.json exists.
+- [x] Add PHPUnit test: resolver falls back to Null when no pipeline detected.
+- [x] Create renderer `src/assets/index.ts` with TypeScript asset types.
+- [x] Create renderer `src/assets/inject.ts` that injects `<link>`, `<script type="importmap">`, and `<script type="module">`.
+- [x] Implement URL deduplication in `inject.ts`.
+- [x] Implement cleanup of injected assets on teardown.
+- [x] Add Vitest test: stylesheets are injected into `<head>`.
+- [x] Add Vitest test: importmap is injected before module scripts.
+- [x] Add Vitest test: duplicate script URLs are not injected twice.
+- [x] Add kitchen-sink example: Pentatrion Vite project.
+- [x] Add kitchen-sink example: Webpack Encore project.
+- [x] Add kitchen-sink example: AssetMapper project.
 - [ ] Add kitchen-sink example: no pipeline project.

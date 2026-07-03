@@ -130,29 +130,29 @@ If `server` is not set, the framework auto-detects:
 
 ### Workflow
 
-- [ ] Add or update a Vitest test for every server backend implemented.
-- [ ] Update framework README with server options and tradeoffs after adding a backend.
-- [ ] Run `yarn nx compile symfony-vite` and `yarn nx run-many -t check` after server changes.
+- [x] Add or update a Vitest test for every server backend implemented.
+- [x] Update framework README with server options and tradeoffs after adding a backend.
+- [x] Run `yarn nx compile symfony-vite` and `yarn nx run-many -t check` after server changes.
 
 ### Implementation
 
-- [ ] Create `src/server/php.ts` with `startPhpServer(options)` and `stopPhpServer()`.
-- [ ] Build `php -S` command with correct host, port, document root, and router script.
-- [ ] Implement free port detection using Node `net.createServer`.
-- [ ] Spawn PHP process with `child_process.spawn` and capture stdout/stderr for debugging.
-- [ ] Implement `stopPhpServer` that kills the child process and waits for exit.
-- [ ] Create `src/server/frankenphp.ts` with `startFrankenPhpServer()` and `stopFrankenPhpServer()`.
-- [ ] Build FrankenPHP worker-mode command for the `storybook` environment.
-- [ ] Create `src/server/roadrunner.ts` with `startRoadRunnerServer()` and `stopRoadRunnerServer()`.
-- [ ] Generate `.rr.storybook.yaml` config for RoadRunner on the fly.
-- [ ] Create `src/server/symfony-cli.ts` with `startSymfonyCliServer()` and `stopSymfonyCliServer()`.
-- [ ] Create `src/server/existing.ts` that validates `serverUrl` and skips start/stop.
-- [ ] Create `src/server/detect.ts` that checks `PATH` for `frankenphp`, `rr`, `symfony`, and falls back to `php`.
-- [ ] Create `src/server/health.ts` that polls `GET /_storybook/health` with timeout and retries.
-- [ ] Implement server URL injection via Vite `define` (`import.meta.env.STORYBOOK_SYMFONY_URL`).
-- [ ] Implement fallback to runtime environment variable if `define` is not available.
-- [ ] Add Vitest test: `php -S` server starts and responds to health.
-- [ ] Add Vitest test: `php -S` server stops cleanly.
-- [ ] Add Vitest test: auto-detection picks FrankenPHP when binary is present.
-- [ ] Add Vitest test: health-check throws on timeout.
-- [ ] Document server options and tradeoffs in framework README.
+- [x] Create `src/server/php.ts` with `startPhpServer(options)` and `stopPhpServer()`.
+- [x] Build `php -S` command with correct host, port, document root, and router script.
+- [x] Implement free port detection using Node `net.createServer`.
+- [x] Spawn PHP process with `child_process.spawn` and capture stdout/stderr for debugging.
+- [x] Implement `stopPhpServer` that kills the child process and waits for exit.
+- [x] Create `src/server/frankenphp.ts` with `startFrankenPhpServer()` and `stopFrankenPhpServer()`.
+- [x] Build FrankenPHP worker-mode command for the `storybook` environment.
+- [x] Create `src/server/roadrunner.ts` with `startRoadRunnerServer()` and `stopRoadRunnerServer()`.
+- [x] Generate `.rr.storybook.yaml` config for RoadRunner on the fly.
+- [x] Create `src/server/symfony-cli.ts` with `startSymfonyCliServer()` and `stopSymfonyCliServer()`.
+- [x] Create `src/server/existing.ts` that validates `serverUrl` and skips start/stop.
+- [x] Create `src/server/detect.ts` that checks `PATH` for `frankenphp`, `rr`, `symfony`, and falls back to `php`.
+- [x] Create `src/server/health.ts` that polls `GET /_storybook/health` with timeout and retries.
+- [x] Implement server URL injection via Vite `define` (`import.meta.env.STORYBOOK_SYMFONY_URL`).
+- [x] Implement fallback to runtime environment variable if `define` is not available.
+- [x] Add Vitest test: `php -S` server starts and responds to health.
+- [x] Add Vitest test: `php -S` server stops cleanly.
+- [x] Add Vitest test: auto-detection picks FrankenPHP when binary is present.
+- [x] Add Vitest test: health-check throws on timeout.
+- [x] Document server options and tradeoffs in framework README.

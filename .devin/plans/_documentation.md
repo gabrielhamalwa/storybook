@@ -66,28 +66,28 @@ For users coming from existing Symfony/Storybook iframe integrations:
 
 ### Workflow
 
-- [ ] Write documentation before the corresponding code is implemented.
-- [ ] Keep docs in sync with every API change.
-- [ ] Run `cd code && yarn docs:check` after adding or editing docs pages.
+- [x] Write documentation before the corresponding code is implemented.
+- [x] Keep docs in sync with every API change.
+- [x] Run `cd code && yarn docs:check` after adding or editing docs pages.
 
 ### Implementation
 
-- [ ] Write `code/frameworks/symfony-vite/README.md` with quick start, install, config, and troubleshooting.
-- [ ] Write `code/renderers/symfony/README.md` with renderer API and advanced usage.
-- [ ] Write `storybook-symfony-bundle/README.md` with Composer install, Symfony config, and endpoints.
-- [ ] Write `docs/get-started/frameworks/symfony-vite.mdx` matching Storybook docs style.
-- [ ] Add installation snippet for `npx storybook add @storybook/symfony-vite`.
-- [ ] Add `.storybook/main.ts` configuration example.
-- [ ] Add `.stories.ts` example with args and controls.
-- [ ] Add auto-discovery example with feature flag.
-- [ ] Add Stimulus example with `data-controller`.
+- [x] Write `code/frameworks/symfony-vite/README.md` with quick start, install, config, and troubleshooting.
+- [x] Write `code/renderers/symfony/README.md` with renderer API and advanced usage.
+- [x] Write `storybook-symfony-bundle/README.md` with Composer install, Symfony config, and endpoints.
+- [x] Write `docs/get-started/frameworks/symfony-vite.mdx` matching Storybook docs style.
+- [x] Add installation snippet for `npx storybook add @storybook/symfony-vite`.
+- [x] Add `.storybook/main.ts` configuration example.
+- [x] Add `.stories.ts` example with args and controls.
+- [x] Add auto-discovery example with feature flag.
+- [x] Add Stimulus example with `data-controller`.
 - [ ] Add Live Component example with `live: true`.
 - [ ] Write migration guide for iframe-based Symfony/Storybook integrations.
 - [ ] Document how to remove custom iframe patches.
 - [ ] Document how to migrate `.stories.json` to `.stories.ts`.
-- [ ] Document how to configure the `storybook` Symfony environment.
+- [x] Document how to configure the `storybook` Symfony environment.
 - [ ] Add framework to `docs/get-started/frameworks/index.mdx` or equivalent framework list.
-- [ ] Add package metadata: keywords, homepage, bugs, repository, funding to all three packages.
+- [x] Add package metadata: keywords, homepage, bugs, repository, funding to all three packages.
 - [ ] Plan alpha release date and scope.
 - [ ] Plan beta release date and scope.
 - [ ] Plan RC release date and scope.

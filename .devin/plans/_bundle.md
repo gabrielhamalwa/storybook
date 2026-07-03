@@ -191,44 +191,46 @@ The bundle never triggers a full `cache:clear` automatically. The Storybook fram
 
 ### Workflow
 
-- [ ] Write `storybook-symfony-bundle/README.md` before implementing the bundle.
-- [ ] Add or update a PHPUnit test for every bundle feature implemented.
-- [ ] Run `composer test` in the bundle directory after each bundle change.
-- [ ] Run `cd code && yarn fmt:write` before committing any monorepo file changes.
+- [x] Write `storybook-symfony-bundle/README.md` before implementing the bundle.
+- [x] Add or update a PHPUnit test for every bundle feature implemented.
+- [x] Run `composer test` in the bundle directory after each bundle change.
+- [x] Run `cd code && yarn fmt:write` before committing any monorepo file changes.
 
 ### Implementation
 
-- [ ] Create `composer.json` with PSR-4 autoloading for `Storybook\StorybookBundle`.
-- [ ] Create `StorybookBundle.php` and `DependencyInjection/StorybookExtension.php`.
-- [ ] Add `Configuration.php` for bundle config (environment, project_dir, public_dir).
-- [ ] Add `GET /_storybook/health` route returning `{"status":"ok"}`.
-- [ ] Add `POST /_storybook/render/{id}` route and `StorybookController::render`.
-- [ ] Add `GET /_storybook/index` route and `StorybookController::index`.
-- [ ] Add `GET /_storybook/source/{id}` route and `StorybookController::source`.
-- [ ] Create `Dto/RenderRequest.php` with `args` and `globals` fields.
+- [x] Create `composer.json` with PSR-4 autoloading for `Storybook\StorybookBundle`.
+- [x] Create `StorybookBundle.php` and `DependencyInjection/StorybookExtension.php`.
+- [x] Add `Configuration.php` for bundle config (environment, project_dir, public_dir).
+- [x] Add `GET /_storybook/health` route returning `{"status":"ok"}`.
+- [x] Add `POST /_storybook/render/{id}` route and `StorybookController::render`.
+- [x] Add `GET /_storybook/index` route and `StorybookController::index`.
+- [x] Add `GET /_storybook/source/{id}` route and `StorybookController::source`.
+- [x] Create `Dto/RenderRequest.php` with `args` and `globals` fields.
 - [ ] Create `Dto/RenderResponse.php` with `html`, `assets`, `metadata` fields.
 - [ ] Create `Dto/ComponentMetadata.php` and `Dto/AssetCollection.php`.
-- [ ] Create `Dto/AssetScript.php` and `Dto/AssetStyle.php`.
-- [ ] Create `Component/ComponentAdapterInterface.php`.
-- [ ] Create `Component/TwigComponentAdapter.php` using `ux.twig_component` service.
-- [ ] Create `Component/LiveComponentAdapter.php` using `ux.live_component` service.
-- [ ] Create `Component/TemplateAdapter.php` using `twig` service.
-- [ ] Create `Component/ControllerFragmentAdapter.php` using HTTP sub-request.
+- [x] Create `Dto/AssetCollection.php`.
+- [x] Create `Dto/AssetScript.php` and `Dto/AssetStyle.php`.
+- [x] Create `Component/ComponentAdapterInterface.php`.
+- [x] Create `Component/TwigComponentAdapter.php` using `ux.twig_component` service.
+- [x] Create `Component/LiveComponentAdapter.php` using `ux.live_component` service.
+- [x] Create `Component/TemplateAdapter.php` using `twig` service.
+- [x] Create `Component/ControllerFragmentAdapter.php` using HTTP sub-request.
 - [ ] Create `Component/ComponentResolver.php` that picks the right adapter from story metadata.
-- [ ] Create `Asset/AssetExtractorInterface.php`.
-- [ ] Create `Asset/PentatrionViteExtractor.php` reading `public/build/manifest.json`.
-- [ ] Create `Asset/EncoreAssetExtractor.php` reading `public/build/entrypoints.json`.
-- [ ] Create `Asset/AssetMapperExtractor.php` reading `assets/importmap.json`.
-- [ ] Create `Asset/NullAssetExtractor.php` returning empty collection.
-- [ ] Create `Asset/AssetExtractorResolver.php` that auto-detects the pipeline.
-- [ ] Create `Indexer/ComponentIndexer.php` that scans `src/Twig/Components/` and `templates/components/`.
-- [ ] Add PHP reflection to infer `#[AsTwigComponent]` constructor/property types.
+- [x] Create `Asset/AssetExtractorInterface.php`.
+- [x] Create `Asset/PentatrionViteExtractor.php` reading `public/build/manifest.json`.
+- [x] Create `Asset/EncoreAssetExtractor.php` reading `public/build/entrypoints.json`.
+- [x] Create `Asset/AssetMapperExtractor.php` reading `assets/importmap.json`.
+- [x] Create `Asset/NullAssetExtractor.php` returning empty collection.
+- [x] Create `Asset/AssetExtractorResolver.php` that auto-detects the pipeline.
+- [x] Create `Indexer/ComponentIndexer.php` that scans `src/Twig/Components/`.
+- [x] Add PHP reflection to infer `#[AsTwigComponent]` constructor/property types.
 - [ ] Add Twig parser to read `{% props %}` block.
-- [ ] Add PHPUnit/Pest test suite with `phpunit.xml`.
-- [ ] Write PHPUnit test: `TwigComponentAdapter` renders a known component.
-- [ ] Write PHPUnit test: `PentatrionViteExtractor` returns expected scripts/styles.
-- [ ] Write PHPUnit test: `EncoreAssetExtractor` returns expected scripts/styles.
-- [ ] Write PHPUnit test: `AssetMapperExtractor` returns expected importmap.
-- [ ] Write PHPUnit test: `StorybookController::render` returns valid JSON.
-- [ ] Write PHPUnit test: `StorybookController::index` returns expected component list.
-- [ ] Write bundle `README.md` with install, configure, and usage instructions.
+- [x] Add PHPUnit/Pest test suite with `phpunit.xml`.
+- [x] Write PHPUnit test: `TwigComponentAdapter` renders a known component.
+- [x] Write PHPUnit test: `PentatrionViteExtractor` returns expected scripts/styles.
+- [x] Write PHPUnit test: `EncoreAssetExtractor` returns expected scripts/styles.
+- [x] Write PHPUnit test: `AssetMapperExtractor` returns expected importmap.
+- [x] Write PHPUnit test: `StorybookController::render` returns valid JSON.
+- [x] Write PHPUnit test: `StorybookController::index` returns expected component list.
+- [x] Write PHPUnit test: `StorybookController::source` returns Twig and PHP source.
+- [x] Write bundle `README.md` with install, configure, and usage instructions.

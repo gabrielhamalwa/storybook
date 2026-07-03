@@ -173,43 +173,43 @@ The auto-discovery indexer is documented in `_stories.md`.
 
 ### Workflow
 
-- [ ] Write `code/renderers/symfony/README.md` before implementing the renderer.
-- [ ] Add or update a unit test for every renderer feature implemented.
-- [ ] Run `yarn nx compile symfony-renderer` after each renderer change.
-- [ ] Run `yarn nx run-many -t check` before committing renderer changes.
-- [ ] Run `cd code && yarn fmt:write` before committing renderer changes.
+- [x] Write `code/renderers/symfony/README.md` before implementing the renderer.
+- [x] Add or update a unit test for every renderer feature implemented.
+- [x] Run `yarn nx compile symfony-renderer` after each renderer change.
+- [x] Run `yarn nx run-many -t check` before committing renderer changes.
+- [x] Run `cd code && yarn fmt:write` before committing renderer changes.
 
 ### Implementation
 
-- [ ] Create `code/renderers/symfony/package.json` with dependencies on `@storybook/global`, `ts-dedent`, and `storybook` peer.
-- [ ] Create `code/renderers/symfony/project.json` with `compile` and `check` targets.
-- [ ] Create `code/renderers/symfony/build-config.ts` matching other renderer packages.
-- [ ] Create `code/renderers/symfony/tsconfig.json`.
-- [ ] Create `src/types.ts` with `SymfonyRenderer` extending `WebRenderer`.
-- [ ] Create `src/public-types.ts` exporting `Meta`, `StoryObj`, `StoryFn`, `Decorator`, `StoryContext`, `Preview`.
-- [ ] Create `src/globals.ts` setting `globalThis.STORYBOOK_ENV = 'symfony'`.
-- [ ] Create `src/index.ts` importing `globals.ts` and re-exporting public types.
-- [ ] Create `src/entry-preview.ts` exporting `render`, `renderToCanvas`, and `parameters`.
-- [ ] Create `src/preset.ts` exporting `previewAnnotations` and `experimental_indexers`.
-- [ ] Implement `src/render.ts` `render` function returning component id placeholder.
-- [ ] Implement `src/render.ts` `renderToCanvas` that reads server URL from `import.meta.env`.
-- [ ] Implement `renderToCanvas` arg serialization (dates, objects, arrays).
-- [ ] Implement `renderToCanvas` POST request to `/_storybook/render/{id}`.
-- [ ] Implement `renderToCanvas` HTML injection via `canvasElement.innerHTML`.
-- [ ] Implement `renderToCanvas` error handling via `showError`.
-- [ ] Create `src/assets/index.ts` with normalized asset types.
-- [ ] Create `src/assets/inject.ts` that injects stylesheets, importmap, and scripts.
-- [ ] Implement script/style deduplication by URL in `inject.ts`.
+- [x] Create `code/renderers/symfony/package.json` with dependencies on `@storybook/global`, `ts-dedent`, and `storybook` peer.
+- [x] Create `code/renderers/symfony/project.json` with `compile` and `check` targets.
+- [x] Create `code/renderers/symfony/build-config.ts` matching other renderer packages.
+- [x] Create `code/renderers/symfony/tsconfig.json`.
+- [x] Create `src/types.ts` with `SymfonyRenderer` extending `WebRenderer`.
+- [x] Create `src/public-types.ts` exporting `Meta`, `StoryObj`, `StoryFn`, `Decorator`, `StoryContext`, `Preview`.
+- [x] Create `src/globals.ts` setting `globalThis.STORYBOOK_ENV = 'symfony'`.
+- [x] Create `src/index.ts` importing `globals.ts` and re-exporting public types.
+- [x] Create `src/entry-preview.ts` exporting `render`, `renderToCanvas`, and `parameters`.
+- [x] Create `src/preset.ts` exporting `previewAnnotations` and `experimental_indexers`.
+- [x] Implement `src/render.ts` `render` function returning component id placeholder.
+- [x] Implement `src/render.ts` `renderToCanvas` that reads server URL from `import.meta.env`.
+- [x] Implement `renderToCanvas` arg serialization (dates, objects, arrays).
+- [x] Implement `renderToCanvas` POST request to `/_storybook/render/{id}`.
+- [x] Implement `renderToCanvas` HTML injection via `canvasElement.innerHTML`.
+- [x] Implement `renderToCanvas` error handling via `showError`.
+- [x] Create `src/assets/index.ts` with normalized asset types.
+- [x] Create `src/assets/inject.ts` that injects stylesheets, importmap, and scripts.
+- [x] Implement script/style deduplication by URL in `inject.ts`.
 - [ ] Create `src/assets/pentatrionVite.ts` for Vite dev server URL handling.
 - [ ] Create `src/assets/encore.ts` for Encore entrypoint loading.
 - [ ] Create `src/assets/assetMapper.ts` for importmap injection.
 - [ ] Create `src/assets/none.ts` fallback.
-- [ ] Implement Stimulus disconnect before replacing HTML.
-- [ ] Implement Stimulus connect after injecting HTML via `simulateDOMContentLoaded`.
-- [ ] Implement `TeardownRenderToCanvas` cleanup function.
-- [ ] Add `vitest.config.ts` using `happy-dom` or `jsdom` environment.
-- [ ] Write Vitest test: `renderToCanvas` fetches and injects HTML.
-- [ ] Write Vitest test: `renderToCanvas` calls `showError` on invalid response.
-- [ ] Write Vitest test: Stimulus disconnect/connect fire in correct order.
-- [ ] Write Vitest test: asset injection deduplicates scripts.
-- [ ] Write TypeScript test: example story compiles with `Meta`/`StoryObj`.
+- [x] Implement Stimulus disconnect before replacing HTML.
+- [x] Implement Stimulus connect after injecting HTML via `simulateDOMContentLoaded`.
+- [x] Implement `TeardownRenderToCanvas` cleanup function.
+- [x] Add `vitest.config.ts` using `happy-dom` or `jsdom` environment.
+- [x] Write Vitest test: `renderToCanvas` fetches and injects HTML.
+- [x] Write Vitest test: `renderToCanvas` calls `showError` on invalid response.
+- [x] Write Vitest test: Stimulus disconnect/connect fire in correct order.
+- [x] Write Vitest test: asset injection deduplicates scripts.
+- [x] Write TypeScript test: example story compiles with `Meta`/`StoryObj`.

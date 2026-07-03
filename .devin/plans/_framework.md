@@ -156,38 +156,38 @@ The framework exports `StorybookConfig` that extends the base Vite config and th
 
 ### Workflow
 
-- [ ] Write `code/frameworks/symfony-vite/README.md` before implementing the framework.
-- [ ] Add or update a unit test for every framework feature implemented.
-- [ ] Run `yarn nx compile symfony-vite` after each framework change.
-- [ ] Run `yarn nx run-many -t check` before committing framework changes.
-- [ ] Run `cd code && yarn fmt:write` before committing framework changes.
+- [x] Write `code/frameworks/symfony-vite/README.md` before implementing the framework.
+- [x] Add or update a unit test for every framework feature implemented.
+- [x] Run `yarn nx compile symfony-vite` after each framework change.
+- [x] Run `yarn nx run-many -t check` before committing framework changes.
+- [x] Run `cd code && yarn fmt:write` before committing framework changes.
 
 ### Implementation
 
-- [ ] Create `code/frameworks/symfony-vite/package.json` with dependencies on `@storybook/symfony`, `@storybook/builder-vite`, and `storybook` peer.
-- [ ] Create `code/frameworks/symfony-vite/project.json` with `compile` and `check` targets.
-- [ ] Create `code/frameworks/symfony-vite/build-config.ts`.
-- [ ] Create `code/frameworks/symfony-vite/tsconfig.json`.
-- [ ] Create `src/types.ts` exporting `StorybookConfig` and `SymfonyFrameworkOptions`.
-- [ ] Create `src/index.ts` re-exporting `@storybook/symfony` and `types.ts`.
-- [ ] Create `src/preset.ts` exporting `core` with builder and renderer.
-- [ ] Add `viteFinal` export in `src/preset.ts` that injects the Symfony Vite plugin.
-- [ ] Create `src/vite-plugin.ts` with `storybookSymfonyPlugin` function.
-- [ ] Implement `configureServer` hook to start the PHP server.
-- [ ] Implement `closeBundle`/`close` hook to stop the PHP server.
-- [ ] Implement `php -S` start command and stop logic.
-- [ ] Implement free port detection for the PHP server.
-- [ ] Implement health-check polling against `/_storybook/health`.
-- [ ] Implement `serverUrl` injection via `define` or environment variable.
-- [ ] Implement FrankenPHP start/stop command.
-- [ ] Implement RoadRunner start/stop command.
-- [ ] Implement Symfony CLI start/stop command.
-- [ ] Implement "existing server" mode that skips start/stop.
-- [ ] Implement server auto-detection based on binaries in `PATH`.
-- [ ] Create `src/options.ts` with default framework options.
-- [ ] Validate options: `projectDir` exists, `publicDir` exists, `bin/console` exists.
-- [ ] Add `vitest.config.ts` for framework tests.
-- [ ] Write Vitest test: Vite plugin starts PHP server and waits for health.
-- [ ] Write Vitest test: Vite plugin stops PHP server on close.
-- [ ] Write Vitest test: `core` preset resolves builder and renderer.
-- [ ] Write Vitest test: options validation rejects missing project dir.
+- [x] Create `code/frameworks/symfony-vite/package.json` with dependencies on `@storybook/symfony`, `@storybook/builder-vite`, and `storybook` peer.
+- [x] Create `code/frameworks/symfony-vite/project.json` with `compile` and `check` targets.
+- [x] Create `code/frameworks/symfony-vite/build-config.ts`.
+- [x] Create `code/frameworks/symfony-vite/tsconfig.json`.
+- [x] Create `src/types.ts` exporting `StorybookConfig` and `SymfonyFrameworkOptions`.
+- [x] Create `src/index.ts` re-exporting `@storybook/symfony` and `types.ts`.
+- [x] Create `src/preset.ts` exporting `core` with builder and renderer.
+- [x] Add `viteFinal` export in `src/preset.ts` that injects the Symfony Vite plugin.
+- [x] Create `src/vite-plugin.ts` with `storybookSymfonyPlugin` function.
+- [x] Implement `configureServer` hook to start the PHP server.
+- [x] Implement `closeBundle`/`close` hook to stop the PHP server.
+- [x] Implement `php -S` start command and stop logic.
+- [x] Implement free port detection for the PHP server.
+- [x] Implement health-check polling against `/_storybook/health`.
+- [x] Implement `serverUrl` injection via `define` or environment variable.
+- [x] Implement FrankenPHP start/stop command.
+- [x] Implement RoadRunner start/stop command.
+- [x] Implement Symfony CLI start/stop command.
+- [x] Implement "existing server" mode that skips start/stop.
+- [x] Implement server auto-detection based on binaries in `PATH`.
+- [x] Create `src/options.ts` with default framework options.
+- [x] Validate options: `projectDir` exists, `publicDir` exists, `bin/console` exists.
+- [x] Add `vitest.config.ts` for framework tests.
+- [x] Write Vitest test: Vite plugin starts PHP server and waits for health.
+- [x] Write Vitest test: Vite plugin stops PHP server on close.
+- [x] Write Vitest test: `core` preset resolves builder and renderer.
+- [x] Write Vitest test: options validation rejects missing project dir.

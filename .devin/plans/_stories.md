@@ -113,33 +113,33 @@ The renderer can expose these as parameters so the docs addon displays them.
 
 ### Workflow
 
-- [ ] Update `docs/get-started/frameworks/symfony-vite.mdx` whenever the story format or indexing changes.
-- [ ] Add or update type tests for every public type change.
-- [ ] Add a kitchen-sink story for every story type supported.
-- [ ] Run `yarn nx run-many -t check` after changes to public types or indexer.
+- [x] Update `docs/get-started/frameworks/symfony-vite.mdx` whenever the story format or indexing changes.
+- [x] Add or update type tests for every public type change.
+- [x] Add a kitchen-sink story for every story type supported.
+- [x] Run `yarn nx run-many -t check` after changes to public types or indexer.
 
 ### Implementation
 
-- [ ] Define `Meta<TArgs>` type in `src/public-types.ts`.
-- [ ] Define `StoryObj<TArgs>` type in `src/public-types.ts`.
-- [ ] Define `StoryFn<TArgs>` type in `src/public-types.ts`.
-- [ ] Define `Decorator<TArgs>` type in `src/public-types.ts`.
-- [ ] Define `StoryContext<TArgs>` type in `src/public-types.ts`.
-- [ ] Implement `component` resolution in `renderToCanvas` (component name, template path, controller reference).
-- [ ] Implement `parameters.symfony` overrides (adapter, template, environment, server overrides).
-- [ ] Implement `experimental_indexers` in `src/preset.ts` matching `*.stories.php` or `*.stories.twig` patterns.
-- [ ] Implement indexer call to `GET /_storybook/index` to discover components.
-- [ ] Implement virtual story module generation for auto-discovered components.
-- [ ] Add `parameters.symfony.autoDiscovered` flag to distinguish generated stories.
-- [ ] Implement argType inference in bundle from `#[AsTwigComponent]` constructor parameters.
-- [ ] Implement argType inference in bundle from `#[AsTwigComponent]` public properties.
+- [x] Define `Meta<TArgs>` type in `src/public-types.ts`.
+- [x] Define `StoryObj<TArgs>` type in `src/public-types.ts`.
+- [x] Define `StoryFn<TArgs>` type in `src/public-types.ts`.
+- [x] Define `Decorator<TArgs>` type in `src/public-types.ts`.
+- [x] Define `StoryContext<TArgs>` type in `src/public-types.ts`.
+- [x] Implement `component` resolution in `renderToCanvas` (component name, template path, controller reference).
+- [x] Implement `parameters.symfony` overrides (adapter, template, environment, server overrides).
+- [x] Implement `experimental_indexers` in `src/preset.ts` matching `src/Twig/Components/**/*.php`.
+- [x] Implement indexer call to `GET /_storybook/index` to discover components.
+- [x] Implement virtual story module generation for auto-discovered components.
+- [x] Add `parameters.symfony.autoDiscovered` flag to distinguish generated stories.
+- [x] Implement argType inference in bundle from `#[AsTwigComponent]` constructor parameters.
+- [x] Implement argType inference in bundle from `#[AsTwigComponent]` public properties.
 - [ ] Implement argType inference in bundle from Twig `{% props %}` block.
-- [ ] Implement `GET /_storybook/source/{id}` endpoint returning Twig template source.
-- [ ] Implement `GET /_storybook/source/{id}` endpoint returning component class source.
+- [x] Implement `GET /_storybook/source/{id}` endpoint returning Twig template source.
+- [x] Implement `GET /_storybook/source/{id}` endpoint returning component class source.
 - [ ] Expose source parameters so docs panel can display Twig source.
 - [ ] Add Autodocs support for `.stories.ts` files.
-- [ ] Write `.stories.ts` example: Twig component with args.
+- [x] Write `.stories.ts` example: Twig component with args.
 - [ ] Write `.stories.ts` example: Live component with args.
-- [ ] Write `.stories.ts` example: plain Twig template with args.
-- [ ] Write `.stories.ts` example: controller fragment with args.
-- [ ] Write auto-discovery example that generates stories from component files.
+- [x] Write `.stories.ts` example: plain Twig template with args.
+- [x] Write `.stories.ts` example: controller fragment with args.
+- [x] Write auto-discovery example that generates stories from component files.

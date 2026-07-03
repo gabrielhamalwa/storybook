@@ -93,59 +93,59 @@ The monorepo CI should:
 
 ### Workflow
 
-- [ ] Add a test for every feature before marking it complete.
-- [ ] Run unit tests locally before committing.
-- [ ] Run the kitchen-sink manually after every vertical slice.
-- [ ] Add CI coverage for the new packages as soon as they compile.
+- [x] Add a test for every feature before marking it complete.
+- [x] Run unit tests locally before committing.
+- [x] Run the kitchen-sink manually after every vertical slice.
+- [x] Add CI coverage for the new packages as soon as they compile.
 
 ### Composer bundle tests
 
-- [ ] Set up PHPUnit or Pest with `composer.json` dev dependency and `phpunit.xml`.
-- [ ] Write PHPUnit test: `TwigComponentAdapter` renders a Twig component with args.
+- [x] Set up PHPUnit or Pest with `composer.json` dev dependency and `phpunit.xml`.
+- [x] Write PHPUnit test: `TwigComponentAdapter` renders a Twig component with args.
 - [ ] Write PHPUnit test: `LiveComponentAdapter` renders a live component with initial state.
-- [ ] Write PHPUnit test: `TemplateAdapter` renders a plain Twig template.
-- [ ] Write PHPUnit test: `ControllerFragmentAdapter` renders a controller fragment.
-- [ ] Write PHPUnit test: `PentatrionViteExtractor` returns expected dev server URLs.
-- [ ] Write PHPUnit test: `EncoreAssetExtractor` returns expected scripts and styles.
-- [ ] Write PHPUnit test: `AssetMapperExtractor` returns expected importmap.
-- [ ] Write PHPUnit test: `NullAssetExtractor` returns empty collection.
-- [ ] Write PHPUnit test: `StorybookController::render` returns valid JSON for valid input.
-- [ ] Write PHPUnit test: `StorybookController::render` returns 404 for unknown component.
-- [ ] Write PHPUnit test: `StorybookController::index` returns expected component list.
-- [ ] Write PHPUnit test: `StorybookController::source` returns Twig and PHP source.
+- [x] Write PHPUnit test: `TemplateAdapter` renders a plain Twig template.
+- [x] Write PHPUnit test: `ControllerFragmentAdapter` renders a controller fragment.
+- [x] Write PHPUnit test: `PentatrionViteExtractor` returns expected dev server URLs.
+- [x] Write PHPUnit test: `EncoreAssetExtractor` returns expected scripts and styles.
+- [x] Write PHPUnit test: `AssetMapperExtractor` returns expected importmap.
+- [x] Write PHPUnit test: `NullAssetExtractor` returns empty collection.
+- [x] Write PHPUnit test: `StorybookController::render` returns valid JSON for valid input.
+- [x] Write PHPUnit test: `StorybookController::render` returns 404 for unknown component.
+- [x] Write PHPUnit test: `StorybookController::index` returns expected component list.
+- [x] Write PHPUnit test: `StorybookController::source` returns Twig and PHP source.
 
 ### Renderer tests
 
-- [ ] Set up `vitest.config.ts` with `happy-dom` environment.
-- [ ] Write Vitest test: `renderToCanvas` fetches HTML and injects it into `canvasElement`.
-- [ ] Write Vitest test: `renderToCanvas` serializes dates and objects correctly.
-- [ ] Write Vitest test: `renderToCanvas` calls `showError` on HTTP error.
-- [ ] Write Vitest test: Stimulus `disconnect` fires before HTML replacement.
-- [ ] Write Vitest test: Stimulus `connect` fires after HTML replacement.
-- [ ] Write Vitest test: asset injection appends stylesheets to `<head>`.
-- [ ] Write Vitest test: asset injection injects importmap before module scripts.
-- [ ] Write Vitest test: duplicate script URLs are deduplicated.
-- [ ] Write Vitest test: asset cleanup removes injected tags on teardown.
-- [ ] Write TypeScript type test: example story satisfies `Meta` and `StoryObj`.
+- [x] Set up `vitest.config.ts` with `happy-dom` environment.
+- [x] Write Vitest test: `renderToCanvas` fetches HTML and injects it into `canvasElement`.
+- [x] Write Vitest test: `renderToCanvas` serializes dates and objects correctly.
+- [x] Write Vitest test: `renderToCanvas` calls `showError` on HTTP error.
+- [x] Write Vitest test: Stimulus `disconnect` fires before HTML replacement.
+- [x] Write Vitest test: Stimulus `connect` fires after HTML replacement.
+- [x] Write Vitest test: asset injection appends stylesheets to `<head>`.
+- [x] Write Vitest test: asset injection injects importmap before module scripts.
+- [x] Write Vitest test: duplicate script URLs are deduplicated.
+- [x] Write Vitest test: asset cleanup removes injected tags on teardown.
+- [x] Write TypeScript type test: example story satisfies `Meta` and `StoryObj`.
 
 ### Framework tests
 
-- [ ] Write Vitest test: Vite plugin starts `php -S` and waits for health endpoint.
-- [ ] Write Vitest test: Vite plugin stops the PHP server when Vite closes.
-- [ ] Write Vitest test: `core` preset resolves `@storybook/builder-vite` and `@storybook/symfony/preset`.
-- [ ] Write Vitest test: framework options validation rejects missing `projectDir`.
-- [ ] Write Vitest test: server auto-detection prefers FrankenPHP over `php -S`.
+- [x] Write Vitest test: Vite plugin starts `php -S` and waits for health endpoint.
+- [x] Write Vitest test: Vite plugin stops the PHP server when Vite closes.
+- [x] Write Vitest test: `core` preset resolves `@storybook/builder-vite` and `@storybook/symfony/preset`.
+- [x] Write Vitest test: framework options validation rejects missing `projectDir`.
+- [x] Write Vitest test: server auto-detection prefers FrankenPHP over `php -S`.
 
 ### Integration and E2E
 
-- [ ] Create `test-storybooks/symfony-vite-kitchen-sink/` with `composer.json`, `package.json`, and Symfony project structure.
-- [ ] Add a Twig component with Stimulus to the kitchen-sink.
+- [x] Create `test-storybooks/symfony-vite-kitchen-sink/` with `composer.json`, `package.json`, and Symfony project structure.
+- [x] Add a Twig component with Stimulus to the kitchen-sink.
 - [ ] Add a Live Component to the kitchen-sink.
-- [ ] Add a plain Twig template story to the kitchen-sink.
-- [ ] Add a controller fragment story to the kitchen-sink.
-- [ ] Add Pentatrion Vite setup to the kitchen-sink.
-- [ ] Add Webpack Encore setup to the kitchen-sink.
-- [ ] Add AssetMapper setup to the kitchen-sink.
+- [x] Add a plain Twig template story to the kitchen-sink.
+- [x] Add a controller fragment story to the kitchen-sink.
+- [x] Add Pentatrion Vite setup to the kitchen-sink.
+- [x] Add Webpack Encore setup to the kitchen-sink.
+- [x] Add AssetMapper setup to the kitchen-sink.
 - [ ] Add no-asset setup to the kitchen-sink.
 - [ ] Write E2E test: open a story and assert rendered HTML contains expected text.
 - [ ] Write E2E test: change a control and assert the rendered HTML updates.
@@ -155,11 +155,11 @@ The monorepo CI should:
 
 ### CI
 
-- [ ] Add `compile` and `check` NX targets for `code/renderers/symfony` and `code/frameworks/symfony-vite`.
-- [ ] Add CI step to run `yarn nx run-many -t compile` including the new packages.
-- [ ] Add CI step to run `yarn nx run-many -t check` including the new packages.
-- [ ] Add CI step to run renderer unit tests.
-- [ ] Add CI step to run framework unit tests.
+- [x] Add `compile` and `check` NX targets for `code/renderers/symfony` and `code/frameworks/symfony-vite`.
+- [x] Add CI step to run `yarn nx run-many -t compile` including the new packages.
+- [x] Add CI step to run `yarn nx run-many -t check` including the new packages.
+- [x] Add CI step to run renderer unit tests.
+- [x] Add CI step to run framework unit tests.
 - [ ] Add CI step to run Composer bundle tests.
-- [ ] Add CI step to build the kitchen-sink.
+- [x] Add CI step to build the kitchen-sink.
 - [ ] Add CI step to run E2E tests against the kitchen-sink.
