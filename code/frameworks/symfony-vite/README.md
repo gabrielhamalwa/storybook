@@ -366,7 +366,7 @@ The framework can start a PHP backend for you, or connect to one that is already
 | `port` | `number` | random free port | Port for the PHP server. |
 | `phpBinary` | `string` | `'php'` | Path to the PHP binary. |
 | `console` | `string` | `<projectDir>/bin/console` | Path to the Symfony console. |
-| `prewarmCache` | `boolean` | `true` | Run `cache:warmup` for the configured environment before starting the PHP server. |
+| `prewarmCache` | `boolean` | `true` | Run `cache:warmup` (and `asset-map:compile` when AssetMapper is available) for the configured environment before starting the PHP server. |
 
 When `server` is omitted or set to `'auto'`, the framework detects the best available backend in this order: FrankenPHP, RoadRunner, Symfony CLI, then `php -S`.
 
@@ -422,7 +422,7 @@ Add a `postinstall` script to your project's `package.json` to pre-warm the Symf
 }
 ```
 
-The script runs `php bin/console cache:warmup --env=storybook` from the project root. If PHP or the Symfony console is not available, it logs a warning and exits without failing the install.
+The script runs `php bin/console cache:warmup --env=storybook` from the project root, and also runs `php bin/console asset-map:compile --env=storybook` when AssetMapper is available. If PHP or the Symfony console is not available, it logs a warning and exits without failing the install.
 
 ## Asset pipeline support
 
@@ -443,6 +443,42 @@ storybook:
 ```
 
 `asset_pipeline` accepts `auto`, `pentatrion_vite`, `encore`, `asset_mapper`, or `none`. The default `auto` setting detects the installed pipeline in this order: Pentatrion Vite, Webpack Encore, AssetMapper, then none.
+
+### Pentatrion Vite development
+
+When you use Pentatrion Vite, the Vite dev server must be running alongside Storybook so the `entrypoints.json` is generated and the dev server URLs are available. The simplest way is to start both with a script:
+
+```json
+{
+  "scripts": {
+    "dev": "concurrently \"yarn vite\" \"yarn storybook\"",
+    "storybook": "storybook dev -p 6006"
+  }
+}
+```
+
+```bash
+yarn dev
+```
+
+## Stimulus
+
+Symfony UX Stimulus controllers connect automatically when the component template declares `data-controller`. Because the PHP render is asynchronous, the controller may not be connected yet when the `play` function starts. Use `waitFor` from `storybook/test` to wait for the `data-connected` attribute before triggering actions:
+
+```ts
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+
+export const Clickable = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    await waitFor(() => expect(button).toHaveAttribute('data-connected', 'true'));
+    await userEvent.click(button);
+    await waitFor(() => expect(button).toHaveAttribute('data-clicked', 'true'));
+  },
+};
+```
 
 ## Migration
 

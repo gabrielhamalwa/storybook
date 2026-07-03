@@ -35,7 +35,17 @@ If you are migrating from an iframe-based Symfony/Storybook integration, read th
 
 To install Storybook in an existing Symfony project, run this command in your project's root directory:
 
-<CodeSnippets path="create-command.md" variant="new-users" copyEvent="CreateCommandCopy" />
+<CodeSnippets
+  path="symfony-vite-create-command.md"
+  variant="new-users"
+  copyEvent="CreateCommandCopy"
+/>
+
+This runs the Storybook `add` command, which installs the `@storybook/symfony-vite` framework and updates your `.storybook/main.ts`. You still need the `storybook/symfony-bundle` Composer package in your Symfony project:
+
+```bash
+composer require --dev storybook/symfony-bundle
+```
 
 You can then get started [writing stories](../whats-a-story.mdx), [running tests](../../writing-tests/index.mdx), and [documenting your components](../../writing-docs/index.mdx). For more control over the installation process, refer to the [installation guide](../install.mdx).
 
@@ -425,6 +435,29 @@ export const Clickable: Story = {
 Storybook's interaction tests and test runner work with `@storybook/symfony-vite` stories. Because the renderer handles the DOM and assets, play functions can use the same `@testing-library` helpers as other frameworks.
 
 For E2E coverage or CI, start the PHP server and the asset dev server (when using Pentatrion Vite), then run Playwright or the test runner against the Storybook preview. The [kitchen-sink](https://github.com/storybookjs/storybook/tree/next/test-storybooks/symfony-vite-kitchen-sink) includes a Playwright example that covers rendering, controls, the docs page, and Stimulus interactions.
+
+## Auto-discovery
+
+The framework can automatically discover Symfony UX TwigComponents from your PHP source files so you do not have to write a `.stories.ts` file for every component. Enable the experimental feature in `.storybook/main.ts` and include the component source path in the `stories` glob:
+
+```ts title=".storybook/main.ts"
+import type { StorybookConfig } from '@storybook/symfony-vite';
+
+const config: StorybookConfig = {
+  stories: ['../stories/**/*.stories.ts', '../src/Twig/Components/**/*.php'],
+  features: {
+    experimental_symfonyAutoDiscovery: true,
+  },
+  framework: {
+    name: '@storybook/symfony-vite',
+    options: {},
+  },
+};
+
+export default config;
+```
+
+Discovered components appear in the sidebar with the title derived from the component name. They render the component with no args, so components with required props should keep a manually written story file.
 
 ## FAQ
 

@@ -6,6 +6,7 @@ test.describe('Symfony/Twig kitchen sink', () => {
   test('Button/Primary renders the expected Twig component', async ({ page }) => {
     await page.goto(storyUrl('kitchen-sink-button--primary'));
     const iframe = page.locator('iframe#storybook-preview-iframe').contentFrame();
+    await iframe.locator('#storybook-root').waitFor({ state: 'visible' });
     const button = iframe.locator('#storybook-root button');
 
     await expect(button).toHaveText('Primary Button');
@@ -15,6 +16,7 @@ test.describe('Symfony/Twig kitchen sink', () => {
   test('changing a control updates the rendered HTML', async ({ page }) => {
     await page.goto(storyUrl('kitchen-sink-button--primary'));
     const iframe = page.locator('iframe#storybook-preview-iframe').contentFrame();
+    await iframe.locator('#storybook-root').waitFor({ state: 'visible' });
     const button = iframe.locator('#storybook-root button');
 
     await expect(button).toHaveText('Primary Button');
@@ -26,6 +28,7 @@ test.describe('Symfony/Twig kitchen sink', () => {
   test('Clickable play function clicks the Stimulus-controlled button', async ({ page }) => {
     await page.goto(storyUrl('kitchen-sink-button--clickable'));
     const iframe = page.locator('iframe#storybook-preview-iframe').contentFrame();
+    await iframe.locator('#storybook-root').waitFor({ state: 'visible' });
     const button = iframe.locator('#storybook-root button');
 
     await expect(button).toHaveAttribute('data-connected', 'true');
@@ -35,8 +38,10 @@ test.describe('Symfony/Twig kitchen sink', () => {
   test('docs page shows the Twig source', async ({ page }) => {
     await page.goto('/?path=/docs/kitchen-sink-button--docs');
     const iframe = page.locator('iframe#storybook-preview-iframe').contentFrame();
-    await expect(iframe.locator('body')).toContainText('data-controller="button"');
-    await expect(iframe.locator('body')).toContainText('{{ label }}');
+    const docsBody = iframe.locator('body');
+    await expect(docsBody).not.toContainText('Loading source...');
+    await expect(docsBody).toContainText('data-controller="button"');
+    await expect(docsBody).toContainText('{{ label }}');
   });
 
   test('auto-discovered component appears in the sidebar', async ({ page }) => {
