@@ -240,13 +240,13 @@ We build everything, but in order so each slice is end-to-end and testable.
 - [x] Implement AssetMapper importmap injection in the renderer.
 - [x] Add AssetMapper example to the kitchen-sink.
 - [x] Implement `NullAssetExtractor` fallback.
-- [ ] Add no-asset/manual example to the kitchen-sink.
+- [x] Add no-asset/manual example to the kitchen-sink.
 - [x] Implement pipeline auto-detection in the bundle.
 
 ### Phase 3: Component types
 
 - [x] Implement `LiveComponentAdapter` for Symfony UX Live Components.
-- [ ] Add Live Component example to the kitchen-sink.
+- [x] Add Live Component example to the kitchen-sink.
 - [x] Implement `TemplateAdapter` for plain Twig templates.
 - [x] Add plain template example to the kitchen-sink.
 - [x] Implement `ControllerFragmentAdapter` for controller fragments.
@@ -259,10 +259,10 @@ We build everything, but in order so each slice is end-to-end and testable.
 - [x] Implement `experimental_indexer` in the renderer preset that calls the index endpoint.
 - [x] Implement virtual story module generation for auto-discovered components.
 - [x] Implement `GET /_storybook/source/{id}` endpoint returning Twig source.
-- [ ] Wire source endpoint into docs parameters so the docs panel shows Twig source.
+- [x] Wire source endpoint into docs parameters so the docs panel shows Twig source.
 - [x] Implement argType inference from `#[AsTwigComponent]` constructor parameters and public properties.
-- [ ] Implement argType inference from Twig `{% props %}` block.
-- [ ] Enable Autodocs for `.stories.ts` files.
+- [x] Implement argType inference from Twig `{% props %}` block.
+- [x] Enable Autodocs for `.stories.ts` files.
 
 ### Phase 5: Performance
 
@@ -281,10 +281,10 @@ We build everything, but in order so each slice is end-to-end and testable.
 - [x] Write `code/renderers/symfony/README.md`.
 - [x] Write `storybook-symfony-bundle/README.md`.
 - [x] Write `docs/get-started/frameworks/symfony-vite.mdx`.
-- [ ] Write migration guide for users coming from iframe-based integrations.
+- [x] Write migration guide for users coming from iframe-based integrations.
 - [x] Add package metadata (keywords, homepage, bugs, repository).
-- [ ] Prepare RFC for the Storybook core team.
-- [ ] Plan alpha/beta/RC release schedule.
+- [x] Prepare RFC for the Storybook core team.
+- [x] Plan alpha/beta/RC release schedule.
 
 ### Phase 7: Testing
 
@@ -301,4 +301,4 @@ We build everything, but in order so each slice is end-to-end and testable.
 - [x] Write TypeScript type tests for public story types.
 - [ ] Add E2E test that opens a story in the kitchen-sink and asserts rendered HTML.
 - [ ] Add E2E test for a play function that clicks a Stimulus-controlled button.
-- [ ] Add monorepo CI checks for the new packages.
+- [x] Add monorepo CI checks for the new packages.

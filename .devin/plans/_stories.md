@@ -136,10 +136,10 @@ The renderer can expose these as parameters so the docs addon displays them.
 - [x] Implement argType inference in bundle from Twig `{% props %}` block.
 - [x] Implement `GET /_storybook/source/{id}` endpoint returning Twig template source.
 - [x] Implement `GET /_storybook/source/{id}` endpoint returning component class source.
-- [ ] Expose source parameters so docs panel can display Twig source.
-- [ ] Add Autodocs support for `.stories.ts` files.
+- [x] Expose source parameters so docs panel can display Twig source.
+- [x] Add Autodocs support for `.stories.ts` files.
 - [x] Write `.stories.ts` example: Twig component with args.
-- [ ] Write `.stories.ts` example: Live component with args.
+- [x] Write `.stories.ts` example: Live component with args.
 - [x] Write `.stories.ts` example: plain Twig template with args.
 - [x] Write `.stories.ts` example: controller fragment with args.
 - [x] Write auto-discovery example that generates stories from component files.

@@ -153,4 +153,4 @@ Each pipeline has its own HMR strategy:
 - [x] Add kitchen-sink example: Pentatrion Vite project.
 - [x] Add kitchen-sink example: Webpack Encore project.
 - [x] Add kitchen-sink example: AssetMapper project.
-- [ ] Add kitchen-sink example: no pipeline project.
+- [x] Add kitchen-sink example: no pipeline project.

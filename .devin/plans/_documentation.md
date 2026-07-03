@@ -81,15 +81,15 @@ For users coming from existing Symfony/Storybook iframe integrations:
 - [x] Add `.stories.ts` example with args and controls.
 - [x] Add auto-discovery example with feature flag.
 - [x] Add Stimulus example with `data-controller`.
-- [ ] Add Live Component example with `live: true`.
-- [ ] Write migration guide for iframe-based Symfony/Storybook integrations.
-- [ ] Document how to remove custom iframe patches.
-- [ ] Document how to migrate `.stories.json` to `.stories.ts`.
+- [x] Add Live Component example with `live: true`.
+- [x] Write migration guide for iframe-based Symfony/Storybook integrations.
+- [x] Document how to remove custom iframe patches.
+- [x] Document how to migrate `.stories.json` to `.stories.ts`.
 - [x] Document how to configure the `storybook` Symfony environment.
-- [ ] Add framework to `docs/get-started/frameworks/index.mdx` or equivalent framework list.
+- [x] Add framework to `docs/get-started/frameworks/index.mdx` or equivalent framework list.
 - [x] Add package metadata: keywords, homepage, bugs, repository, funding to all three packages.
-- [ ] Plan alpha release date and scope.
-- [ ] Plan beta release date and scope.
-- [ ] Plan RC release date and scope.
-- [ ] Prepare RFC for the Storybook core team with architecture overview.
+- [x] Plan alpha release date and scope.
+- [x] Plan beta release date and scope.
+- [x] Plan RC release date and scope.
+- [x] Prepare RFC for the Storybook core team with architecture overview.
 - [ ] Announce alpha in Storybook Discord `#showcase` channel.

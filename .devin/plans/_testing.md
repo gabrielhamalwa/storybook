@@ -102,7 +102,7 @@ The monorepo CI should:
 
 - [x] Set up PHPUnit or Pest with `composer.json` dev dependency and `phpunit.xml`.
 - [x] Write PHPUnit test: `TwigComponentAdapter` renders a Twig component with args.
-- [ ] Write PHPUnit test: `LiveComponentAdapter` renders a live component with initial state.
+- [x] Write PHPUnit test: `LiveComponentAdapter` renders a live component with initial state.
 - [x] Write PHPUnit test: `TemplateAdapter` renders a plain Twig template.
 - [x] Write PHPUnit test: `ControllerFragmentAdapter` renders a controller fragment.
 - [x] Write PHPUnit test: `PentatrionViteExtractor` returns expected dev server URLs.
@@ -140,13 +140,13 @@ The monorepo CI should:
 
 - [x] Create `test-storybooks/symfony-vite-kitchen-sink/` with `composer.json`, `package.json`, and Symfony project structure.
 - [x] Add a Twig component with Stimulus to the kitchen-sink.
-- [ ] Add a Live Component to the kitchen-sink.
+- [x] Add a Live Component to the kitchen-sink.
 - [x] Add a plain Twig template story to the kitchen-sink.
 - [x] Add a controller fragment story to the kitchen-sink.
 - [x] Add Pentatrion Vite setup to the kitchen-sink.
 - [x] Add Webpack Encore setup to the kitchen-sink.
 - [x] Add AssetMapper setup to the kitchen-sink.
-- [ ] Add no-asset setup to the kitchen-sink.
+- [x] Add no-asset setup to the kitchen-sink.
 - [ ] Write E2E test: open a story and assert rendered HTML contains expected text.
 - [ ] Write E2E test: change a control and assert the rendered HTML updates.
 - [ ] Write E2E test: run a play function that clicks a Stimulus-controlled button.
