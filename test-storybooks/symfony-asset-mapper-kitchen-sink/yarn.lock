@@ -865,7 +865,7 @@ __metadata:
 
 "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite::locator=symfony-asset-mapper-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=b1e557&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=4f7e9d&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/builder-vite": "workspace:*"
     "@storybook/symfony": "workspace:*"
@@ -874,19 +874,19 @@ __metadata:
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
   bin:
     prewarm-symfony-storybook-cache: ./bin/prewarmCache.js
-  checksum: 10c0/96781af4066e858c26f08f6a05c04e5bdeea7472534d270e2c548d2ce28eaa48a0016455fd70ae0e21621b522287241fe2ef0a811a7455f78721d9d3dbe484b2
+  checksum: 10c0/a5f288cf7431e1fdb442c72b8f2f646e43ca8548bcd8ff724d6badb9e04aaec66367d242f3775900811e62a45e9b7c2afd9dc4b8b7335ccc4842c4d08bd10efd
   languageName: node
   linkType: hard
 
 "@storybook/symfony@file:../../code/renderers/symfony::locator=symfony-asset-mapper-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=348fff&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=afeaa7&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     ts-dedent: "npm:^2.0.0"
   peerDependencies:
     storybook: "workspace:^"
-  checksum: 10c0/bc7f79a6bb5b44c30809e6d379448cb30115087e5ae1a122d97f404d53b4cc612e214f34341d40bb8b56c4f04aec854d4cf17dd8da0321e00a8bb8119a9c9ae7
+  checksum: 10c0/b16dbbda3643a0415f8c4c571af176450c9cd0920a31c58ecd24b7d82110566e05401452932468d0cbf52491fd06a8bbbb2b2d2ef39755d14de81d61242140df
   languageName: node
   linkType: hard
 

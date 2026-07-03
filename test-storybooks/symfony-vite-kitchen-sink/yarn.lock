@@ -970,7 +970,7 @@ __metadata:
 
 "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite::locator=symfony-vite-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=acfbf1&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=4f7e9d&locator=symfony-vite-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/builder-vite": "workspace:*"
     "@storybook/symfony": "workspace:*"
@@ -979,7 +979,7 @@ __metadata:
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
   bin:
     prewarm-symfony-storybook-cache: ./bin/prewarmCache.js
-  checksum: 10c0/2247a5acc6b94935fc2c389171378e7ce9dfd6cc985125c455b1da3f94cd90c984dfb165c59452ee9b7ba1a7afb6037fff9cd67882f8495312942823fbf1765e
+  checksum: 10c0/a5f288cf7431e1fdb442c72b8f2f646e43ca8548bcd8ff724d6badb9e04aaec66367d242f3775900811e62a45e9b7c2afd9dc4b8b7335ccc4842c4d08bd10efd
   languageName: node
   linkType: hard
 
