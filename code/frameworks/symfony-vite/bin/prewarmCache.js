@@ -34,5 +34,25 @@ child.on('exit', (code) => {
   if (code !== null && code !== 0) {
     logger.warn(`Symfony cache pre-warm exited with code ${code}.`);
   }
-  process.exit(0);
+
+  const assetMapChild = spawn(
+    phpBinary,
+    [consolePath, 'asset-map:compile', `--env=${environment}`],
+    {
+      cwd: projectDir,
+      env: { ...process.env, APP_ENV: environment },
+      stdio: 'inherit',
+    }
+  );
+
+  assetMapChild.on('error', () => {
+    process.exit(0);
+  });
+
+  assetMapChild.on('exit', (assetMapCode) => {
+    if (assetMapCode !== null && assetMapCode !== 0) {
+      logger.warn(`Symfony asset map compile exited with code ${assetMapCode}.`);
+    }
+    process.exit(0);
+  });
 });
