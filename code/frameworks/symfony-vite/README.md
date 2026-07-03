@@ -410,6 +410,20 @@ When you run `storybook dev`, the framework:
 
 When you select a story, the renderer calls `POST /_storybook/render/{storyId}` with the component ID, optional adapter, template, controller, and story args, then injects the returned HTML and assets into the preview canvas.
 
+### Pre-warm cache on install
+
+Add a `postinstall` script to your project's `package.json` to pre-warm the Symfony container cache after every install:
+
+```json
+{
+  "scripts": {
+    "postinstall": "prewarm-symfony-storybook-cache"
+  }
+}
+```
+
+The script runs `php bin/console cache:warmup --env=storybook` from the project root. If PHP or the Symfony console is not available, it logs a warning and exits without failing the install.
+
 ## Asset pipeline support
 
 The PHP bundle auto-detects the installed asset pipeline by checking for known Symfony services:

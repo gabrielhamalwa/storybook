@@ -275,6 +275,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hotwired/stimulus-webpack-helpers@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@hotwired/stimulus-webpack-helpers@npm:1.0.1"
+  peerDependencies:
+    "@hotwired/stimulus": ">= 3.0"
+  checksum: 10c0/2575b44cf625df2d6853996d0c0f39527114875f81184d078886f603a5652331894a84fb6ded1bd7ff3e18667e955d6388794ae912ce61d2682c5079f9dd1950
+  languageName: node
+  linkType: hard
+
 "@hotwired/stimulus@npm:^3.2":
   version: 3.2.2
   resolution: "@hotwired/stimulus@npm:3.2.2"
@@ -332,6 +341,18 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.1.0"
     "@jridgewell/sourcemap-codec": "npm:^1.4.14"
   checksum: 10c0/4b30ec8cd56c5fd9a661f088230af01e0c1a3888d11ffb6b47639700f71225be21d1f7e168048d6d4f9449207b978a235c07c8f15c07705685d16dc06280e9d9
+  languageName: node
+  linkType: hard
+
+"@mdx-js/react@npm:^3.0.0":
+  version: 3.1.1
+  resolution: "@mdx-js/react@npm:3.1.1"
+  dependencies:
+    "@types/mdx": "npm:^2.0.0"
+  peerDependencies:
+    "@types/react": ">=16"
+    react: ">=16"
+  checksum: 10c0/34ca98bc2a0f969894ea144dc5c8a5294690505458cd24965cd9be854d779c193ad9192bf9143c4c18438fafd1902e100d99067e045c69319288562d497558c6
   languageName: node
   linkType: hard
 
@@ -810,22 +831,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/addon-docs@file:../../code/addons/docs::locator=symfony-vite-kitchen-sink%40workspace%3A.":
+  version: 10.5.0-alpha.9
+  resolution: "@storybook/addon-docs@file:../../code/addons/docs#../../code/addons/docs::hash=d781b3&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  dependencies:
+    "@mdx-js/react": "npm:^3.0.0"
+    "@storybook/csf-plugin": "workspace:*"
+    "@storybook/icons": "npm:^2.0.2"
+    "@storybook/react-dom-shim": "workspace:*"
+    react: "npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+    react-dom: "npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+    ts-dedent: "npm:^2.0.0"
+  peerDependencies:
+    "@types/react": ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    storybook: "workspace:^"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/ee5e83cd7916965dfe67c137917d5eb5b9fce325f74d9cd6a4426e0dd95350b73f8cc24870a8fa5d2a9c2fad9dd0e7ab0bf4196de05fe7fbc41486f08f0449b3
+  languageName: node
+  linkType: hard
+
 "@storybook/builder-vite@file:../../code/builders/builder-vite::locator=symfony-vite-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/builder-vite@file:../../code/builders/builder-vite#../../code/builders/builder-vite::hash=1f58e6&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/builder-vite@file:../../code/builders/builder-vite#../../code/builders/builder-vite::hash=d7fae7&locator=symfony-vite-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/csf-plugin": "workspace:*"
     ts-dedent: "npm:^2.0.0"
   peerDependencies:
     storybook: "workspace:^"
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-  checksum: 10c0/f2a5ce76af7042e2f47f5ec45c3f24b590e2b315c911946e584f357fb8380d288de6f7367a6dcad53e8dca42124577518744b5c549259cc403eda928c288adaa
+  checksum: 10c0/95b3afa7b70453cfe53bae57f3930708d9846eea549177ce26e34a8b87656bf56f6806590d035cf330ce385947833b6235835f0d0fcdbcfd96d5659801e9ee91
   languageName: node
   linkType: hard
 
 "@storybook/csf-plugin@file:../../code/lib/csf-plugin::locator=symfony-vite-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/csf-plugin@file:../../code/lib/csf-plugin#../../code/lib/csf-plugin::hash=4d07dc&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/csf-plugin@file:../../code/lib/csf-plugin#../../code/lib/csf-plugin::hash=dda2f9&locator=symfony-vite-kitchen-sink%40workspace%3A."
   dependencies:
     unplugin: "npm:^2.3.5"
   peerDependencies:
@@ -843,7 +885,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/7dcdcebec02fa32a485d8e6cdc6204f04ac11012685746c285864afdca0fde1a1b6ee3b1299c6b0bc46d93b1d65cee197a03ef973a040e61681e022bba5ecfb0
+  checksum: 10c0/f66ae5d61c0745706d4299208f02890a661d0a04ab2bfc023e5f217313e0501659fa7e1ea62c6079b3216bb7faa382746629499abcb3011f8bfad54023c0d0bd
   languageName: node
   linkType: hard
 
@@ -863,28 +905,71 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/react-dom-shim@file:../../code/lib/react-dom-shim::locator=symfony-vite-kitchen-sink%40workspace%3A.":
+  version: 10.5.0-alpha.9
+  resolution: "@storybook/react-dom-shim@file:../../code/lib/react-dom-shim#../../code/lib/react-dom-shim::hash=b91cd4&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  peerDependencies:
+    "@types/react": ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    "@types/react-dom": ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    storybook: "workspace:^"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/93d8be61d4bd2fb5235df714f839b58921cb0cc8e71ae4d34128d911dc8c8e1b9804ca62db85ba0a77a9c04c574396f131159476eabdf975efb8a03f4f1c340c
+  languageName: node
+  linkType: hard
+
 "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite::locator=symfony-vite-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=036495&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=b1e557&locator=symfony-vite-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/builder-vite": "workspace:*"
     "@storybook/symfony": "workspace:*"
   peerDependencies:
     storybook: "workspace:^"
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-  checksum: 10c0/645673b682bc732ba738e830e238366309038f0410ced934ca90fd3873dd913e9bc6dad3c6d892cf5f581bb7dd03cf8e7c6285185f56f1d6439c8236f0fa9aec
+  bin:
+    prewarm-symfony-storybook-cache: ./bin/prewarmCache.js
+  checksum: 10c0/96781af4066e858c26f08f6a05c04e5bdeea7472534d270e2c548d2ce28eaa48a0016455fd70ae0e21621b522287241fe2ef0a811a7455f78721d9d3dbe484b2
   languageName: node
   linkType: hard
 
 "@storybook/symfony@file:../../code/renderers/symfony::locator=symfony-vite-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=881c6d&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=348fff&locator=symfony-vite-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     ts-dedent: "npm:^2.0.0"
   peerDependencies:
     storybook: "workspace:^"
-  checksum: 10c0/7895a2e28378c6f0d72a5e91dce911cd40900609edcd2287635544debc0d9014eced4f2dd6fd9b364a8d5354f6c10fa5311a93bd29169570467b4f00d1d177d9
+  checksum: 10c0/bc7f79a6bb5b44c30809e6d379448cb30115087e5ae1a122d97f404d53b4cc612e214f34341d40bb8b56c4f04aec854d4cf17dd8da0321e00a8bb8119a9c9ae7
+  languageName: node
+  linkType: hard
+
+"@symfony/stimulus-bridge@npm:^3.2.0 || ^4.0.0":
+  version: 4.0.1
+  resolution: "@symfony/stimulus-bridge@npm:4.0.1"
+  dependencies:
+    "@hotwired/stimulus-webpack-helpers": "npm:^1.0.1"
+    "@types/webpack-env": "npm:^1.16.4"
+    loader-utils: "npm:^2.0.0 || ^3.0.0"
+    schema-utils: "npm:^3.0.0 || ^4.0.0"
+  peerDependencies:
+    "@hotwired/stimulus": ^3.0
+  checksum: 10c0/c904619b00cfb75a1b95d746c55ef853309ce74c6ec25e3edcaa1532a04f68ecb9e28045b8663d0743445ce3a6090561e3d07fb010df636b1b9bbb2740321ec3
+  languageName: node
+  linkType: hard
+
+"@symfony/ux-live-component@file:vendor/symfony/ux-live-component/assets::locator=symfony-vite-kitchen-sink%40workspace%3A.":
+  version: 2.35.0
+  resolution: "@symfony/ux-live-component@file:vendor/symfony/ux-live-component/assets#vendor/symfony/ux-live-component/assets::hash=297b55&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  peerDependencies:
+    "@hotwired/stimulus": ^3.0.0
+  checksum: 10c0/cac382e614ed4c1644645556b887e81c632d472f6669b877226c42c9d8a596beccec9009e92acdcb031c29c10bc4b0be99a042d82db0271e50f014be95dc4c03
   languageName: node
   linkType: hard
 
@@ -967,6 +1052,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/json-schema@npm:^7.0.9":
+  version: 7.0.15
+  resolution: "@types/json-schema@npm:7.0.15"
+  checksum: 10c0/a996a745e6c5d60292f36731dd41341339d4eeed8180bb09226e5c8d23759067692b1d88e5d91d72ee83dfc00d3aca8e7bd43ea120516c17922cbcb7c3e252db
+  languageName: node
+  linkType: hard
+
+"@types/mdx@npm:^2.0.0":
+  version: 2.0.14
+  resolution: "@types/mdx@npm:2.0.14"
+  checksum: 10c0/f1e3873c1e36e2685fb99222bf81a23c55a8e2edf49d0c45cabf2c875b0ae814cd6050cce5770ff1c6881ac747d2ad33731e1de32139b04cf181d8d7e1943ff4
+  languageName: node
+  linkType: hard
+
+"@types/webpack-env@npm:^1.16.4":
+  version: 1.18.8
+  resolution: "@types/webpack-env@npm:1.18.8"
+  checksum: 10c0/527a5d1eb75c5243e4f3665d956c7c340f899955dd25d16c9fd9750406f32e95a3a17d207640295038e8235c0c2a2daf084f420e088e58b965d82fc74f6012d7
+  languageName: node
+  linkType: hard
+
 "@vitest/expect@npm:3.2.4":
   version: 3.2.4
   resolution: "@vitest/expect@npm:3.2.4"
@@ -1029,6 +1135,43 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 10c0/5dcefea5f8f023b6cc24cbe71fb5a8112b601d36c4fa07d14e4e6ffc2ee47383332c46b36c766d9437725aa6660156eae50efa0c838719823b50d7c327c4ed42
+  languageName: node
+  linkType: hard
+
+"ajv-formats@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "ajv-formats@npm:2.1.1"
+  dependencies:
+    ajv: "npm:^8.0.0"
+  peerDependencies:
+    ajv: ^8.0.0
+  peerDependenciesMeta:
+    ajv:
+      optional: true
+  checksum: 10c0/e43ba22e91b6a48d96224b83d260d3a3a561b42d391f8d3c6d2c1559f9aa5b253bfb306bc94bbeca1d967c014e15a6efe9a207309e95b3eaae07fcbcdc2af662
+  languageName: node
+  linkType: hard
+
+"ajv-keywords@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "ajv-keywords@npm:5.1.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+  peerDependencies:
+    ajv: ^8.8.2
+  checksum: 10c0/18bec51f0171b83123ba1d8883c126e60c6f420cef885250898bf77a8d3e65e3bfb9e8564f497e30bdbe762a83e0d144a36931328616a973ee669dc74d4a9590
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^8.0.0, ajv@npm:^8.9.0":
+  version: 8.20.0
+  resolution: "ajv@npm:8.20.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10c0/5df9a1c8f83863cde1bd3a9ddb426f599718f88e3dc9153616c79fb28e0be455335830d7f21d745576519f057b371352daa31047b6a33d7036fe08777d60cf2a
   languageName: node
   linkType: hard
 
@@ -1286,6 +1429,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-deep-equal@npm:^3.1.3":
+  version: 3.1.3
+  resolution: "fast-deep-equal@npm:3.1.3"
+  checksum: 10c0/40dedc862eb8992c54579c66d914635afbec43350afbbe991235fdcb4e3a8d5af1b23ae7e79bef7d4882d0ecee06c3197488026998fb19f72dc95acff1d1b1d0
+  languageName: node
+  linkType: hard
+
+"fast-uri@npm:^3.0.1":
+  version: 3.1.3
+  resolution: "fast-uri@npm:3.1.3"
+  checksum: 10c0/0ce405815546770ad7e730b8f8fd58db80cefe4533ee99ee1a3263f11d2ccc3b8a0cf10d6cd9ba590e9746eb43b60f2ef2631d0c379a9ebba063ce0d4076b109
+  languageName: node
+  linkType: hard
+
 "fdir@npm:^6.5.0":
   version: 6.5.0
   resolution: "fdir@npm:6.5.0"
@@ -1371,6 +1528,20 @@ __metadata:
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
   checksum: 10c0/e248708d377aa058eacf2037b07ded847790e6de892bbad3dac0abba2e759cb9f121b00099a65195616badcb6eca8d14d975cb3e89eb1cfda644756402c8aeed
+  languageName: node
+  linkType: hard
+
+"json-schema-traverse@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "json-schema-traverse@npm:1.0.0"
+  checksum: 10c0/71e30015d7f3d6dc1c316d6298047c8ef98a06d31ad064919976583eb61e1018a60a0067338f0f79cabc00d84af3fcc489bd48ce8a46ea165d9541ba17fb30c6
+  languageName: node
+  linkType: hard
+
+"loader-utils@npm:^2.0.0 || ^3.0.0":
+  version: 3.3.1
+  resolution: "loader-utils@npm:3.3.1"
+  checksum: 10c0/f2af4eb185ac5bf7e56e1337b666f90744e9f443861ac521b48f093fb9e8347f191c8960b4388a3365147d218913bc23421234e7788db69f385bacfefa0b4758
   languageName: node
   linkType: hard
 
@@ -1651,10 +1822,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-dom@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0":
+  version: 19.2.7
+  resolution: "react-dom@npm:19.2.7"
+  dependencies:
+    scheduler: "npm:^0.27.0"
+  peerDependencies:
+    react: ^19.2.7
+  checksum: 10c0/970ff600f6e80d47d39e2f226f12f226173b3cba3382efc97c5f0cd663de9af38c7a4c11c213fb936094faeac83060d660247accaa96b752180d5b951b9cfecb
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^17.0.1":
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 10c0/2bdb6b93fbb1820b024b496042cce405c57e2f85e777c9aabd55f9b26d145408f9f74f5934676ffdc46f3dcff656d78413a6e43968e7b3f92eea35b3052e9053
+  languageName: node
+  linkType: hard
+
+"react@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0":
+  version: 19.2.7
+  resolution: "react@npm:19.2.7"
+  checksum: 10c0/0bd0e2f1bbd4ba97561c6597bf8a5fec05e6476fe61e165c1065598d16668efc6715205599c94d3ddd49d36cb0f21cbf1b9bcc18ee840b805ce222c3e8d558ac
   languageName: node
   linkType: hard
 
@@ -1678,6 +1867,13 @@ __metadata:
     indent-string: "npm:^4.0.0"
     strip-indent: "npm:^3.0.0"
   checksum: 10c0/d64a6b5c0b50eb3ddce3ab770f866658a2b9998c678f797919ceb1b586bab9259b311407280bd80b804e2a7c7539b19238ae6a2a20c843f1a7fcff21d48c2eae
+  languageName: node
+  linkType: hard
+
+"require-from-string@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "require-from-string@npm:2.0.2"
+  checksum: 10c0/aaa267e0c5b022fc5fd4eef49d8285086b15f2a1c54b28240fdf03599cbd9c26049fee3eab894f2e1f6ca65e513b030a7c264201e3f005601e80c49fb2937ce2
   languageName: node
   linkType: hard
 
@@ -1778,6 +1974,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"scheduler@npm:^0.27.0":
+  version: 0.27.0
+  resolution: "scheduler@npm:0.27.0"
+  checksum: 10c0/4f03048cb05a3c8fddc45813052251eca00688f413a3cee236d984a161da28db28ba71bd11e7a3dd02f7af84ab28d39fb311431d3b3772fed557945beb00c452
+  languageName: node
+  linkType: hard
+
+"schema-utils@npm:^3.0.0 || ^4.0.0":
+  version: 4.3.3
+  resolution: "schema-utils@npm:4.3.3"
+  dependencies:
+    "@types/json-schema": "npm:^7.0.9"
+    ajv: "npm:^8.9.0"
+    ajv-formats: "npm:^2.1.1"
+    ajv-keywords: "npm:^5.1.0"
+  checksum: 10c0/1c8d2c480a026d7c02ab2ecbe5919133a096d6a721a3f201fa50663e4f30f6d6ba020dfddd93cb828b66b922e76b342e103edd19a62c95c8f60e9079cc403202
+  languageName: node
+  linkType: hard
+
 "semver@npm:^7.3.5, semver@npm:^7.7.3":
   version: 7.8.5
   resolution: "semver@npm:7.8.5"
@@ -1803,7 +2018,7 @@ __metadata:
 
 "storybook@file:../../code/core::locator=symfony-vite-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "storybook@file:../../code/core#../../code/core::hash=6ad097&locator=symfony-vite-kitchen-sink%40workspace%3A."
+  resolution: "storybook@file:../../code/core#../../code/core::hash=ff5c77&locator=symfony-vite-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     "@storybook/icons": "npm:^2.0.2"
@@ -1834,7 +2049,7 @@ __metadata:
       optional: true
   bin:
     storybook: ./dist/bin/dispatcher.js
-  checksum: 10c0/e875ac5939f3d551dc4aba1dd85139bc1a1d1d5b9ece2de714d50b6f53a3b4a514ac29ca44f822d4adaadfac80efeb4c3cd980b632edbeae125efa98ee47bbbd
+  checksum: 10c0/08c6d31ff4f7cd5e0d2a433edbcae06bb2d0a08a708b0fd476a233c10400b3139293e05a7402b6d8e61b5999c0234b0b2d35f8cf109cf3b88bf1dafa4e9765b5
   languageName: node
   linkType: hard
 
@@ -1852,8 +2067,11 @@ __metadata:
   resolution: "symfony-vite-kitchen-sink@workspace:."
   dependencies:
     "@hotwired/stimulus": "npm:^3.2"
+    "@storybook/addon-docs": "npm:*"
     "@storybook/symfony": "npm:*"
     "@storybook/symfony-vite": "npm:*"
+    "@symfony/stimulus-bridge": "npm:^3.2.0 || ^4.0.0"
+    "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets"
     storybook: "npm:*"
     typescript: "npm:^5.8.3"
     vite: "npm:^7.0.4"

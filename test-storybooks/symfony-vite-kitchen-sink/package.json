@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build-storybook": "storybook build",
+    "postinstall": "prewarm-symfony-storybook-cache",
     "storybook": "storybook dev -p 6006",
     "test-storybook": "storybook test"
   },
@@ -12,6 +13,7 @@
     "@storybook/addon-docs": "file:../../code/addons/docs",
     "@storybook/builder-vite": "file:../../code/builders/builder-vite",
     "@storybook/csf-plugin": "file:../../code/lib/csf-plugin",
+    "@storybook/react-dom-shim": "file:../../code/lib/react-dom-shim",
     "@storybook/symfony": "file:../../code/renderers/symfony",
     "@storybook/symfony-vite": "file:../../code/frameworks/symfony-vite",
     "storybook": "file:../../code/core"

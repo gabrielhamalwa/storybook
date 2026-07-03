@@ -20,6 +20,7 @@ export interface ImportMap {
 }
 
 export interface NormalizedAssets {
+  pipeline?: string;
   styles: StyleAsset[];
   scripts: ScriptAsset[];
   importmap?: ImportMap;

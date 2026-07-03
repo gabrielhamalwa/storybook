@@ -206,8 +206,8 @@ The bundle never triggers a full `cache:clear` automatically. The Storybook fram
 - [x] Add `GET /_storybook/index` route and `StorybookController::index`.
 - [x] Add `GET /_storybook/source/{id}` route and `StorybookController::source`.
 - [x] Create `Dto/RenderRequest.php` with `args` and `globals` fields.
-- [ ] Create `Dto/RenderResponse.php` with `html`, `assets`, `metadata` fields.
-- [ ] Create `Dto/ComponentMetadata.php` and `Dto/AssetCollection.php`.
+- [x] Create `Dto/RenderResponse.php` with `html`, `assets`, `metadata` fields.
+- [x] Create `Dto/ComponentMetadata.php` and `Dto/AssetCollection.php`.
 - [x] Create `Dto/AssetCollection.php`.
 - [x] Create `Dto/AssetScript.php` and `Dto/AssetStyle.php`.
 - [x] Create `Component/ComponentAdapterInterface.php`.
@@ -215,7 +215,7 @@ The bundle never triggers a full `cache:clear` automatically. The Storybook fram
 - [x] Create `Component/LiveComponentAdapter.php` using `ux.live_component` service.
 - [x] Create `Component/TemplateAdapter.php` using `twig` service.
 - [x] Create `Component/ControllerFragmentAdapter.php` using HTTP sub-request.
-- [ ] Create `Component/ComponentResolver.php` that picks the right adapter from story metadata.
+- [x] Create `Component/ComponentResolver.php` that picks the right adapter from story metadata.
 - [x] Create `Asset/AssetExtractorInterface.php`.
 - [x] Create `Asset/PentatrionViteExtractor.php` reading `public/build/manifest.json`.
 - [x] Create `Asset/EncoreAssetExtractor.php` reading `public/build/entrypoints.json`.

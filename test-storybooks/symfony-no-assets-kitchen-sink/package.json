@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build-storybook": "storybook build",
+    "postinstall": "prewarm-symfony-storybook-cache",
     "storybook": "storybook dev -p 6006",
     "test-storybook": "storybook test"
   },

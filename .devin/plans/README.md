@@ -267,7 +267,7 @@ We build everything, but in order so each slice is end-to-end and testable.
 ### Phase 5: Performance
 
 - [x] Scaffold `config/packages/storybook/` environment with minimal framework config.
-- [ ] Add post-install script to pre-warm `var/cache/storybook/`.
+- [x] Add post-install script to pre-warm `var/cache/storybook/`.
 - [x] Implement FrankenPHP server start/stop in the Vite plugin.
 - [x] Implement RoadRunner server start/stop in the Vite plugin.
 - [x] Implement Symfony CLI server start/stop in the Vite plugin.

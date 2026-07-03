@@ -12,4 +12,8 @@ export default class extends Controller {
   disconnect() {
     this.element.removeAttribute('data-connected');
   }
+
+  click() {
+    this.element.setAttribute('data-clicked', 'true');
+  }
 }

@@ -40,7 +40,11 @@
     "./package.json": "./package.json",
     "./preset": "./dist/preset.js"
   },
+  "bin": {
+    "prewarm-symfony-storybook-cache": "./bin/prewarmCache.js"
+  },
   "files": [
+    "bin/**/*",
     "dist/**/*",
     "template/**/*",
     "README.md",

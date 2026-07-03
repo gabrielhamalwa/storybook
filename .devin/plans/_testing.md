@@ -147,9 +147,9 @@ The monorepo CI should:
 - [x] Add Webpack Encore setup to the kitchen-sink.
 - [x] Add AssetMapper setup to the kitchen-sink.
 - [x] Add no-asset setup to the kitchen-sink.
-- [ ] Write E2E test: open a story and assert rendered HTML contains expected text.
+- [x] Write E2E test: open a story and assert rendered HTML contains expected text.
 - [ ] Write E2E test: change a control and assert the rendered HTML updates.
-- [ ] Write E2E test: run a play function that clicks a Stimulus-controlled button.
+- [x] Write E2E test: run a play function that clicks a Stimulus-controlled button.
 - [ ] Write E2E test: open docs page and assert Twig source is visible.
 - [ ] Write E2E test: auto-discovered component appears in the sidebar.
 

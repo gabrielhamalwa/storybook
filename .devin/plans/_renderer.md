@@ -200,10 +200,10 @@ The auto-discovery indexer is documented in `_stories.md`.
 - [x] Create `src/assets/index.ts` with normalized asset types.
 - [x] Create `src/assets/inject.ts` that injects stylesheets, importmap, and scripts.
 - [x] Implement script/style deduplication by URL in `inject.ts`.
-- [ ] Create `src/assets/pentatrionVite.ts` for Vite dev server URL handling.
-- [ ] Create `src/assets/encore.ts` for Encore entrypoint loading.
-- [ ] Create `src/assets/assetMapper.ts` for importmap injection.
-- [ ] Create `src/assets/none.ts` fallback.
+- [x] Create `src/assets/pentatrionVite.ts` for Vite dev server URL handling.
+- [x] Create `src/assets/encore.ts` for Encore entrypoint loading.
+- [x] Create `src/assets/assetMapper.ts` for importmap injection.
+- [x] Create `src/assets/none.ts` fallback.
 - [x] Implement Stimulus disconnect before replacing HTML.
 - [x] Implement Stimulus connect after injecting HTML via `simulateDOMContentLoaded`.
 - [x] Implement `TeardownRenderToCanvas` cleanup function.
