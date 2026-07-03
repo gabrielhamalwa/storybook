@@ -15,10 +15,10 @@ You start by [installing](../../get-started/install.mdx) Storybook into an exist
 
 Storybook provides support for the leading industry builders and frameworks. However, that doesn't mean you can't use Storybook with other frameworks. Below is a list of currently supported frameworks divided by their builders.
 
-| Builder | Framework                                                                  |
-| ------- | -------------------------------------------------------------------------- |
-| Webpack | React, Angular, Vue 3, Web Components, NextJS, HTML, Ember, Preact, Svelte |
-| Vite    | React, Vue 3, Web Components, HTML, Svelte, SvelteKit, Qwik, Solid         |
+| Builder | Framework                                                                             |
+| ------- | ------------------------------------------------------------------------------------- |
+| Webpack | React, Angular, Vue 3, Web Components, NextJS, HTML, Ember, Preact, Svelte            |
+| Vite    | React, Vue 3, Web Components, HTML, Svelte, SvelteKit, Qwik, Solid, Symfony (preview) |
 
 ### What about feature support?
 
@@ -38,6 +38,7 @@ Every modern web application has unique requirements and relies on various tools
 | `legacyRootApi`  | Requires React 18. Toggles support for React's [legacy root API](https://reactjs.org/blog/2022/03/08/react-18-upgrade-guide.html#updates-to-client-rendering-apis)<br />`framework: { name: '@storybook/react-webpack5', options: { legacyRootApi: true } }` | React     |
 | `enableIvy`      | Enabled by default with Angular 9+. Replaces the default compiler with the [Ivy compiler](https://docs.angular.lat/guide/ivy)<br />`framework: { name: '@storybook/angular', options: { enableIvy: true } }`                                                 | Angular   |
 | `enableNgcc`     | Enabled by default with Angular 9+. Adds support for ngcc for backwards compatibility<br />`framework: { name: '@storybook/angular', options: { enableNgcc: false } }`                                                                                       | Angular   |
+| `symfony`        | Configures the Symfony PHP backend lifecycle<br />`framework: { name: '@storybook/symfony-vite', options: { symfony: { server: 'php' } } }`                                                                                                                  | Symfony   |
 
 ---
 

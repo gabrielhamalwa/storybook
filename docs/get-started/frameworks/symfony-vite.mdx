@@ -246,6 +246,59 @@ storybook:
   asset_pipeline: none
 ```
 
+### Pentatrion Vite
+
+When `pentatrion/vite-bundle` is installed, the bundle reads the configured `entrypoint` from Vite's `entrypoints.json` and returns the matching CSS and module scripts. In development, the bundle uses the Vite dev server URLs returned by `vite-plugin-symfony`; in production, it uses the built manifest paths.
+
+Make sure your project has a Vite config that builds the `app` entrypoint and registers the `vite-plugin-symfony` plugin:
+
+```js title="vite.config.js"
+import { defineConfig } from 'vite';
+import symfonyPlugin from 'vite-plugin-symfony';
+
+export default defineConfig({
+  plugins: [
+    symfonyPlugin({
+      stimulus: true,
+    }),
+  ],
+  build: {
+    rollupOptions: {
+      input: {
+        app: './assets/app.js',
+      },
+    },
+  },
+});
+```
+
+And a Stimulus bootstrap entry point:
+
+```js title="assets/app.js"
+import { Application } from '@hotwired/stimulus';
+import { registerControllers } from 'vite-plugin-symfony/stimulus/helpers';
+
+const app = Application.start();
+
+registerControllers(
+  app,
+  import.meta.glob('./controllers/*_controller.js', {
+    query: '?stimulus',
+    eager: true,
+  }),
+);
+```
+
+Start the Vite dev server alongside Storybook so the `entrypoints.json` is generated and Stimulus controllers can connect in the preview.
+
+### Webpack Encore
+
+When `symfony/webpack-encore-bundle` is installed, the bundle reads the Encore entrypoint lookup for the configured entrypoint. Configure your `webpack.config.cjs` (or `webpack.config.js`) to build an `app` entrypoint that includes your Stimulus bootstrap and component styles.
+
+### AssetMapper
+
+When `symfony/asset-mapper` is installed, the bundle reads the import map and eager entrypoint imports. Make sure the `app` asset is registered in `importmap.php` and any CSS files are mapped as eager imports. The framework's post-install cache pre-warm also runs `asset-map:compile` when AssetMapper is available, so the import map is generated before the first render.
+
 ## Performance tips
 
 ### Keep the `storybook` environment minimal
@@ -312,6 +365,67 @@ When managing the cache manually, warm it once after installing or changing conf
 APP_ENV=storybook bin/console cache:warmup
 ```
 
+## Stimulus
+
+Symfony UX [Stimulus](https://stimulus.hotwired.dev/) controllers work out of the box as long as the component's entrypoint assets are loaded. The renderer dispatches the same lifecycle events as the browser, so controllers connect when a story is rendered and disconnect before the next story replaces the canvas.
+
+Make sure the component's template declares a controller:
+
+```twig title="templates/components/Button.html.twig"
+<button
+  type="button"
+  data-controller="button"
+  data-button-variant-value="{{ variant }}"
+  data-action="click->button#click"
+  class="btn btn-{{ variant }}"
+>
+  {{ label }}
+</button>
+```
+
+### Waiting for controllers in play functions
+
+Because the PHP render and the asset request are asynchronous, the controller may not be connected yet when the `play` function starts. Use `waitFor` from `storybook/test` to wait for the `data-connected` attribute before triggering actions:
+
+```ts title="Button.stories.ts"
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+
+type ButtonArgs = {
+  label: string;
+  variant?: 'primary' | 'secondary';
+};
+
+const meta = {
+  title: 'Components/Button',
+  component: 'Button',
+} satisfies Meta<ButtonArgs>;
+
+export default meta;
+type Story = StoryObj<ButtonArgs>;
+
+export const Clickable: Story = {
+  args: {
+    label: 'Click me',
+    variant: 'primary',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button');
+
+    await waitFor(() => expect(button).toHaveAttribute('data-connected', 'true'));
+    await userEvent.click(button);
+    await waitFor(() => expect(button).toHaveAttribute('data-clicked', 'true'));
+  },
+};
+```
+
+## Testing
+
+Storybook's interaction tests and test runner work with `@storybook/symfony-vite` stories. Because the renderer handles the DOM and assets, play functions can use the same `@testing-library` helpers as other frameworks.
+
+For E2E coverage or CI, start the PHP server and the asset dev server (when using Pentatrion Vite), then run Playwright or the test runner against the Storybook preview. The [kitchen-sink](https://github.com/storybookjs/storybook/tree/next/test-storybooks/symfony-vite-kitchen-sink) includes a Playwright example that covers rendering, controls, the docs page, and Stimulus interactions.
+
 ## FAQ
 
 ### How do I manually install the Symfony framework?
@@ -348,17 +462,17 @@ Type: `object`
 
 Configures the Symfony PHP backend and server lifecycle.
 
-| Option         | Type      | Default                    | Description                                                                                  |
-| -------------- | --------- | -------------------------- | -------------------------------------------------------------------------------------------- |
-| `environment`  | `string`  | `storybook`                | Symfony environment used to boot the kernel.                                                 |
-| `projectDir`   | `string`  | `process.cwd()`            | Path to the Symfony project root.                                                            |
-| `publicDir`    | `string`  | `<projectDir>/public`      | Path to the public directory.                                                                |
-| `server`       | `string`  | `auto`                     | PHP server backend: `php`, `frankenphp`, `roadrunner`, `symfony-cli`, `existing`, or `auto`. |
-| `serverUrl`    | `string`  | —                          | URL to use when `server` is `existing`.                                                      |
-| `port`         | `number`  | random free port           | Port for the PHP server.                                                                     |
-| `phpBinary`    | `string`  | `php`                      | Path to the PHP binary.                                                                      |
-| `console`      | `string`  | `<projectDir>/bin/console` | Path to the Symfony console.                                                                 |
-| `prewarmCache` | `boolean` | `true`                     | Run `cache:warmup` for the configured environment before starting the PHP server.            |
+| Option         | Type      | Default                    | Description                                                                                                                               |
+| -------------- | --------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `environment`  | `string`  | `storybook`                | Symfony environment used to boot the kernel.                                                                                              |
+| `projectDir`   | `string`  | `process.cwd()`            | Path to the Symfony project root.                                                                                                         |
+| `publicDir`    | `string`  | `<projectDir>/public`      | Path to the public directory.                                                                                                             |
+| `server`       | `string`  | `auto`                     | PHP server backend: `php`, `frankenphp`, `roadrunner`, `symfony-cli`, `existing`, or `auto`.                                              |
+| `serverUrl`    | `string`  | —                          | URL to use when `server` is `existing`.                                                                                                   |
+| `port`         | `number`  | random free port           | Port for the PHP server.                                                                                                                  |
+| `phpBinary`    | `string`  | `php`                      | Path to the PHP binary.                                                                                                                   |
+| `console`      | `string`  | `<projectDir>/bin/console` | Path to the Symfony console.                                                                                                              |
+| `prewarmCache` | `boolean` | `true`                     | Run `cache:warmup` (and `asset-map:compile` when AssetMapper is available) for the configured environment before starting the PHP server. |
 
 #### `builder`
 
