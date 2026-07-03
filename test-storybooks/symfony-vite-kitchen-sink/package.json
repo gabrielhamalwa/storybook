@@ -29,6 +29,7 @@
     "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
     "storybook": "*",
     "typescript": "^5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vite-plugin-symfony": "^8.2.4"
   }
 }
