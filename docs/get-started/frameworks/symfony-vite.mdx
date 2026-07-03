@@ -256,7 +256,27 @@ export default config;
 
 ### Pre-warm the container cache
 
-The first render after a container change can be slow because Symfony compiles the container for the `storybook` environment. Warm the cache once after installing or changing configuration:
+The framework runs `bin/console cache:warmup --env=storybook` automatically before starting the PHP server, so the first render does not pay the cost of container compilation. You can disable this behavior with `prewarmCache: false` if you prefer to manage the cache yourself:
+
+```ts title=".storybook/main.ts"
+import type { StorybookConfig } from '@storybook/symfony-vite';
+
+const config: StorybookConfig = {
+  // ...
+  framework: {
+    name: '@storybook/symfony-vite',
+    options: {
+      symfony: {
+        prewarmCache: false,
+      },
+    },
+  },
+};
+
+export default config;
+```
+
+When managing the cache manually, warm it once after installing or changing configuration:
 
 ```bash
 APP_ENV=storybook bin/console cache:warmup
@@ -298,16 +318,17 @@ Type: `object`
 
 Configures the Symfony PHP backend and server lifecycle.
 
-| Option        | Type     | Default                    | Description                                                                                  |
-| ------------- | -------- | -------------------------- | -------------------------------------------------------------------------------------------- |
-| `environment` | `string` | `storybook`                | Symfony environment used to boot the kernel.                                                 |
-| `projectDir`  | `string` | `process.cwd()`            | Path to the Symfony project root.                                                            |
-| `publicDir`   | `string` | `<projectDir>/public`      | Path to the public directory.                                                                |
-| `server`      | `string` | `auto`                     | PHP server backend: `php`, `frankenphp`, `roadrunner`, `symfony-cli`, `existing`, or `auto`. |
-| `serverUrl`   | `string` | —                          | URL to use when `server` is `existing`.                                                      |
-| `port`        | `number` | random free port           | Port for the PHP server.                                                                     |
-| `phpBinary`   | `string` | `php`                      | Path to the PHP binary.                                                                      |
-| `console`     | `string` | `<projectDir>/bin/console` | Path to the Symfony console.                                                                 |
+| Option         | Type      | Default                    | Description                                                                                  |
+| -------------- | --------- | -------------------------- | -------------------------------------------------------------------------------------------- |
+| `environment`  | `string`  | `storybook`                | Symfony environment used to boot the kernel.                                                 |
+| `projectDir`   | `string`  | `process.cwd()`            | Path to the Symfony project root.                                                            |
+| `publicDir`    | `string`  | `<projectDir>/public`      | Path to the public directory.                                                                |
+| `server`       | `string`  | `auto`                     | PHP server backend: `php`, `frankenphp`, `roadrunner`, `symfony-cli`, `existing`, or `auto`. |
+| `serverUrl`    | `string`  | —                          | URL to use when `server` is `existing`.                                                      |
+| `port`         | `number`  | random free port           | Port for the PHP server.                                                                     |
+| `phpBinary`    | `string`  | `php`                      | Path to the PHP binary.                                                                      |
+| `console`      | `string`  | `<projectDir>/bin/console` | Path to the Symfony console.                                                                 |
+| `prewarmCache` | `boolean` | `true`                     | Run `cache:warmup` for the configured environment before starting the PHP server.            |
 
 #### `builder`
 

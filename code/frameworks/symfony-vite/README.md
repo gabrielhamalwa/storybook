@@ -323,6 +323,7 @@ The framework can start a PHP backend for you, or connect to one that is already
 | `port` | `number` | random free port | Port for the PHP server. |
 | `phpBinary` | `string` | `'php'` | Path to the PHP binary. |
 | `console` | `string` | `<projectDir>/bin/console` | Path to the Symfony console. |
+| `prewarmCache` | `boolean` | `true` | Run `cache:warmup` for the configured environment before starting the PHP server. |
 
 When `server` is omitted or set to `'auto'`, the framework detects the best available backend in this order: FrankenPHP, RoadRunner, Symfony CLI, then `php -S`.
 
@@ -358,10 +359,11 @@ framework: {
 
 When you run `storybook dev`, the framework:
 
-1. Starts the configured PHP server in the `storybook` environment.
-2. Polls `GET /_storybook/health` until the backend is ready.
-3. Injects the server URL into the preview bundle as `import.meta.env.STORYBOOK_SYMFONY_URL`.
-4. Stops the PHP server when the Vite dev server shuts down.
+1. Pre-warms the Symfony container cache for the configured environment (unless `prewarmCache` is `false` or `server` is `existing`).
+2. Starts the configured PHP server in the `storybook` environment.
+3. Polls `GET /_storybook/health` until the backend is ready.
+4. Injects the server URL into the preview bundle as `import.meta.env.STORYBOOK_SYMFONY_URL`.
+5. Stops the PHP server when the Vite dev server shuts down.
 
 When you select a story, the renderer calls `POST /_storybook/render/{storyId}` with the component ID, optional adapter, template, controller, and story args, then injects the returned HTML and assets into the preview canvas.
 

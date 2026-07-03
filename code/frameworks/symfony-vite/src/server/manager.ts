@@ -6,6 +6,7 @@ import { detectServerType } from './detect.ts';
 import { startExistingServer } from './existing.ts';
 import { startFrankenPhpServer } from './frankenphp.ts';
 import { startPhpServer } from './php.ts';
+import { prewarmSymfonyCache } from './prewarm.ts';
 import { startRoadRunnerServer } from './roadrunner.ts';
 import { startSymfonyCliServer } from './symfony-cli.ts';
 import type { ServerState } from './types.ts';
@@ -51,6 +52,7 @@ export async function getOrStartServer(
 
   serverPromise = (async () => {
     const resolved = resolveSymfonyOptions(options);
+    await prewarmSymfonyCache(resolved);
     const serverType = resolved.server === 'auto' ? await detectServerType() : resolved.server;
     const state = await startServer({ ...resolved, server: serverType });
 

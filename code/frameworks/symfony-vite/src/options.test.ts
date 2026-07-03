@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { vol } from 'memfs';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getServerUrl, resolveSymfonyOptions } from './options.ts';
 
@@ -29,6 +29,7 @@ describe('resolveSymfonyOptions', () => {
     expect(options.port).toBe(0);
     expect(options.phpBinary).toBe('php');
     expect(options.console).toBe('/project/bin/console');
+    expect(options.prewarmCache).toBe(true);
   });
 
   it('throws when projectDir does not exist', () => {
@@ -56,6 +57,7 @@ describe('resolveSymfonyOptions', () => {
       port: 8080,
       phpBinary: '/usr/bin/php',
       console: '/custom/app/console',
+      prewarmCache: false,
     });
 
     expect(options.environment).toBe('test');
@@ -63,6 +65,7 @@ describe('resolveSymfonyOptions', () => {
     expect(options.port).toBe(8080);
     expect(options.phpBinary).toBe('/usr/bin/php');
     expect(options.console).toBe('/custom/app/console');
+    expect(options.prewarmCache).toBe(false);
   });
 });
 

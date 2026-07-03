@@ -16,8 +16,8 @@ export type SymfonyFrameworkOptions = {
     projectDir?: string;
     /** Path to the public directory. Default: '<projectDir>/public'. */
     publicDir?: string;
-    /** PHP server type. Default: 'php'. */
-    server?: 'php' | 'frankenphp' | 'roadrunner' | 'symfony-cli' | 'existing';
+    /** PHP server type. Default: 'auto'. */
+    server?: 'php' | 'frankenphp' | 'roadrunner' | 'symfony-cli' | 'existing' | 'auto';
     /** URL to use when server is 'existing'. */
     serverUrl?: string;
     /** Port for the PHP server. Default: random free port. */
@@ -26,6 +26,8 @@ export type SymfonyFrameworkOptions = {
     phpBinary?: string;
     /** Path to the Symfony console. Default: '<projectDir>/bin/console'. */
     console?: string;
+    /** Pre-warm the Symfony container cache before starting the PHP server. Default: true. */
+    prewarmCache?: boolean;
   };
   builder?: BuilderOptions;
 };

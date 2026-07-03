@@ -1,0 +1,62 @@
+name: Symfony
+
+on:
+  push:
+    branches:
+      - next
+    paths:
+      - 'code/renderers/symfony/**'
+      - 'code/frameworks/symfony-vite/**'
+      - 'test-storybooks/symfony-*/**'
+      - '.github/workflows/symfony.yml'
+  pull_request:
+    paths:
+      - 'code/renderers/symfony/**'
+      - 'code/frameworks/symfony-vite/**'
+      - 'test-storybooks/symfony-*/**'
+      - '.github/workflows/symfony.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle-tests:
+    name: Bundle PHPUnit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: storybookjs/storybook-symfony-bundle
+          path: storybook-symfony-bundle
+          persist-credentials: false
+
+      - uses: shivammathur/setup-php@9e72090528149de0e460346519dafed437db2dd6 # v2.32.0
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install Composer dependencies
+        working-directory: storybook-symfony-bundle
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPUnit
+        working-directory: storybook-symfony-bundle
+        run: vendor/bin/phpunit
+
+  monorepo-checks:
+    name: Monorepo renderer/framework checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - run: yarn install --immutable
+
+      - run: yarn nx run-many -t check -p symfony-renderer symfony-vite
