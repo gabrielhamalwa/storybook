@@ -8,6 +8,29 @@ sidebar:
 
 Storybook for Symfony & Vite is a [framework](../../contribute/framework.mdx) that makes it easy to develop and test [Symfony](https://symfony.com/) [Twig components](https://symfony.com/bundles/ux-twig-component), plain Twig templates, controller fragments, and Symfony UX Live Components in isolation, with full support for [Stimulus](https://stimulus.hotwired.dev/) and the most common Symfony asset pipelines.
 
+<GetStartedVersions
+  versions={[
+    {
+      name: 'Symfony',
+      range: '6.4 || 7.0',
+      icon: '/images/logos/renderers/logo-symfony.svg',
+    },
+    {
+      name: 'Vite',
+      range: '≥ 5',
+      icon: '/images/logos/builders/vite.svg',
+    },
+  ]}
+/>
+
+<Callout variant="info" icon="🧪">
+
+`@storybook/symfony-vite` is currently in [preview](../../releases/features.mdx#preview). The framework is feature-complete for the documented use cases, but APIs and defaults may change based on feedback before it is marked stable. Please report issues and share feedback on [GitHub](https://github.com/storybookjs/storybook/issues).
+
+If you are migrating from an iframe-based Symfony/Storybook integration, read the [migration guide](./symfony-vite-migration.mdx).
+
+</Callout>
+
 ## Install
 
 To install Storybook in an existing Symfony project, run this command in your project's root directory:
@@ -92,7 +115,7 @@ The PHP bundle can render four different kinds of components. By default, the `c
 | Twig component      | `component: 'Button'`                                                                                                                        | Default. Renders the component registered with `#[AsTwigComponent('Button')]` using the provided args. |
 | Plain Twig template | `component: 'components/Alert.html.twig'` or `parameters.symfony.adapter: 'template'` with `parameters.symfony.template`                     | Renders a plain Twig template with the story args as variables.                                        |
 | Controller fragment | `component: 'App\\Controller\\AlertController::fragment'` or `parameters.symfony.adapter: 'controller'` with `parameters.symfony.controller` | Renders a Symfony controller fragment.                                                                 |
-| Live component      | `component: 'Notification'` with `parameters.symfony.adapter: 'live'`                                                                        | Renders a Symfony UX Live Component. Requires `symfony/ux-live-component`.                             |
+| Live component      | `component: 'Notification'` with `parameters.symfony.adapter: 'live'` or `parameters.symfony.live: true`                                     | Renders a Symfony UX Live Component. Requires `symfony/ux-live-component`.                             |
 
 The default Twig component example renders the `Button` component with the story args:
 
@@ -182,7 +205,7 @@ const meta = {
   component: 'Notification',
   parameters: {
     symfony: {
-      adapter: 'live',
+      live: true,
     },
   },
 } satisfies Meta<NotificationArgs>;
@@ -214,6 +237,13 @@ The default `asset_pipeline: auto` setting detects the pipeline in this order: P
 storybook:
   asset_pipeline: auto
   entrypoint: app
+```
+
+For projects that do not use an asset pipeline, set `asset_pipeline: none` so the bundle returns no styles or scripts:
+
+```yaml title="config/packages/storybook/storybook.yaml"
+storybook:
+  asset_pipeline: none
 ```
 
 ## Performance tips

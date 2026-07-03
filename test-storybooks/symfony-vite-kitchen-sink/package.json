@@ -9,6 +9,7 @@
     "test-storybook": "storybook test"
   },
   "resolutions": {
+    "@storybook/addon-docs": "file:../../code/addons/docs",
     "@storybook/builder-vite": "file:../../code/builders/builder-vite",
     "@storybook/csf-plugin": "file:../../code/lib/csf-plugin",
     "@storybook/symfony": "file:../../code/renderers/symfony",
@@ -19,8 +20,11 @@
     "@hotwired/stimulus": "^3.2"
   },
   "devDependencies": {
+    "@storybook/addon-docs": "*",
     "@storybook/symfony": "*",
     "@storybook/symfony-vite": "*",
+    "@symfony/stimulus-bridge": "^3.2.0 || ^4.0.0",
+    "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
     "storybook": "*",
     "typescript": "^5.8.3",
     "vite": "^7.0.4"

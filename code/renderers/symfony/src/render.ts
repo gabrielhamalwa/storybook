@@ -24,7 +24,7 @@ export async function renderToCanvas(
 ): Promise<void | TeardownRenderToCanvas> {
   const { componentId } = storyFn();
 
-  const { symfony: { serverUrl, adapter, template, controller } = {} } = parameters;
+  const { symfony: { serverUrl, adapter, template, controller, live } = {} } = parameters;
 
   const url = serverUrl || (import.meta.env.STORYBOOK_SYMFONY_URL as string);
 
@@ -54,6 +54,9 @@ export async function renderToCanvas(
     const body: Record<string, unknown> = { componentId, args };
     if (adapter) {
       body.adapter = adapter;
+    }
+    if (live) {
+      body.adapter = 'live';
     }
     if (template) {
       body.template = template;

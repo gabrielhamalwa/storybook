@@ -15,7 +15,9 @@ import type { SymfonyRenderer } from './types.ts';
 export type { Args, ArgTypes, Parameters, StrictArgs } from 'storybook/internal/types';
 export type { SymfonyRenderer };
 
-export type Meta<TArgs = Args> = ComponentAnnotations<SymfonyRenderer, TArgs>;
+export type Meta<TArgs = Args> = ComponentAnnotations<SymfonyRenderer, TArgs> & {
+  autodocs?: boolean;
+};
 
 export type StoryFn<TArgs = Args> = AnnotatedStoryFn<SymfonyRenderer, TArgs>;
 

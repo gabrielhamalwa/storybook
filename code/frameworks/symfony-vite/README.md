@@ -43,6 +43,49 @@ storybook:
   type: attribute
 ```
 
+### Storybook environment config
+
+Storybook boots Symfony in a dedicated `storybook` environment. Keep it minimal so the container compiles quickly. A minimal `config/packages/storybook/framework.yaml` looks like this:
+
+```yaml
+framework:
+  router:
+    utf8: true
+    strict_requirements: ~
+  test: false
+  session:
+    enabled: false
+```
+
+You also need Twig, TwigComponent, and Stimulus enabled in that environment. Add the following files only if you need to override the default environment configuration:
+
+```yaml
+# config/packages/storybook/twig.yaml
+twig:
+  default_path: '%kernel.project_dir%/templates'
+
+# config/packages/storybook/twig_component.yaml
+twig_component:
+  anonymous_template_directory: 'components/'
+  defaults:
+    App\Twig\Components\: 'components/'
+
+# config/packages/storybook/stimulus.yaml
+stimulus:
+  controllers_path: '%kernel.project_dir%/assets/controllers'
+  controller_jsons_path: '%kernel.project_dir%/assets/controllers.json'
+```
+
+If you use AssetMapper, also add `config/packages/storybook/assets.yaml`:
+
+```yaml
+framework:
+  asset_mapper:
+    paths:
+      assets/
+    importmap_path: '%kernel.project_dir%/importmap.php'
+```
+
 ## Quick start
 
 1. Create a Twig component in `src/Twig/Components/Button.php`:
@@ -255,7 +298,7 @@ export const Alert: Story = {
 
 ### Live component
 
-Live components require `symfony/ux-live-component`. Set `parameters.symfony.adapter` to `'live'` and keep the `component` property as the live component name. The backend renders the live component markup; reactivity is provided by the component itself.
+Live components require `symfony/ux-live-component`. Set `parameters.symfony.adapter` to `'live'` or `live: true` and keep the `component` property as the live component name. The backend renders the live component markup; reactivity is provided by the component itself.
 
 ```ts
 import type { Meta, StoryObj } from '@storybook/symfony-vite';
@@ -269,7 +312,7 @@ const meta = {
   component: 'Notification',
   parameters: {
     symfony: {
-      adapter: 'live',
+      live: true,
     },
   },
 } satisfies Meta<NotificationArgs>;
@@ -386,6 +429,14 @@ storybook:
 ```
 
 `asset_pipeline` accepts `auto`, `pentatrion_vite`, `encore`, `asset_mapper`, or `none`. The default `auto` setting detects the installed pipeline in this order: Pentatrion Vite, Webpack Encore, AssetMapper, then none.
+
+## Migration
+
+If you are migrating from an iframe-based Symfony/Storybook integration such as `sensiolabs/StorybookBundle`, follow the [migration guide](https://github.com/storybookjs/storybook/blob/next/docs/get-started/frameworks/symfony-vite-migration.mdx). It covers removing iframe patches, migrating `.stories.json` files to `.stories.ts`, and configuring the `storybook` environment.
+
+## RFC and release plan
+
+The high-level architecture, server backends, and proposed release timeline are documented in the [RFC](https://github.com/storybookjs/storybook/blob/next/.devin/plans/RFC.md). The project is targeting an alpha, beta, RC, and stable release path once the core slices are validated in the kitchen-sink.
 
 ## Troubleshooting
 

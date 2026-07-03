@@ -10,7 +10,7 @@ Learn more about Storybook at [storybook.js.org](https://storybook.js.org/?ref=r
 
 For each story, the renderer:
 
-1. Reads the Symfony server URL and the story's `component` identifier and adapter parameters (`adapter`, `template`, `controller`, `live`).
+1. Reads the Symfony server URL and the story's `component` identifier and adapter parameters (`adapter`, `template`, `controller`, `live`). When `live` is `true`, the renderer sends `adapter: 'live'` to the backend.
 2. Serializes the story args and posts them to the PHP backend, including any adapter override.
 3. Injects the returned HTML into the preview canvas.
 4. Injects the returned styles and scripts into the preview document.
@@ -117,7 +117,7 @@ You can override the default Twig component adapter per story or per component b
 | `twig_component` | `{ component: 'Button' }` | Default. Renders a Symfony UX TwigComponent. |
 | `template` | `{ adapter: 'template', template: 'components/Alert.html.twig' }` | Renders a plain Twig template with the story args as variables. |
 | `controller` | `{ adapter: 'controller', controller: 'App\\Controller\\AlertController::fragment' }` | Renders a Symfony controller fragment. |
-| `live` | `{ adapter: 'live', component: 'Notification' }` | Renders a Symfony UX Live Component. Requires `symfony/ux-live-component`. |
+| `live` | `{ adapter: 'live', component: 'Notification' }` or `{ live: true, component: 'Notification' }` | Renders a Symfony UX Live Component. Requires `symfony/ux-live-component`. |
 
 When `adapter` is omitted, the PHP bundle detects the adapter from the `component` identifier: `.twig` paths use the template adapter, `::` references use the controller adapter, and everything else uses the Twig component adapter.
 
@@ -171,7 +171,7 @@ const meta = {
   component: 'Notification',
   parameters: {
     symfony: {
-      adapter: 'live',
+      live: true,
     },
   },
 } satisfies Meta<{ message: string }>;
@@ -257,3 +257,11 @@ Most use cases are better served by global parameters or by wrapping the Twig co
 ### Custom asset injection
 
 The renderer's asset injection is designed to work out of the box with Pentatrion Vite, Webpack Encore, and AssetMapper. If you need a custom pipeline, implement it on the PHP side by providing a service that implements `Storybook\SymfonyBundle\Asset\AssetExtractorInterface` and tagging it as `storybook.asset_pipeline`.
+
+## Migration
+
+If you are migrating from an iframe-based Symfony/Storybook integration, use the framework's [migration guide](https://github.com/storybookjs/storybook/blob/next/docs/get-started/frameworks/symfony-vite-migration.mdx). The renderer itself is installed automatically with `@storybook/symfony-vite`; the migration is mostly about moving story files to `.stories.ts` and configuring the PHP backend.
+
+## Symfony environment
+
+The renderer expects a PHP backend running in a dedicated `storybook` environment. The `@storybook/symfony-vite` framework starts that server for you. If you are building a custom integration on top of this renderer, make sure the Symfony `storybook` environment has a minimal `framework.yaml` that enables routing, and that the `storybook/symfony-bundle` routes are registered under the `/_storybook` prefix.

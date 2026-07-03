@@ -1,0 +1,189 @@
+---
+title: Migrate from iframe-based Symfony Storybook integrations
+hideRendererSelector: true
+sidebar:
+  order: 15
+  title: Symfony migration
+---
+
+This guide is for projects that already use an iframe-based Storybook integration for Symfony, such as [`sensiolabs/StorybookBundle`](https://github.com/sensiolabs/StorybookBundle), and want to move to the official Storybook for Symfony & Vite framework.
+
+The new framework removes the need for a separate Symfony application that renders inside an iframe. Instead, Vite serves Storybook, and the PHP bundle renders Twig components directly into the Storybook canvas.
+
+## Before you start
+
+Make sure you have:
+
+- PHP 8.2 or higher
+- Symfony 6.4 or 7.0
+- Vite 5 or higher
+- The old iframe-based integration backed up or in a separate branch
+
+You do not need to remove your existing Symfony project. The new framework runs alongside it in a dedicated `storybook` environment.
+
+## Remove iframe patches
+
+Iframe-based integrations usually patch the Storybook preview or add a custom `preview.html` so that the component is fetched from a Symfony route. The new framework does this automatically, so those patches are no longer needed.
+
+1. Remove any custom `.storybook/preview.html` or `iframe.html` overrides.
+2. Remove `manager-head.html` or `preview-head.html` snippets that load the Symfony app or resize the iframe.
+3. Remove any custom webpack or Vite plugin that injects the Symfony preview URL into the bundle.
+4. If you previously configured a custom `previewUrl` in `.storybook/main.js`, delete it.
+
+After these changes, your `.storybook` directory should contain only standard Storybook configuration files such as `main.ts`, `preview.ts`, and `manager.ts`.
+
+## Install the new framework
+
+Install the Storybook for Symfony & Vite framework and the Composer bundle:
+
+<CodeSnippets path="symfony-vite-install.md" />
+
+Then set the framework in `.storybook/main.ts`:
+
+<CodeSnippets path="symfony-vite-add-framework.md" />
+
+Finally, register the bundle's routes in the `storybook` environment, for example in `config/routes/storybook.yaml`:
+
+```yaml title="config/routes/storybook.yaml"
+storybook:
+  resource: Storybook\SymfonyBundle\Controller\StorybookController
+  type: attribute
+```
+
+## Migrate `.stories.json` to `.stories.ts`
+
+Iframe-based integrations often generate `.stories.json` files from PHP metadata. The new framework can still index `.stories.json` files for a gradual migration, but `.stories.ts` files are the recommended format because they give you full CSF 3 features, type safety, and controls.
+
+### Example `.stories.json` file
+
+```json title="stories/Button.stories.json"
+{
+  "title": "Components/Button",
+  "stories": [
+    {
+      "name": "Primary",
+      "args": {
+        "label": "Primary Button",
+        "variant": "primary"
+      }
+    }
+  ]
+}
+```
+
+### Equivalent `.stories.ts` file
+
+```ts title="stories/Button.stories.ts"
+import type { Meta, StoryObj } from '@storybook/symfony-vite';
+
+type ButtonArgs = {
+  label: string;
+  variant?: 'primary' | 'secondary';
+};
+
+const meta = {
+  title: 'Components/Button',
+  component: 'Button',
+} satisfies Meta<ButtonArgs>;
+
+export default meta;
+type Story = StoryObj<ButtonArgs>;
+
+export const Primary: Story = {
+  args: {
+    label: 'Primary Button',
+    variant: 'primary',
+  },
+};
+```
+
+The `component` field is the Twig component name registered with `#[AsTwigComponent('Button')]`. If you previously used a template path or a controller reference in the old integration, you can keep the same identifier; the new framework auto-detects the adapter.
+
+## Configure the `storybook` Symfony environment
+
+Storybook boots Symfony in a dedicated `storybook` environment. Keep it minimal so the container compiles quickly and sessions do not leak between renders.
+
+A minimal `config/packages/storybook/framework.yaml` looks like this:
+
+```yaml title="config/packages/storybook/framework.yaml"
+framework:
+  router:
+    utf8: true
+    strict_requirements: ~
+  test: false
+  session:
+    enabled: false
+```
+
+You also need Twig, TwigComponent, and Stimulus enabled in that environment. Add the following files only if you need to override the default environment configuration:
+
+```yaml title="config/packages/storybook/twig.yaml"
+twig:
+  default_path: '%kernel.project_dir%/templates'
+```
+
+```yaml title="config/packages/storybook/twig_component.yaml"
+twig_component:
+  anonymous_template_directory: 'components/'
+  defaults:
+    App\Twig\Components\: 'components/'
+```
+
+```yaml title="config/packages/storybook/stimulus.yaml"
+stimulus:
+  controllers_path: '%kernel.project_dir%/assets/controllers'
+  controller_jsons_path: '%kernel.project_dir%/assets/controllers.json'
+```
+
+If you use AssetMapper, also add `config/packages/storybook/assets.yaml`:
+
+```yaml title="config/packages/storybook/assets.yaml"
+framework:
+  asset_mapper:
+    paths: assets/
+    importmap_path: '%kernel.project_dir%/importmap.php'
+```
+
+## Asset pipeline differences
+
+Iframe-based integrations usually load the full Symfony app entrypoint, which already includes all CSS and JavaScript. The new framework extracts only the assets that belong to the configured entrypoint, so the pipeline is more explicit.
+
+| Topic              | Iframe integration                           | Storybook for Symfony & Vite                                                         |
+| ------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Styles and scripts | Loaded by the full Symfony app               | Extracted from the configured entrypoint by the PHP bundle                           |
+| Stimulus           | Connected on iframe load                     | Re-connected on every story by the renderer                                          |
+| Asset location     | Usually the Symfony `public/build` directory | Same public directory, but the framework injects the URLs returned by the PHP bundle |
+
+The bundle auto-detects Pentatrion Vite, Webpack Encore, or AssetMapper. If the detection is wrong, set the pipeline explicitly in `config/packages/storybook/storybook.yaml`:
+
+```yaml title="config/packages/storybook/storybook.yaml"
+storybook:
+  asset_pipeline: auto
+  entrypoint: app
+```
+
+`asset_pipeline` accepts `auto`, `pentatrion_vite`, `encore`, `asset_mapper`, or `none`.
+
+Make sure your entrypoint includes the CSS and the Stimulus bootstrap that your components need. If components render without styles, verify the `assets` object returned by the `POST /_storybook/render/{storyId}` endpoint contains the expected styles and scripts.
+
+## Update your stories
+
+The CSF 3 format is the same as other Storybook frameworks. A few things to keep in mind when migrating:
+
+- Args are passed as Twig variables or component props. Type them in TypeScript so controls are generated automatically.
+- Decorators and loaders work the same way, but the actual render happens asynchronously on the PHP server.
+- Globals such as locale are sent to the PHP bundle as part of the render request.
+- If you used custom `parameters` to configure the iframe in the old integration, replace them with `parameters.symfony` options.
+
+## Verify the migration
+
+1. Start Storybook: `yarn storybook`
+2. Confirm the PHP server starts and the health check passes: `GET /_storybook/health`
+3. Open a migrated story and check that the HTML, styles, and Stimulus controllers load correctly.
+4. If a story is missing, check that the component identifier matches the Twig component name, template path, or controller reference used by the PHP bundle.
+
+## Learn more
+
+- [Storybook for Symfony & Vite](./symfony-vite.mdx)
+- [Storybook for Symfony & Vite README](https://github.com/storybookjs/storybook/tree/next/code/frameworks/symfony-vite)
+- [Composer bundle README](https://github.com/storybookjs/storybook-symfony-bundle)

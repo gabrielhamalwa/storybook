@@ -1,8 +1,15 @@
+import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Indexer, IndexerOptions, IndexInput, Options } from 'storybook/internal/types';
 
-import { experimental_indexers } from './preset.ts';
+import { experimental_indexers, previewAnnotations as previewAnnotationsRaw } from './preset.ts';
+
+const previewAnnotations = previewAnnotationsRaw as (
+  input: string[],
+  options: Options
+) => Promise<string[]>;
 
 vi.mock('node:fs/promises', () => ({
   readFile: vi.fn(),
@@ -130,5 +137,35 @@ describe('experimental_indexers', () => {
 
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
+  });
+});
+
+describe('previewAnnotations', () => {
+  it('includes the renderer preview entry with the autodocs default tag', async () => {
+    const options = createOptions();
+    const annotations = await previewAnnotations([], options);
+
+    expect(annotations).toContain(
+      fileURLToPath(import.meta.resolve('@storybook/symfony/entry-preview'))
+    );
+  });
+
+  it('includes the docs preview entry when the docs addon is enabled', async () => {
+    const options = {
+      ...createOptions(),
+      presets: {
+        apply: vi.fn(async (key: string) => {
+          if (key === 'docs') {
+            return { defaultName: 'Docs' };
+          }
+          return {};
+        }),
+      },
+    } as unknown as Options;
+    const annotations = await previewAnnotations([], options);
+
+    expect(annotations).toContain(
+      fileURLToPath(import.meta.resolve('@storybook/symfony/entry-preview-docs'))
+    );
   });
 });

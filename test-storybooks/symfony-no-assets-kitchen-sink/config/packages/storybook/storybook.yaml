@@ -1,0 +1,3 @@
+storybook:
+  asset_pipeline: none
+  entrypoint: app

@@ -27,4 +27,13 @@ export interface Parameters {
     live?: boolean;
     autoDiscovered?: boolean;
   };
+  docs?: {
+    source?: {
+      template?: string;
+      class?: string;
+      code?: string;
+      language?: string;
+      type?: string;
+    };
+  };
 }
