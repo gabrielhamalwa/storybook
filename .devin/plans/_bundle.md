@@ -224,7 +224,7 @@ The bundle never triggers a full `cache:clear` automatically. The Storybook fram
 - [x] Create `Asset/AssetExtractorResolver.php` that auto-detects the pipeline.
 - [x] Create `Indexer/ComponentIndexer.php` that scans `src/Twig/Components/`.
 - [x] Add PHP reflection to infer `#[AsTwigComponent]` constructor/property types.
-- [ ] Add Twig parser to read `{% props %}` block.
+- [x] Add Twig parser to read `{% props %}` block.
 - [x] Add PHPUnit/Pest test suite with `phpunit.xml`.
 - [x] Write PHPUnit test: `TwigComponentAdapter` renders a known component.
 - [x] Write PHPUnit test: `PentatrionViteExtractor` returns expected scripts/styles.

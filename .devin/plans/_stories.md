@@ -133,7 +133,7 @@ The renderer can expose these as parameters so the docs addon displays them.
 - [x] Add `parameters.symfony.autoDiscovered` flag to distinguish generated stories.
 - [x] Implement argType inference in bundle from `#[AsTwigComponent]` constructor parameters.
 - [x] Implement argType inference in bundle from `#[AsTwigComponent]` public properties.
-- [ ] Implement argType inference in bundle from Twig `{% props %}` block.
+- [x] Implement argType inference in bundle from Twig `{% props %}` block.
 - [x] Implement `GET /_storybook/source/{id}` endpoint returning Twig template source.
 - [x] Implement `GET /_storybook/source/{id}` endpoint returning component class source.
 - [ ] Expose source parameters so docs panel can display Twig source.
