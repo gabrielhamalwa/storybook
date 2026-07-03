@@ -1,8 +1,10 @@
 /** @vitest-environment happy-dom */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+/* eslint-disable @typescript-eslint/no-unused-vars -- useEffect is referenced inside the manual mock below */
 import { emitTransformCode, useEffect, useRef } from 'storybook/preview-api';
 
+import type { StoryContext } from '../public-types.ts';
 import { sourceDecorator } from './sourceDecorator.ts';
 
 vi.mock('storybook/preview-api', () => ({
@@ -21,7 +23,7 @@ const createContext = (overrides: Record<string, unknown> = {}) =>
     args: {},
     unmappedArgs: {},
     ...overrides,
-  }) as any;
+  }) as unknown as StoryContext;
 
 describe('sourceDecorator', () => {
   beforeEach(() => {
