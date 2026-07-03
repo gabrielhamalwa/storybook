@@ -22,7 +22,7 @@ export const Default: Story = {
   args: {
     count: 0,
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const count = canvas.getByText('0');
 

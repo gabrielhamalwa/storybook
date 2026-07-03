@@ -17,7 +17,7 @@ export const Default: Story = {
   args: {
     label: 'No Asset Button',
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
 

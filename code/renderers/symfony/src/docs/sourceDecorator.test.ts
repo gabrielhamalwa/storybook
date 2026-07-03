@@ -63,6 +63,28 @@ describe('sourceDecorator', () => {
     vi.unstubAllGlobals();
   });
 
+  it('uses context.component as the source id when available', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({
+          template: '<button class="btn">{{ label }}</button>',
+          class: 'App\\Twig\\Components\\Button',
+        }),
+      } as unknown as Response)
+    );
+
+    const context = createContext({ component: 'Button' });
+    sourceDecorator(() => ({}), context);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/_storybook/source/Button');
+
+    vi.unstubAllGlobals();
+  });
+
   it('uses import.meta.env.STORYBOOK_SYMFONY_URL as fallback', async () => {
     import.meta.env.STORYBOOK_SYMFONY_URL = 'http://localhost:9000';
 

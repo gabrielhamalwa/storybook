@@ -42,7 +42,9 @@ export const sourceDecorator: Decorator = (storyFn, context) => {
 
     const fetchSource = async () => {
       try {
-        const response = await global.fetch(`${serverUrl}/_storybook/source/${context.id}`);
+        const sourceId =
+          (typeof context.component === 'string' ? context.component : null) || context.id;
+        const response = await global.fetch(`${serverUrl}/_storybook/source/${sourceId}`);
         if (!response.ok) {
           return;
         }

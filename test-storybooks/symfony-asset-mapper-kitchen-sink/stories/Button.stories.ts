@@ -19,11 +19,11 @@ export const Primary: Story = {
     label: 'Primary Button',
     variant: 'primary',
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ args, canvasElement }: { args: ButtonArgs; canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
 
-    await expect(button).toHaveTextContent('Primary Button');
+    await expect(button).toHaveTextContent(args.label);
     await expect(button).toHaveClass('btn-primary');
   },
 };
@@ -40,7 +40,7 @@ export const Clickable: Story = {
     label: 'Click me',
     variant: 'primary',
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole('button');
 
