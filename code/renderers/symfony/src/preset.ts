@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type {
   ComponentTitle,
   Indexer,
+  Options,
   PresetProperty,
   StoryName,
   Tag,
@@ -23,9 +24,11 @@ export const experimental_indexers: PresetProperty<'experimental_indexers'> = as
   existingIndexers,
   options
 ) => {
-  const features = (await options.presets.apply('features', {}, options)) as Record<string, any>;
+  const features = (await options.presets.apply('features', {}, options)) as Record<
+    string,
+    unknown
+  >;
   const autoDiscoveryEnabled = features?.experimental_symfonyAutoDiscovery === true;
-
   const indexers: Indexer[] = [
     {
       test: /(stories|story)\.json$/,
@@ -61,15 +64,17 @@ export const experimental_indexers: PresetProperty<'experimental_indexers'> = as
   return [...indexers, ...(existingIndexers || [])];
 };
 
-async function resolveSymfonyServerUrl(options: any): Promise<string | undefined> {
+async function resolveSymfonyServerUrl(options: Options): Promise<string | undefined> {
   if (process.env.STORYBOOK_SYMFONY_URL) {
     return process.env.STORYBOOK_SYMFONY_URL;
   }
 
   try {
-    const framework = await options.presets.apply('framework', {}, options);
+    const framework = (await options.presets.apply('framework', {}, options)) as
+      | string
+      | { options?: { symfony?: { serverUrl?: string } } };
     const frameworkOptions =
-      typeof framework === 'string' ? {} : (framework?.options?.symfony ?? {});
+      typeof framework === 'string' ? {} : (framework.options?.symfony ?? {});
 
     if (frameworkOptions.serverUrl) {
       return frameworkOptions.serverUrl;
