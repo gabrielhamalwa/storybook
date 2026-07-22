@@ -57,7 +57,6 @@ describe('resolveSymfonyOptions', () => {
       port: 8080,
       phpBinary: '/usr/bin/php',
       console: '/custom/app/console',
-      prewarmCache: false,
     });
 
     expect(options.environment).toBe('test');
@@ -65,7 +64,6 @@ describe('resolveSymfonyOptions', () => {
     expect(options.port).toBe(8080);
     expect(options.phpBinary).toBe('/usr/bin/php');
     expect(options.console).toBe('/custom/app/console');
-    expect(options.prewarmCache).toBe(false);
   });
 });
 
