@@ -15,7 +15,7 @@ The new framework removes the need for a separate Symfony application that rende
 Make sure you have:
 
 - PHP 8.2 or higher
-- Symfony 6.4 or 7.0
+- Symfony 6.4, 7.x, or 8.x
 - Vite 5 or higher
 - The old iframe-based integration backed up or in a separate branch
 
@@ -151,7 +151,7 @@ Iframe-based integrations usually load the full Symfony app entrypoint, which al
 | Topic              | Iframe integration                           | Storybook for Symfony & Vite                                                         |
 | ------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Styles and scripts | Loaded by the full Symfony app               | Extracted from the configured entrypoint by the PHP bundle                           |
-| Stimulus           | Connected on iframe load                     | Re-connected on every story by the renderer                                          |
+| Stimulus           | Connected on iframe load                     | Observes rendered canvas changes through its normal DOM lifecycle                    |
 | Asset location     | Usually the Symfony `public/build` directory | Same public directory, but the framework injects the URLs returned by the PHP bundle |
 
 The bundle auto-detects Pentatrion Vite, Webpack Encore, or AssetMapper. If the detection is wrong, set the pipeline explicitly in `config/packages/storybook/storybook.yaml`:
