@@ -6,6 +6,13 @@ import type { RenderContext } from 'storybook/internal/types';
 
 import { renderToCanvas } from './render.ts';
 import type { SymfonyRenderer } from './types.ts';
+import { requestSymfonyWasm } from './wasm/client.ts';
+
+vi.mock('./wasm/client.ts', () => ({
+  getStaticAssetBaseUrl: vi.fn().mockReturnValue('/design-system'),
+  installLiveComponentFetchBridge: vi.fn(),
+  requestSymfonyWasm: vi.fn(),
+}));
 
 const createMockContext = (overrides: Record<string, unknown> = {}) =>
   ({
@@ -17,7 +24,13 @@ const createMockContext = (overrides: Record<string, unknown> = {}) =>
     storyFn: vi.fn().mockReturnValue({ componentId: 'Button' }),
     storyContext: {
       args: { label: 'Click me' },
-      parameters: {},
+      globals: { locale: 'de' },
+      parameters: {
+        symfony: {
+          adapter: 'template',
+          template: 'components/button.html.twig',
+        },
+      },
     },
     ...overrides,
   }) as unknown as RenderContext<SymfonyRenderer>;
@@ -33,6 +46,7 @@ describe('renderToCanvas', () => {
     document.body.innerHTML = '';
     document.head.innerHTML = '';
     delete import.meta.env.STORYBOOK_SYMFONY_URL;
+    delete import.meta.env.STORYBOOK_SYMFONY_ARCHIVE_URL;
   });
 
   it('renders HTML returned by the Symfony render endpoint', async () => {
@@ -58,97 +72,18 @@ describe('renderToCanvas', () => {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ componentId: 'Button', args: { label: 'Click me' } }),
+        body: JSON.stringify({
+          componentId: 'Button',
+          adapter: 'template',
+          template: 'components/button.html.twig',
+          controller: undefined,
+          args: { label: 'Click me' },
+          globals: { locale: 'de' },
+        }),
       }
     );
     expect(canvas.innerHTML).toBe('<button class="btn">Click me</button>');
     expect(context.showMain).toHaveBeenCalled();
-  });
-
-  it('sends adapter and template overrides to the render endpoint', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: vi.fn().mockResolvedValue({
-          html: '<div class="alert">Hello</div>',
-          assets: { styles: [], scripts: [] },
-        }),
-      } as unknown as Response)
-    );
-
-    const canvas = document.getElementById('canvas') as HTMLDivElement;
-    const context = createMockContext({
-      storyContext: {
-        args: { message: 'Hello' },
-        parameters: {
-          symfony: {
-            adapter: 'template',
-            template: 'templates/components/Alert.html.twig',
-          },
-        },
-      },
-    });
-
-    await renderToCanvas(context, canvas);
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:8000/_storybook/render/button--primary',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          componentId: 'Button',
-          args: { message: 'Hello' },
-          adapter: 'template',
-          template: 'templates/components/Alert.html.twig',
-        }),
-      }
-    );
-  });
-
-  it('sends controller override to the render endpoint', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: vi.fn().mockResolvedValue({
-          html: '<div class="alert">Controller</div>',
-          assets: { styles: [], scripts: [] },
-        }),
-      } as unknown as Response)
-    );
-
-    const canvas = document.getElementById('canvas') as HTMLDivElement;
-    const context = createMockContext({
-      storyContext: {
-        args: { message: 'Hello' },
-        parameters: {
-          symfony: {
-            adapter: 'controller',
-            controller: 'App\\Controller\\AlertController::fragment',
-          },
-        },
-      },
-    });
-
-    await renderToCanvas(context, canvas);
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:8000/_storybook/render/button--primary',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          componentId: 'Button',
-          args: { message: 'Hello' },
-          adapter: 'controller',
-          controller: 'App\\Controller\\AlertController::fragment',
-        }),
-      }
-    );
   });
 
   it('injects returned assets and removes them on teardown', async () => {
@@ -211,7 +146,10 @@ describe('renderToCanvas', () => {
       vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
-        json: vi.fn().mockResolvedValue({}),
+        json: vi.fn().mockResolvedValue({
+          error: 'Failed to render component',
+          message: 'Unknown component "Missing".',
+        }),
       } as unknown as Response)
     );
 
@@ -222,8 +160,74 @@ describe('renderToCanvas', () => {
 
     expect(context.showError).toHaveBeenCalledWith(
       expect.objectContaining({
-        description: expect.stringContaining('500'),
+        description: 'Symfony render endpoint returned 500: Unknown component "Missing".',
       })
+    );
+  });
+
+  it('selects the live adapter when live is enabled', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({
+          html: '<div>Live</div>',
+          assets: { styles: [], scripts: [] },
+        }),
+      } as unknown as Response)
+    );
+
+    const context = createMockContext({
+      storyContext: {
+        args: {},
+        globals: {},
+        parameters: { symfony: { live: true } },
+      },
+    });
+
+    await renderToCanvas(context, document.getElementById('canvas') as HTMLDivElement);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: JSON.stringify({
+          componentId: 'Button',
+          adapter: 'live',
+          args: {},
+          globals: {},
+        }),
+      })
+    );
+  });
+
+  it('renders through the packaged browser runtime in a static build', async () => {
+    delete import.meta.env.STORYBOOK_SYMFONY_URL;
+    import.meta.env.STORYBOOK_SYMFONY_ARCHIVE_URL = './symfony-runtime/application.zip';
+    vi.mocked(requestSymfonyWasm).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          html: '<button>Static</button>',
+          assets: {
+            styles: [],
+            scripts: [],
+            importmap: { imports: { app: '/build/app.js' } },
+          },
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    );
+
+    const canvas = document.getElementById('canvas') as HTMLDivElement;
+    await renderToCanvas(createMockContext(), canvas);
+
+    expect(requestSymfonyWasm).toHaveBeenCalledWith(
+      './symfony-runtime/application.zip',
+      '/_storybook/render/button--primary',
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(canvas.innerHTML).toBe('<button>Static</button>');
+    expect(document.querySelector('script[type="importmap"]')?.textContent).toContain(
+      '/design-system/build/app.js'
     );
   });
 });
