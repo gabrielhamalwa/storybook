@@ -1,5 +1,6 @@
 import { logger } from 'storybook/internal/node-logger';
 
+import { SymfonyFrameworkError } from '../errors.ts';
 import { getServerUrl, resolveSymfonyOptions, type ResolvedSymfonyOptions } from '../options.ts';
 import type { SymfonyFrameworkOptions } from '../types.ts';
 import { detectServerType } from './detect.ts';
@@ -11,10 +12,10 @@ import { startRoadRunnerServer } from './roadrunner.ts';
 import { startSymfonyCliServer } from './symfony-cli.ts';
 import type { ServerState } from './types.ts';
 
-let serverPromise: Promise<ServerState> | null = null;
+let serverPromise: Promise<ServerState> | undefined;
 
-export function startServer(options: ResolvedSymfonyOptions): Promise<ServerState> {
-  const serverType = options.server === 'auto' ? 'php' : options.server;
+export async function startServer(options: ResolvedSymfonyOptions): Promise<ServerState> {
+  const serverType = options.server === 'auto' ? await detectServerType() : options.server;
 
   if (serverType === 'existing') {
     return startExistingServer({ serverUrl: getServerUrl(options) });
@@ -39,38 +40,51 @@ export function startServer(options: ResolvedSymfonyOptions): Promise<ServerStat
     case 'symfony-cli':
       return startSymfonyCliServer(startOptions);
     default:
-      throw new Error(`Unsupported Symfony server backend: ${serverType}`);
+      throw new SymfonyFrameworkError(`Unsupported Symfony server backend: ${serverType}`);
   }
 }
 
-export async function getOrStartServer(
+export function getOrStartServer(
   options: SymfonyFrameworkOptions['symfony'] = {}
 ): Promise<ServerState> {
   if (serverPromise) {
     return serverPromise;
   }
 
-  serverPromise = (async () => {
+  const pendingServer = (async () => {
     const resolved = resolveSymfonyOptions(options);
     await prewarmSymfonyCache(resolved);
-    const serverType = resolved.server === 'auto' ? await detectServerType() : resolved.server;
-    const state = await startServer({ ...resolved, server: serverType });
+    const server = await startServer(resolved);
 
-    logger.info(`Symfony server ready at ${state.url}`);
-    process.env.STORYBOOK_SYMFONY_URL = state.url;
+    logger.info(`Symfony server ready at ${server.url}`);
+    process.env.STORYBOOK_SYMFONY_URL = server.url;
 
-    return state;
+    return server;
   })();
 
-  return serverPromise;
+  serverPromise = pendingServer;
+  void pendingServer.catch(() => {
+    if (serverPromise === pendingServer) {
+      serverPromise = undefined;
+      delete process.env.STORYBOOK_SYMFONY_URL;
+    }
+  });
+
+  return pendingServer;
 }
 
 export async function stopServer(): Promise<void> {
-  if (!serverPromise) {
+  const pendingServer = serverPromise;
+  serverPromise = undefined;
+
+  if (!pendingServer) {
     return;
   }
 
-  const server = await serverPromise;
-  await server.stop();
-  serverPromise = null;
+  try {
+    const server = await pendingServer;
+    await server.stop();
+  } finally {
+    delete process.env.STORYBOOK_SYMFONY_URL;
+  }
 }
