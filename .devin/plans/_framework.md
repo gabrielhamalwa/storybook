@@ -191,3 +191,20 @@ The framework exports `StorybookConfig` that extends the base Vite config and th
 - [x] Write Vitest test: Vite plugin stops PHP server on close.
 - [x] Write Vitest test: `core` preset resolves builder and renderer.
 - [x] Write Vitest test: options validation rejects missing project dir.
+
+### First-class monorepo integration
+
+- [x] Register renderer and framework build entries in `scripts/build/entry-configs.ts`.
+- [x] Add the framework and renderer to core enums and renderer/builder mappings.
+- [x] Add package exports, Nx compile/check targets, READMEs, and package metadata.
+- [x] Add the canonical framework documentation and migration guide.
+- [x] Add dedicated monorepo and kitchen-sink CI, including a backend-free static E2E job.
+- [x] Add Symfony project detection and a registered generator to `create-storybook`.
+- [x] Keep Composer mutations outside the Node initializer; report the required
+      `composer require --dev storybook/symfony-bundle` step explicitly.
+- [ ] Add Symfony to the externally supplied supported-framework card catalog used by
+      `HomeRenderers`; that catalog is not defined in this repository.
+- [x] Audit renderer-conditional documentation and add Symfony only to features whose contracts are
+      supported (CSF, controls, play functions, docs, testing, publishing).
+- [ ] Add release ownership, package provenance/license approval, and the companion bundle's release
+      process before requesting stable status.
