@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
-import { unlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { logger } from 'storybook/internal/node-logger';
@@ -8,19 +9,52 @@ import { waitForHealth } from './health.ts';
 import { getFreePort } from './port.ts';
 import type { ServerState, StartServerOptions } from './types.ts';
 
-const CONFIG_FILE = '.rr.storybook.yaml';
+function generateRoadRunnerConfig(options: StartServerOptions, port: number): string {
+  const command = `${shellQuote(options.phpBinary)} ${shellQuote(join(options.publicDir, 'index.php'))}`;
+
+  return `version: "3"
+
+server:
+  command: ${yamlQuote(command)}
+  env:
+    APP_ENV: ${yamlQuote(options.environment)}
+    APP_RUNTIME: 'Runtime\\RoadRunnerSymfonyNyholm\\Runtime'
+
+http:
+  address: 127.0.0.1:${port}
+  middleware: [ "static" ]
+  static:
+    dir: ${yamlQuote(options.publicDir)}
+    forbid: [ ".php", ".htaccess" ]
+`;
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", `'"'"'`)}'`;
+}
+
+function yamlQuote(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
 
 export async function startRoadRunnerServer(options: StartServerOptions): Promise<ServerState> {
   const port = options.port === 0 ? await getFreePort() : options.port;
   const url = `http://127.0.0.1:${port}`;
-  const configPath = join(options.projectDir, CONFIG_FILE);
+  const configDir = await mkdtemp(join(tmpdir(), 'storybook-symfony-roadrunner-'));
+  const configPath = join(configDir, 'rr.yaml');
 
   logger.info(`Starting RoadRunner server at ${url} in ${options.environment} environment`);
 
-  const config = buildRoadRunnerConfig(options, port);
-  await writeFile(configPath, config, 'utf8');
+  const configContent = generateRoadRunnerConfig(options, port);
+  try {
+    await writeFile(configPath, configContent, 'utf8');
+  } catch (error) {
+    await rm(configDir, { recursive: true, force: true });
+    throw error;
+  }
+  logger.info(`Generated RoadRunner config at ${configPath}`);
 
-  const child = spawn('rr', ['serve', configPath], {
+  const child = spawn('rr', ['serve', '-c', configPath], {
     cwd: options.projectDir,
     env: {
       ...process.env,
@@ -39,7 +73,13 @@ export async function startRoadRunnerServer(options: StartServerOptions): Promis
     }
   });
 
-  await waitForHealth(url);
+  try {
+    await waitForHealth(url);
+  } catch (error) {
+    child.kill('SIGTERM');
+    await rm(configDir, { recursive: true, force: true });
+    throw error;
+  }
 
   return {
     url,
@@ -53,25 +93,9 @@ export async function startRoadRunnerServer(options: StartServerOptions): Promis
         }, 5000).unref();
         child.kill('SIGTERM');
       });
-      try {
-        await unlink(configPath);
-      } catch {
-        // Config file may already be gone; ignore.
-      }
+
+      await rm(configDir, { recursive: true, force: true });
+      logger.info(`Removed RoadRunner config at ${configPath}`);
     },
   };
-}
-
-function buildRoadRunnerConfig(options: StartServerOptions, port: number): string {
-  return `version: "3"
-
-server:
-  command: '${options.phpBinary} public/index.php'
-  env:
-    - APP_ENV: ${options.environment}
-    - APP_RUNTIME: 'Runtime\\RoadRunnerSymfonyNyholm\\Runtime'
-
-http:
-  address: 127.0.0.1:${port}
-`;
 }
