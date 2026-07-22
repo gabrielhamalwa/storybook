@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import {
@@ -236,10 +236,33 @@ export class ProjectTypeService {
       if (options.html) {
         return ProjectType.HTML;
       }
+      if (this.isSymfonyProject()) {
+        return ProjectType.SYMFONY;
+      }
       const { packageJson } = this.jsPackageManager.primaryPackageJson;
       return this.detectFrameworkPreset(packageJson);
     } catch {
       return ProjectType.UNDETECTED;
+    }
+  }
+
+  private isSymfonyProject(): boolean {
+    const composerPath = find.up('composer.json', { last: getProjectRoot() });
+    if (!composerPath) {
+      return false;
+    }
+
+    try {
+      const composer = JSON.parse(readFileSync(composerPath, 'utf8')) as {
+        require?: Record<string, string>;
+        'require-dev'?: Record<string, string>;
+      };
+      return Boolean(
+        composer.require?.['symfony/framework-bundle'] ||
+        composer['require-dev']?.['symfony/framework-bundle']
+      );
+    } catch {
+      return false;
     }
   }
 
