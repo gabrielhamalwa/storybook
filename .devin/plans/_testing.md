@@ -79,6 +79,8 @@ yarn build-storybook
 npx serve storybook-static
 ```
 
+A successful command is not sufficient. Static-build E2E coverage must start a static file server with no PHP process, serve Storybook from a nested base path, change a control, and execute a Live Component action.
+
 ## CI
 
 The monorepo CI should:
@@ -163,3 +165,7 @@ The monorepo CI should:
 - [x] Add CI step to run Composer bundle tests.
 - [x] Add CI step to build the kitchen-sink.
 - [x] Add CI step to run E2E tests against the kitchen-sink.
+- [x] Build the PHP-WASM static kitchen-sink in CI.
+- [x] Assert the browser makes no backend request during static E2E tests.
+- [x] Serve the artifact from a nested base path and verify controls rerender through PHP-WASM.
+- [x] Verify a Live Component action completes through the in-browser request bridge.
