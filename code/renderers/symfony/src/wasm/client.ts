@@ -1,3 +1,5 @@
+import { SymfonyRendererError } from '../errors.ts';
+
 import type { WorkerRequest, WorkerResponse, WorkerUpload } from './protocol.ts';
 
 type PendingRequest = {
@@ -78,7 +80,9 @@ class SymfonyWasmBridge {
       this.#handleResponse(event.data);
     });
     this.#worker.addEventListener('error', (event) => {
-      const error = new Error(event.message || 'The Symfony PHP-WASM worker crashed.');
+      const error = new SymfonyRendererError(
+        event.message || 'The Symfony PHP-WASM worker crashed.'
+      );
       for (const pending of this.#pending.values()) {
         pending.reject(error);
       }
@@ -119,7 +123,7 @@ class SymfonyWasmBridge {
     this.#pending.delete(message.id);
 
     if (message.error) {
-      pending.reject(new Error(message.error));
+      pending.reject(new SymfonyRendererError(message.error));
       return;
     }
 
