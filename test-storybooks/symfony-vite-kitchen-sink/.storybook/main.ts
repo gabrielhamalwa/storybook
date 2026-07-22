@@ -1,5 +1,7 @@
 import type { StorybookConfig } from '@storybook/symfony-vite';
 
+const existingServerUrl = process.env.STORYBOOK_SYMFONY_URL;
+
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.ts', '../stories/**/*.mdx', '../src/Twig/Components/**/*.php'],
   addons: ['@storybook/addon-docs'],
@@ -10,13 +12,10 @@ const config: StorybookConfig = {
     name: '@storybook/symfony-vite',
     options: {
       symfony: {
-        // Server backend: 'php' (default php -S), 'frankenphp', 'roadrunner',
-        // 'symfony-cli', 'existing', or 'auto' to detect the best available.
-        server: 'php',
-
-        // For 'existing', point Storybook at a server you already started:
-        // server: 'existing',
-        // serverUrl: 'http://localhost:8000',
+        // STORYBOOK_SYMFONY_URL is an optional local/existing-server override.
+        // Production builds package Symfony into the browser automatically.
+        server: existingServerUrl ? 'existing' : 'php',
+        serverUrl: existingServerUrl,
 
         // Symfony environment, project root, and public directory:
         // environment: 'storybook',
