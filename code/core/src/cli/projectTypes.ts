@@ -17,6 +17,7 @@ export enum ProjectType {
   SOLID = 'solid',
   SVELTE = 'svelte',
   SVELTEKIT = 'sveltekit',
+  SYMFONY = 'symfony',
   UNDETECTED = 'undetected',
   UNSUPPORTED = 'unsupported',
   VUE3 = 'vue3',
