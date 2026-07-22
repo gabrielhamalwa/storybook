@@ -43,7 +43,6 @@ export function parseComponentIdFromVirtualImport(importPath: string): string | 
 
 export function generateCsfModule(component: ComponentMetadata): string {
   const adapter = component.type === 'live_component' ? "adapter: 'live',\n" : '';
-  const propsJson = JSON.stringify(component.props, null, 2).replace(/`/g, '\\`');
 
   return `export default {
   title: ${JSON.stringify(component.title)},
@@ -88,31 +87,29 @@ export async function fetchComponentIndex(
   options: AutoDiscoveryOptions = {}
 ): Promise<ComponentMetadata[]> {
   const { retries = 20, retryDelayMs = 500 } = options;
-  let lastError: Error | undefined;
+  let lastErrorMessage: string | undefined;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const response = await global.fetch(`${serverUrl}/_storybook/index`);
 
-      if (!response.ok) {
-        throw new Error(`Symfony index endpoint returned ${response.status}`);
+      if (response.ok) {
+        const data = (await response.json()) as IndexResponse;
+
+        return data.components ?? [];
       }
 
-      const data = (await response.json()) as IndexResponse;
-
-      return data.components ?? [];
+      lastErrorMessage = `Symfony index endpoint returned ${response.status}`;
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
+      lastErrorMessage = error instanceof Error ? error.message : String(error);
+    }
 
-      if (attempt < retries) {
-        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
-      }
+    if (attempt < retries) {
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
     }
   }
 
-  logger.warn(
-    `Unable to auto-discover Symfony components: ${lastError?.message ?? 'unknown error'}`
-  );
+  logger.warn(`Unable to auto-discover Symfony components: ${lastErrorMessage ?? 'unknown error'}`);
 
   return [];
 }
