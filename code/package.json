@@ -81,6 +81,8 @@
     "@storybook/server": "workspace:*",
     "@storybook/server-webpack5": "workspace:*",
     "@storybook/svelte": "workspace:*",
+    "@storybook/symfony": "workspace:*",
+    "@storybook/symfony-vite": "workspace:*",
     "@storybook/vue3": "workspace:*",
     "@storybook/vue3-vite": "workspace:*",
     "@storybook/web-components": "workspace:*",
