@@ -54,7 +54,8 @@
   ],
   "dependencies": {
     "@storybook/builder-vite": "workspace:*",
-    "@storybook/symfony": "workspace:*"
+    "@storybook/symfony": "workspace:*",
+    "fflate": "^0.8.2"
   },
   "devDependencies": {
     "@types/node": "^22.19.1",
