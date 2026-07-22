@@ -1,4 +1,4 @@
-import type { WebRenderer } from 'storybook/internal/types';
+import type { StoryContext, WebRenderer } from 'storybook/internal/types';
 
 export type { RenderContext } from 'storybook/internal/types';
 
@@ -16,24 +16,28 @@ export interface SymfonyRenderer extends WebRenderer {
   storyResult: StoryFnSymfonyReturnType;
 }
 
+export interface SymfonyParameters {
+  serverUrl?: string;
+  environment?: string;
+  adapter?: 'template' | 'controller' | 'live';
+  template?: string;
+  controller?: string;
+  live?: boolean;
+  autoDiscovered?: boolean;
+}
+
 export interface Parameters {
   renderer: 'symfony';
-  symfony?: {
-    serverUrl?: string;
-    environment?: string;
-    adapter?: 'twig_component' | 'template' | 'controller' | 'live';
-    template?: string;
-    controller?: string;
-    live?: boolean;
-    autoDiscovered?: boolean;
-  };
+  symfony?: SymfonyParameters;
   docs?: {
     source?: {
-      template?: string;
-      class?: string;
-      code?: string;
-      language?: string;
       type?: string;
+      language?: string;
+      code?: string;
+      transform?: (
+        code: string,
+        context: Pick<StoryContext<SymfonyRenderer>, 'args' | 'component' | 'parameters'>
+      ) => string | Promise<string>;
     };
   };
 }
