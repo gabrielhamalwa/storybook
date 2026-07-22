@@ -1,119 +1,249 @@
-# RFC: Storybook for Symfony/Twig
+# RFC: First-class Symfony/Twig support
 
 ## Status
 
-Draft for the Storybook core team.
+Proposed. This document is structured to match Storybook's GitHub RFC discussion template.
+
+## Summary
+
+Add Symfony/Twig as an official Storybook renderer and Vite framework. Development uses the
+project's real Symfony kernel through a locally managed PHP server. The standard `storybook build`
+command produces the standard `storybook-static/` directory, containing a browser-hosted PHP 8.4
+WebAssembly runtime and a sanitized copy of the application. The result is deployable to any static
+file host without a PHP server while retaining controls, Stimulus, and Symfony UX Live Components.
 
 ## Problem statement
 
-Symfony applications are built with Twig templates and Symfony UX components. Today, developers who want to develop or document these components in isolation typically use iframe-based integrations that render a full Symfony page inside the Storybook preview. These integrations are hard to configure, slow to start, and do not integrate with Storybook's addon ecosystem, testing features, or CSF 3.
+Symfony applications commonly implement their design systems with Twig, Symfony UX TwigComponent,
+Stimulus, and Live Components. Existing integrations usually embed an application route in an iframe
+or keep a render API online. Those approaches do not behave like first-class Storybook renderers:
 
-Storybook needs a first-class framework for Symfony that:
+- stories do not render directly in the preview canvas;
+- controls, play functions, docs source, and addons are difficult to integrate consistently;
+- startup and setup depend on manually coordinating JavaScript and PHP servers;
+- a nominally static Storybook still depends on an online PHP service, creating availability,
+  authentication, and attack-surface concerns; and
+- build artifacts cannot be moved between ordinary static hosts in the same way as React, Vue,
+  Svelte, or Web Components Storybooks.
 
-- Renders Twig components, plain Twig templates, controller fragments, and Symfony UX Live Components in the Storybook canvas.
-- Uses the same Vite-based developer experience as the rest of the Storybook ecosystem.
-- Supports the most common Symfony asset pipelines: Pentatrion Vite, Webpack Encore, and AssetMapper.
-- Starts automatically and stays fast enough for day-to-day component work.
+The integration should use Symfony and Storybook conventions instead of reimplementing Twig or
+requiring components to maintain a second JavaScript rendering path.
 
-## Proposed architecture
+## Non-goals
 
-The integration is split into three published packages so the browser, Node, and PHP sides can evolve independently.
+- Running arbitrary production infrastructure in the browser. Applications must replace external
+  databases, private network services, native processes, and unsupported extensions in their
+  isolated `storybook` environment.
+- Hiding PHP source shipped in a static artifact. Browser-delivered source is inspectable, just like
+  browser-delivered JavaScript.
+- Replacing Symfony's profiler, functional test client, or end-to-end application testing.
+- Adding a Webpack Storybook builder in the initial proposal. Symfony projects may still use Encore
+  or AssetMapper for application assets while Storybook itself uses Vite.
+- Making automatic PHP component discovery stable in the first release. CSF stories are the primary
+  authoring API; discovery remains behind a feature flag until its indexing contract is proven.
 
-| Package | Responsibility | Install |
-| --- | --- | --- |
-| `@storybook/symfony` | Renderer: browser-side DOM injection, Stimulus lifecycle, asset injection | Installed via the framework |
-| `@storybook/symfony-vite` | Framework: Vite builder, PHP server lifecycle, Storybook config | `npx storybook add @storybook/symfony-vite` |
-| `storybook/symfony-bundle` | Composer bundle: render endpoints, component adapters, asset extractors | `composer require --dev storybook/symfony-bundle` |
+## Implementation
 
-### Renderer (`@storybook/symfony`)
+The integration consists of three packages with the same renderer/framework split used elsewhere in
+the Storybook monorepo.
 
-The renderer is the browser-side layer. For each story it:
+| Package | Responsibility |
+| --- | --- |
+| `@storybook/symfony` | Story rendering, canvas lifecycle, assets, Twig source, and browser runtime bridge |
+| `@storybook/symfony-vite` | Vite builder integration, local PHP lifecycle, indexing, and static packaging |
+| `storybook/symfony-bundle` | Symfony routes, component adapters, indexing metadata, and asset extraction |
 
-1. Reads the component identifier and adapter parameters from the story context.
-2. POSTs the story args and globals to the PHP render endpoint.
-3. Injects the returned HTML into the Storybook canvas.
-4. Injects the returned styles, scripts, and import map into the preview document.
-5. Dispatches Stimulus lifecycle events so controllers disconnect before the old DOM is removed and reconnect after the new DOM is inserted.
-6. Cleans up injected assets and disconnects controllers when the story is torn down.
+### Development flow
 
-### Framework (`@storybook/symfony-vite`)
+`storybook dev` pre-warms the `storybook` Symfony environment, starts or connects to a local PHP
+server, waits for the bundle health route, and exposes it to the preview through same-origin Vite
+proxies. Story args and globals are posted to the bundle's render route. The renderer inserts the
+returned HTML and normalized application assets into the canvas.
 
-The framework wraps the Vite builder and the renderer. When `storybook dev` starts:
+The framework supports the PHP built-in server, Symfony CLI, FrankenPHP, RoadRunner, and an explicit
+existing-server override. The managed server is stopped with the Vite server.
 
-1. Pre-warms the Symfony container cache for the configured environment.
-2. Starts the PHP server if one is not already running.
-3. Polls the bundle health endpoint until the backend is ready.
-4. Injects the PHP server URL into the preview bundle as `import.meta.env.STORYBOOK_SYMFONY_URL`.
-5. Stops the PHP server when the Vite dev server shuts down.
+### Static build flow
 
-### Composer bundle (`storybook/symfony-bundle`)
+The command and output contract are intentionally identical to other Storybook frameworks:
 
-The bundle exposes the PHP runtime:
+```text
+storybook build
+└─ storybook-static/
+   ├─ index.html
+   ├─ iframe.html
+   ├─ assets/                       Storybook and PHP-WASM chunks
+   ├─ build/, assets/, bundles/     configured Symfony public assets
+   └─ symfony-runtime/
+      └─ application-<hash>.zip     sanitized Symfony filesystem
+```
 
-- `GET /_storybook/health` — readiness check for the framework.
-- `POST /_storybook/render/{id}` — renders a component and returns HTML, assets, and metadata.
-- `GET /_storybook/index` — returns discoverable components for the experimental auto-discovery indexer.
-- `GET /_storybook/source/{id}` — returns component source and template source for the docs panel.
+The framework starts Symfony only while building, for cache preparation and story indexing, and
+stops it before the command exits. The emitted directory has no runtime backend dependency.
 
-## Component adapters
+In the preview iframe, a lazy dedicated Web Worker loads PHP 8.4 WebAssembly, installs the application
+archive into its virtual filesystem, and boots the ordinary `public/index.php` front controller.
+Renderer requests and same-origin `/_components/*` Live Component requests use an HTTP-shaped message
+bridge to that worker. Requests are serialized through one long-lived runtime so the Symfony kernel
+and cache are reused. For text-only Live Component forms, the bridge also sends an internal encoded
+field envelope that the companion bundle restores before Symfony UX reads the request. This keeps
+form handling deterministic on the Asyncify fallback without replacing or exposing the original
+body. Every other `fetch` call remains untouched.
 
-The bundle supports four adapters selected from the story metadata or auto-detected from the component identifier.
+The output works at an origin root or a nested path. Application asset URLs are rebased to the actual
+Storybook deployment directory; they never assume `/` or a particular hosting provider.
 
-| Adapter | Identifier | Trigger |
-| --- | --- | --- |
-| Twig component | `Button` | Default; uses Symfony UX TwigComponent. |
-| Plain Twig template | `components/Alert.html.twig` | `.twig` suffix or `parameters.symfony.adapter: 'template'`. |
-| Controller fragment | `App\Controller\AlertController::fragment` | `::` in the identifier or `parameters.symfony.adapter: 'controller'`. |
-| Live component | `Notification` | `parameters.symfony.adapter: 'live'`. Requires `symfony/ux-live-component`. |
+### Static packaging and compatibility
 
-## Asset pipelines
+The application archive includes Composer metadata and dependencies, Symfony configuration,
+component classes, templates, translations, the front controller, and configured public asset
+roots. It always excludes `.env*`, Symfony secrets, repository/editor metadata, tests, coverage,
+logs, caches, `node_modules`, and unverified out-of-project symlinks. It writes a synthetic
+non-secret `APP_ENV=storybook` environment.
 
-The bundle auto-detects the installed asset pipeline by looking for known Symfony services. Users can override the detection in `config/packages/storybook/storybook.yaml`.
+`staticInclude` and `staticExclude` allow applications to opt additional non-secret files in or out.
+The build validates production asset manifests and Composer extension requirements before emitting
+the archive. Unsupported platform requirements fail with an actionable error.
 
-| Pipeline | Detection | Entrypoint |
-| --- | --- | --- |
-| Pentatrion Vite | `Pentatrion\ViteBundle\Service\EntrypointsLookupCollection` | `entrypoints.json` |
-| Webpack Encore | `webpack_encore.entrypoint_lookup_collection` | `entrypoints.json` |
-| AssetMapper | `asset_mapper.importmap.generator` | `importmap.php` and eager entrypoint imports |
-| None | No service found | No assets injected |
+### Component and asset contracts
 
-The default entrypoint is `app`. The framework and renderer treat the returned assets as normalized values so they do not need to understand the pipeline format.
+The bundle supports Symfony UX TwigComponent names, plain Twig templates, controller fragments, and
+Symfony UX Live Components. It normalizes assets from Pentatrion Vite, Webpack Encore, AssetMapper,
+or no pipeline into styles, scripts, and an optional import map. The renderer remains independent of
+the selected Symfony asset pipeline.
 
-## Server backends and performance
+### Storybook integration surfaces
 
-The framework can start one of several PHP backends:
+An accepted implementation must follow the normal monorepo paths rather than relying only on direct
+package installation:
 
-- `php` — built-in PHP server.
-- `frankenphp` — preferred for local development.
-- `roadrunner` — long-lived workers.
-- `symfony-cli` — Symfony CLI server.
-- `existing` — connect to a server that is already running.
+- renderer and framework package build entries, exports, types, Nx targets, ownership, and release
+  metadata;
+- core renderer/framework enums and renderer/builder mappings;
+- `create-storybook` project detection, generator registration, framework package maps, templates,
+  and tests for a Symfony project;
+- framework documentation, renderer-aware documentation where Symfony behavior differs, migration
+  guidance, and the supported-frameworks catalog;
+- a real Symfony kitchen sink and CI for unit, integration, development E2E, and static E2E tests;
+  and
+- the companion Composer bundle's Packagist/release, Symfony Flex recipe decision, documentation,
+  compatibility matrix, and CI.
 
-The default `auto` setting detects the best available backend in the order above.
+Renderer-specific docs should add Symfony only where the documented feature is actually supported.
+For example, CSF, controls, play functions, and static publishing apply; React-only APIs do not.
 
-To keep startup fast, the framework runs `bin/console cache:warmup --env=storybook` automatically. The `storybook` environment should be kept minimal: disable sessions, tests, and any other services that are not needed for rendering components in isolation.
+## Prior art
 
-## Recommended release timeline
+- [WordPress Playground](https://wordpress.github.io/wordpress-playground/) demonstrates that a
+  large, ordinary PHP application can run reliably in browsers using PHP-WASM and a virtual
+  filesystem. Its request handler provides the HTTP-shaped runtime model used by this proposal.
+- Storybook's `@storybook/server` renderer demonstrates server-produced markup as a renderer model,
+  but its static story output cannot preserve arbitrary control rerenders or Symfony Live Component
+  actions.
+- Existing Symfony/Twig Storybook integrations commonly use iframe routes or deployed render APIs.
+  They validate demand but retain the runtime backend dependency this proposal removes.
 
-| Phase | Goal | Estimated duration |
-| --- | --- | --- |
-| **Alpha** | Foundation slice works in the kitchen-sink: Twig component rendering, Pentatrion Vite pipeline, `php` server. | 2–3 weeks |
-| **Beta** | All asset pipelines and component adapters, plus auto-discovery behind a feature flag. | 3–4 weeks |
-| **RC** | Docs, migration guide, test coverage, and community feedback. | 2–3 weeks |
-| **Stable** | Merge into `next` and ship as an official Storybook framework. | 1–2 weeks |
+An implementation spike has booted an ordinary Symfony 7 kernel from a 6,432-file application
+archive in a Web Worker. From a nested path on a plain static file server, it has rendered Twig,
+rerendered controls, connected and executed Stimulus, and completed a Live Component action with no
+failed browser requests and no PHP server in Chromium, Firefox, and WebKit.
 
-## Open questions
+## Deliverables
 
-1. **Webpack5 support.** The current proposal uses Vite. Should we also provide a `@storybook/symfony-webpack5` framework, or is Vite sufficient for the initial release?
-2. **Symfony UX Live Components.** Live components rely on Turbo Streams and a persistent backend. How much of their interactivity can be exercised inside the Storybook canvas without a full app request lifecycle?
-3. **End-to-end tests.** We need a strategy for E2E coverage that starts a real Symfony project and exercises the render endpoint. Should this be a new sandbox template or a separate CI job?
-4. **Bundle repository visibility.** The Composer bundle lives in a separate repository. When should it be made public so the kitchen-sink can install it directly from Packagist?
-5. **Auto-discovery.** The experimental indexer can discover Twig components from PHP classes. Should it be enabled by default once it is stable, or remain opt-in?
+1. **Renderer and bundle foundation:** CSF rendering, Twig source, component adapters, normalized
+   assets, lifecycle behavior, types, and unit tests.
+2. **Development framework:** Vite integration, managed PHP lifecycle, indexing, configuration,
+   kitchen sinks for supported asset pipelines, and development E2E coverage.
+3. **Portable static runtime:** sanitized packaging, compatibility validation, PHP worker bridge,
+   nested-path asset handling, controls and Live Component static E2E coverage, and performance
+   budgets.
+4. **First-class repository integration:** initializer/detection, framework catalogs and applicable
+   docs, release metadata, CI matrices, migration guide, and companion bundle release process.
+5. **Release readiness:** security review, dependency and generated-artifact license review, browser
+   compatibility matrix, documentation review, canary feedback, and removal of preview flags when
+   the agreed stability criteria are met.
 
-## Related documentation
+## Risks
 
-- [Storybook for Symfony & Vite docs](../../docs/get-started/frameworks/symfony-vite.mdx)
-- [Migration guide](../../docs/get-started/frameworks/symfony-vite-migration.mdx)
-- [Framework README](../../code/frameworks/symfony-vite/README.md)
-- [Renderer README](../../code/renderers/symfony/README.md)
-- [Bundle README](https://github.com/storybookjs/storybook-symfony-bundle)
+- **Download and startup cost.** The current build emits approximately 39 MB of uncompressed PHP
+  WASM variants plus a 9 MB application archive; browsers load one approximately 19 MB WASM variant
+  (about 7.5 MB compressed). Mitigations are lazy worker startup, immutable caching, one PHP version,
+  archive minimization, and future pre-rendering as an optional first-paint cache.
+- **Runtime compatibility.** Native extensions and operating-system integrations are not universally
+  portable. Composer requirements are checked at build time and unsupported services must be
+  replaced in the `storybook` environment.
+- **Source disclosure.** The archive contains PHP source and Composer packages. The build excludes
+  known secret-bearing paths and documentation explicitly warns that opted-in content is public.
+- **Dependency licensing.** The proven `@php-wasm/*` packages are GPL-2.0-or-later while Storybook is
+  MIT. Stable inclusion requires an explicit legal/maintainer decision, a compatible distribution
+  boundary, dual licensing, or an equivalent runtime under a compatible license.
+- **Content Security Policy.** The upstream runtime contains generic JavaScript `eval` branches for
+  dynamically linked modules with `EM_ASM`/`EM_JS` sections and string-based process handlers. The
+  supported PHP 8.4 plus `intl` path does not execute them: the complete static E2E suite passes with
+  `unsafe-eval` forbidden and records no CSP violations. WebAssembly compilation still requires the
+  narrower `wasm-unsafe-eval` source. Security review must decide whether dormant branches may remain
+  in distributed code or should be removed from a Storybook-specific runtime build.
+- **Browser support.** Worker, WebAssembly, and runtime feature behavior must be tested against
+  Storybook's supported browser matrix. The runtime selects JSPI when available and Asyncify
+  otherwise. Firefox versions before 153 use Asyncify by default; Firefox 153 enables JSPI. The
+  request bridge normalizes text form fields because the current Asyncify PHP SAPI does not populate
+  them reliably, and the three-engine static suite covers the fallback. It stages file bytes in the
+  worker's scoped virtual filesystem, restores Symfony `UploadedFile` objects for the Live Action,
+  and removes temporary files after the request.
+- **Maintenance across ecosystems.** Storybook, Symfony, Symfony UX, PHP, Composer, and asset
+  pipelines all move independently. Explicit compatibility matrices and real-project CI reduce the
+  risk of silent drift.
+
+## Unresolved questions
+
+- [ ] Can Storybook legally distribute or bundle the current GPL-2.0-or-later PHP-WASM dependencies,
+  or must the runtime/distribution model change before merge?
+- [x] Can a supported deployment omit `unsafe-eval`? The nested-path static browser suite now
+  enforces that policy while covering Twig rendering, controls, Stimulus, and Live Components.
+- [ ] Must stable distribution remove dormant generic `eval` branches even though the supported
+  runtime path does not execute them under the enforced CSP?
+- [x] What transport and virtual-filesystem contract should static Live Component file uploads use?
+  The bridge transfers browser file bytes to a request-scoped PHP-WASM directory; the bundle
+  restores validated descriptors as Symfony `UploadedFile` objects and removes them after the action.
+- [ ] Should the first release support Symfony 6.4, 7.x, and 8.x with one PHP 8.4 runtime, or narrow
+  the matrix until every combination is represented in CI?
+- [x] `storybook init` detects Symfony and configures the JavaScript framework, then reports the
+  explicit Composer command. The Node initializer does not mutate Composer dependencies.
+- [ ] Does the companion bundle belong in the Storybook GitHub organization, and should it ship a
+  Symfony Flex recipe?
+- [ ] Which team or community maintainers own long-term PHP/Symfony compatibility and release
+  response?
+
+## Alternatives considered / abandoned ideas
+
+### Build-time HTML snapshots
+
+Pre-rendered default states cannot render arbitrary control values or process Live Component
+actions. Snapshots may later improve first paint, but they cannot be the runtime architecture.
+
+### Reimplement Twig in JavaScript
+
+A JavaScript Twig implementation does not include Symfony's service container, PHP component
+classes, custom Twig extensions, forms, security voters, or Live Components. It creates a second,
+incompatible application rather than running the user's application.
+
+### Keep a deployed Symfony render API
+
+This is useful as an explicit custom mode, but it is not a static build. It adds availability,
+authentication, CORS, version skew, and security concerns and prevents artifact portability.
+
+### Generate one static story for every control combination
+
+Control state is open-ended and often non-serializable into a finite build matrix. This also cannot
+model stateful Live Component requests.
+
+### Service Worker request interception
+
+A narrowly scoped iframe `fetch` bridge handles the two Symfony endpoint families without Service
+Worker registration, scope, update, or nested-deployment complexity.
+
+### A less mature Apache-licensed PHP-WASM package
+
+The evaluated alternative has a more compatible license but does not currently provide the same
+maintained, typed request/filesystem APIs or production evidence as WordPress Playground. It remains
+a candidate if it can meet the same Symfony, browser, performance, and maintenance requirements.
