@@ -1,4 +1,5 @@
 import { spawn, type ChildProcess } from 'node:child_process';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { createServer, type AddressInfo, type Server } from 'node:net';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { startPhpServer } from './php.ts';
 
 vi.mock('node:child_process', { spy: true });
+vi.mock('node:fs/promises', { spy: true });
 vi.mock('node:net', { spy: true });
 
 type EventHandler = (...args: unknown[]) => void;
@@ -46,6 +48,9 @@ describe('startPhpServer', () => {
 
     const mockChild = createMockChildProcess();
     vi.mocked(spawn).mockReturnValue(mockChild);
+    vi.mocked(mkdtemp).mockResolvedValue('/private/tmp/storybook-symfony-test');
+    vi.mocked(writeFile).mockResolvedValue();
+    vi.mocked(rm).mockResolvedValue();
 
     vi.mocked(createServer).mockReturnValue({
       listen: vi.fn((port: number, host: string, callback: () => void) => {
@@ -74,12 +79,27 @@ describe('startPhpServer', () => {
     expect(server.url).toBe('http://127.0.0.1:12345');
     expect(spawn).toHaveBeenCalledWith(
       'php',
-      ['-S', '127.0.0.1:12345', '-t', '/project/public', '/project/public/index.php'],
+      [
+        '-S',
+        '127.0.0.1:12345',
+        '-t',
+        '/project/public',
+        '/private/tmp/storybook-symfony-test/router.php',
+      ],
       {
         cwd: '/project',
-        env: expect.objectContaining({ APP_ENV: 'storybook' }),
+        env: expect.objectContaining({
+          APP_ENV: 'storybook',
+          STORYBOOK_SYMFONY_FRONT_CONTROLLER: '/project/public/index.php',
+        }),
         stdio: 'ignore',
       }
+    );
+    expect(writeFile).toHaveBeenCalledWith(
+      '/private/tmp/storybook-symfony-test/router.php',
+      expect.stringContaining(
+        'STORYBOOK_SYMFONY_FRONT_CONTROLLER must point to a readable front controller.'
+      )
     );
   });
 
@@ -98,5 +118,9 @@ describe('startPhpServer', () => {
     await server.stop();
 
     expect(mockChild.kill).toHaveBeenCalledWith('SIGTERM');
+    expect(rm).toHaveBeenCalledWith('/private/tmp/storybook-symfony-test', {
+      recursive: true,
+      force: true,
+    });
   });
 });
