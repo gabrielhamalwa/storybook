@@ -9,7 +9,7 @@ vi.mock('node:child_process', { spy: true });
 
 type EventHandler = (...args: unknown[]) => void;
 
-const createMockChildProcess = (): ChildProcess => {
+const createMockChildProcess = (exitCode = 0): ChildProcess => {
   const eventHandlers: Record<string, EventHandler[]> = {};
 
   const child = {
@@ -17,7 +17,7 @@ const createMockChildProcess = (): ChildProcess => {
       eventHandlers[event] = eventHandlers[event] ?? [];
       eventHandlers[event].push(handler);
       if (event === 'exit') {
-        handler(0, null);
+        handler(exitCode, null);
       }
       return child as ChildProcess;
     }),
@@ -25,7 +25,7 @@ const createMockChildProcess = (): ChildProcess => {
       eventHandlers[event] = eventHandlers[event] ?? [];
       eventHandlers[event].push(handler);
       if (event === 'exit') {
-        handler(0, null);
+        handler(exitCode, null);
       }
       return child as ChildProcess;
     }),
@@ -57,9 +57,20 @@ describe('prewarmSymfonyCache', () => {
   it('spawns php console cache:warmup with the environment when enabled', async () => {
     await prewarmSymfonyCache(baseOptions);
 
-    expect(spawn).toHaveBeenCalledWith(
+    expect(spawn).toHaveBeenNthCalledWith(
+      1,
       'php',
       ['/project/bin/console', 'cache:warmup', '--env=storybook'],
+      {
+        cwd: '/project',
+        env: expect.objectContaining({ APP_ENV: 'storybook' }),
+        stdio: 'ignore',
+      }
+    );
+    expect(spawn).toHaveBeenNthCalledWith(
+      2,
+      'php',
+      ['/project/bin/console', 'asset-map:compile', '--env=storybook'],
       {
         cwd: '/project',
         env: expect.objectContaining({ APP_ENV: 'storybook' }),
@@ -82,5 +93,12 @@ describe('prewarmSymfonyCache', () => {
     });
 
     expect(spawn).not.toHaveBeenCalled();
+  });
+
+  it('continues when cache pre-warming fails', async () => {
+    vi.mocked(spawn).mockReturnValueOnce(createMockChildProcess(1));
+
+    await expect(prewarmSymfonyCache(baseOptions)).resolves.toBeUndefined();
+    expect(spawn).toHaveBeenCalledTimes(2);
   });
 });
