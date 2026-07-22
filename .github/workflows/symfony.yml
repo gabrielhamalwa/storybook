@@ -63,7 +63,7 @@ jobs:
 
       - run: yarn install --immutable
 
-      - run: yarn playwright install chromium
+      - run: yarn playwright install --with-deps chromium firefox webkit
 
       - run: yarn nx compile symfony-renderer
 
@@ -78,3 +78,8 @@ jobs:
         run: |
           cd test-storybooks/symfony-vite-kitchen-sink
           yarn e2e:ci
+
+      - name: Run static PHP-WASM E2E tests
+        run: |
+          cd test-storybooks/symfony-vite-kitchen-sink
+          yarn e2e:static
