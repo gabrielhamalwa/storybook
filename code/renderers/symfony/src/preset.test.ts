@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import type { Indexer, IndexerOptions, IndexInput, Options } from 'storybook/internal/types';
+import type { Indexer, IndexInput, Options } from 'storybook/internal/types';
 
 import { experimental_indexers, previewAnnotations as previewAnnotationsRaw } from './preset.ts';
 
@@ -17,7 +17,7 @@ vi.mock('node:fs/promises', () => ({
 
 const { readFile } = await import('node:fs/promises');
 
-const createOptions = (features: Record<string, any> = {}): Options => {
+const createOptions = (features: Record<string, unknown> = {}): Options => {
   return {
     configDir: '/config',
     presets: {
@@ -41,7 +41,6 @@ const runIndexers = async (
   existing: Indexer[] = [],
   options: Options = createOptions()
 ): Promise<Indexer[]> => {
-  const indexerOptions: IndexerOptions = { makeTitle: (title) => title ?? 'Untitled' };
   const indexers = await (
     experimental_indexers as unknown as (
       existing: Indexer[],
