@@ -19,12 +19,15 @@ export type ResolvedSymfonyOptions = {
   phpBinary: string;
   console: string;
   prewarmCache: boolean;
+  publicAssetPaths: string[];
+  staticInclude?: string[];
+  staticExclude?: string[];
 };
 
 const DEFAULT_ENVIRONMENT = 'storybook';
 const DEFAULT_PHP_BINARY = 'php';
 const DEFAULT_CONSOLE = 'bin/console';
-const DEFAULT_PREWARM_CACHE = true;
+const DEFAULT_PUBLIC_ASSET_PATHS = ['/assets', '/build', '/bundles'];
 
 export function resolveSymfonyOptions(
   options: SymfonyFrameworkOptions['symfony'] = {}
@@ -36,7 +39,6 @@ export function resolveSymfonyOptions(
   const console = options.console ? resolve(options.console) : join(projectDir, DEFAULT_CONSOLE);
   const server = options.server ?? 'auto';
   const port = options.port ?? 0;
-  const prewarmCache = options.prewarmCache ?? DEFAULT_PREWARM_CACHE;
 
   if (!existsSync(projectDir)) {
     throw new SymfonyFrameworkError(`Symfony project directory does not exist: ${projectDir}`);
@@ -61,7 +63,10 @@ export function resolveSymfonyOptions(
     port,
     phpBinary,
     console,
-    prewarmCache,
+    prewarmCache: options.prewarmCache ?? true,
+    publicAssetPaths: options.publicAssetPaths ?? DEFAULT_PUBLIC_ASSET_PATHS,
+    staticInclude: options.staticInclude,
+    staticExclude: options.staticExclude,
   };
 }
 
