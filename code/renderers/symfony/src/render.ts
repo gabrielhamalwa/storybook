@@ -3,8 +3,13 @@ import type { ArgsStoryFn, RenderContext, TeardownRenderToCanvas } from 'storybo
 import { global } from '@storybook/global';
 import { dedent } from 'ts-dedent';
 
-import { injectAssets, manageStimulus, type RenderResponse } from './assets/index.ts';
+import { injectAssets, type RenderResponse } from './assets/index.ts';
 import type { SymfonyRenderer } from './types.ts';
+import {
+  getStaticAssetBaseUrl,
+  installLiveComponentFetchBridge,
+  requestSymfonyWasm,
+} from './wasm/client.ts';
 
 export const render: ArgsStoryFn<SymfonyRenderer> = (args, context) => {
   return { componentId: context.component };
@@ -18,7 +23,7 @@ export async function renderToCanvas(
     showMain,
     showError,
     storyFn,
-    storyContext: { args, parameters },
+    storyContext: { args, globals, parameters },
   }: RenderContext<SymfonyRenderer>,
   canvasElement: SymfonyRenderer['canvasElement']
 ): Promise<void | TeardownRenderToCanvas> {
@@ -27,13 +32,14 @@ export async function renderToCanvas(
   const { symfony: { serverUrl, adapter, template, controller, live } = {} } = parameters;
 
   const url = serverUrl || (import.meta.env.STORYBOOK_SYMFONY_URL as string);
+  const archiveUrl = import.meta.env.STORYBOOK_SYMFONY_ARCHIVE_URL as string | undefined;
 
-  if (!url) {
+  if (!url && !archiveUrl) {
     showError({
       title: `Unable to render story "${name}" of "${title}".`,
       description: dedent`
-        No Symfony server URL is configured.
-        Set parameters.symfony.serverUrl or framework.options.symfony.serverUrl.
+        No Symfony runtime is configured.
+        Start Storybook through @storybook/symfony-vite or set parameters.symfony.serverUrl.
       `,
     });
     return;
@@ -51,30 +57,27 @@ export async function renderToCanvas(
   }
 
   try {
-    const body: Record<string, unknown> = { componentId, args };
-    if (adapter) {
-      body.adapter = adapter;
-    }
-    if (live) {
-      body.adapter = 'live';
-    }
-    if (template) {
-      body.template = template;
-    }
-    if (controller) {
-      body.controller = controller;
-    }
-
-    const response = await global.fetch(`${url}/_storybook/render/${id}`, {
+    const requestInit = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+      body: JSON.stringify({
+        componentId,
+        adapter: live ? 'live' : adapter,
+        template,
+        controller,
+        args,
+        globals,
+      }),
+    } satisfies RequestInit;
+
+    const response = archiveUrl
+      ? await requestSymfonyWasm(archiveUrl, `/_storybook/render/${id}`, requestInit)
+      : await global.fetch(`${url}/_storybook/render/${id}`, requestInit);
 
     if (!response.ok) {
       showError({
         title: `Failed to render story "${name}" of "${title}".`,
-        description: `Symfony render endpoint returned ${response.status}`,
+        description: await getErrorDescription(response),
       });
       return;
     }
@@ -82,23 +85,39 @@ export async function renderToCanvas(
     const data = (await response.json()) as RenderResponse;
     const { html, assets } = data;
 
-    const stimulus = manageStimulus();
-    stimulus.disconnect();
+    if (archiveUrl) {
+      installLiveComponentFetchBridge(archiveUrl);
+    }
 
     showMain();
     canvasElement.innerHTML = html;
 
-    const injected = injectAssets(assets ?? { styles: [], scripts: [] });
-    stimulus.connect();
+    const assetBaseUrl = archiveUrl ? getStaticAssetBaseUrl(archiveUrl) : url;
+    const injected = injectAssets(
+      assets ?? { styles: [], scripts: [] },
+      assetBaseUrl,
+      Boolean(archiveUrl)
+    );
 
     return () => {
       injected.cleanup();
-      stimulus.disconnect();
     };
   } catch (error) {
     showError({
       title: `Failed to render story "${name}" of "${title}".`,
       description: error instanceof Error ? error.message : String(error),
     });
+  }
+}
+
+async function getErrorDescription(response: Response): Promise<string> {
+  try {
+    const payload = (await response.json()) as { error?: string; message?: string };
+    const details = payload.message ?? payload.error;
+    return details
+      ? `Symfony render endpoint returned ${response.status}: ${details}`
+      : `Symfony render endpoint returned ${response.status}`;
+  } catch {
+    return `Symfony render endpoint returned ${response.status}`;
   }
 }
