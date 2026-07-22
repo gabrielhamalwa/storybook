@@ -2,7 +2,7 @@
 
 Develop, document, and test Symfony/Twig components in isolation.
 
-The Symfony renderer is the browser-side layer that turns Storybook stories into rendered Twig components. It fetches HTML from the PHP backend and injects it into the Storybook preview canvas, along with the styles and scripts required by the component.
+The Symfony renderer is the browser-side layer that turns Storybook stories into rendered Twig components. During development it fetches HTML through the framework's local Symfony proxy. In a static build it sends the same request to a Symfony kernel running in a dedicated PHP-WebAssembly worker. It injects the returned HTML, styles, and scripts into the Storybook preview canvas.
 
 Learn more about Storybook at [storybook.js.org](https://storybook.js.org/?ref=readme).
 
@@ -10,12 +10,12 @@ Learn more about Storybook at [storybook.js.org](https://storybook.js.org/?ref=r
 
 For each story, the renderer:
 
-1. Reads the Symfony server URL and the story's `component` identifier and adapter parameters (`adapter`, `template`, `controller`, `live`). When `live` is `true`, the renderer sends `adapter: 'live'` to the backend.
-2. Serializes the story args and posts them to the PHP backend, including any adapter override.
+1. Reads the configured Symfony runtime and the story's `component` identifier and adapter parameters (`adapter`, `template`, `controller`, `live`). When `live` is `true`, the renderer sends `adapter: 'live'` to that runtime.
+2. Serializes the story args and posts them to the configured Symfony runtime, including any adapter override.
 3. Injects the returned HTML into the preview canvas.
 4. Injects the returned styles and scripts into the preview document.
-5. Dispatches Stimulus lifecycle events so controllers disconnect before the old DOM is removed and reconnect after the new DOM is inserted.
-6. Returns a teardown function that cleans up injected assets and disconnects Stimulus controllers before the next render.
+5. Lets Stimulus observe the updated canvas through its normal DOM lifecycle.
+6. Returns a teardown function that cleans up injected assets before the next render.
 
 This renderer is used by `@storybook/symfony-vite`, which also starts the PHP server for you. You usually do not need to install it directly.
 
@@ -190,7 +190,7 @@ If `symfony/ux-live-component` is not installed, the render endpoint returns an 
 
 ## Asset injection
 
-The PHP backend returns a normalized `assets` object:
+The Symfony runtime returns a normalized `assets` object:
 
 ```json
 {
@@ -208,16 +208,11 @@ The renderer converts this into DOM elements:
 - Scripts are injected as `<script>` or `<script type="module">` elements.
 - Import maps are injected as `<script type="importmap">` elements before any module scripts.
 
-All injected elements are placed in a dedicated container in the document head and are removed when the story is torn down. Scripts are re-injected on every render so that Stimulus controllers are evaluated against the new DOM, but the renderer deduplicates by URL to avoid unnecessary reloads.
+All injected elements are placed in a dedicated container in the document head and are removed when the story is torn down. During development, relative asset URLs resolve through the framework's same-origin proxy. In static builds, root-relative assets are rebased to the Storybook deployment directory.
 
 ## Stimulus lifecycle
 
-Symfony UX Stimulus controllers normally connect on the browser's `DOMContentLoaded` event. Because Storybook reuses the same preview document for every story, the renderer manages the lifecycle explicitly:
-
-- Before replacing the canvas HTML, it dispatches `stimulus:disconnect` to disconnect controllers in the current canvas.
-- After injecting the new HTML and assets, it dispatches `DOMContentLoaded` on the document and window so controllers in the new canvas connect.
-
-Controllers that are declared with `data-controller` in the rendered Twig template connect automatically. The teardown function disconnects them again before the next story is rendered.
+Stimulus uses a `MutationObserver` to connect controllers added to the document and disconnect controllers removed from it. Controllers declared with `data-controller` in rendered Twig therefore follow their normal lifecycle when Storybook replaces the canvas; the renderer doesn't synthesize browser events.
 
 ## Advanced usage
 
@@ -260,8 +255,8 @@ The renderer's asset injection is designed to work out of the box with Pentatrio
 
 ## Migration
 
-If you are migrating from an iframe-based Symfony/Storybook integration, use the framework's [migration guide](https://github.com/storybookjs/storybook/blob/next/docs/get-started/frameworks/symfony-vite-migration.mdx). The renderer itself is installed automatically with `@storybook/symfony-vite`; the migration is mostly about moving story files to `.stories.ts` and configuring the PHP backend.
+If you are migrating from an iframe-based Symfony/Storybook integration, use the framework's [migration guide](https://github.com/storybookjs/storybook/blob/next/docs/get-started/frameworks/symfony-vite-migration.mdx). The renderer itself is installed automatically with `@storybook/symfony-vite`; the migration is mostly about moving story files to `.stories.ts` and configuring the isolated `storybook` Symfony environment.
 
 ## Symfony environment
 
-The renderer expects a PHP backend running in a dedicated `storybook` environment. The `@storybook/symfony-vite` framework starts that server for you. If you are building a custom integration on top of this renderer, make sure the Symfony `storybook` environment has a minimal `framework.yaml` that enables routing, and that the `storybook/symfony-bundle` routes are registered under the `/_storybook` prefix.
+The renderer expects Symfony to boot in a dedicated `storybook` environment. The `@storybook/symfony-vite` framework manages the local server during development and packages that environment for static builds. If you are building a custom integration on top of this renderer, make sure the environment has a minimal `framework.yaml` that enables routing and that the `storybook/symfony-bundle` routes are registered under the `/_storybook` prefix.
