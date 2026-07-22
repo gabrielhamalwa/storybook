@@ -1,11 +1,10 @@
 import picocolors from 'picocolors';
 import { dedent } from 'ts-dedent';
 
-import type { Status } from './shared/status-store/index.ts';
-import type { StatusTypeId } from './shared/status-store/index.ts';
+import type { ValidationMeta } from './shared/open-service/errors.ts';
 import { formatIssues } from './shared/open-service/errors.ts';
 import type { ServiceId } from './shared/open-service/types.ts';
-import type { ValidationMeta } from './shared/open-service/errors.ts';
+import type { Status, StatusTypeId } from './shared/status-store/index.ts';
 import { StorybookError } from './storybook-error.ts';
 
 export { StorybookError } from './storybook-error.ts';
@@ -54,6 +53,8 @@ export enum Category {
   FRAMEWORK_VUE3_WEBPACK5 = 'FRAMEWORK_VUE3-WEBPACK5',
   FRAMEWORK_WEB_COMPONENTS_VITE = 'FRAMEWORK_WEB-COMPONENTS-VITE',
   FRAMEWORK_WEB_COMPONENTS_WEBPACK5 = 'FRAMEWORK_WEB-COMPONENTS-WEBPACK5',
+  FRAMEWORK_SYMFONY_VITE = 'FRAMEWORK_SYMFONY_VITE',
+  RENDERER_SYMFONY = 'RENDERER_SYMFONY',
 }
 
 export class NxProjectDetectedError extends StorybookError {
