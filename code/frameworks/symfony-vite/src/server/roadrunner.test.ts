@@ -1,5 +1,5 @@
 import { spawn, type ChildProcess } from 'node:child_process';
-import { unlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { createServer, type AddressInfo, type Server } from 'node:net';
 
 import { vol } from 'memfs';
@@ -47,10 +47,15 @@ describe('startRoadRunnerServer', () => {
   beforeEach(async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200 } as Response));
     vol.reset();
-    vol.fromNestedJSON({ '/project': null });
+    vol.fromNestedJSON({
+      '/project': null,
+      '/tmp/storybook-symfony-roadrunner-test': null,
+    });
 
     const mockChild = createMockChildProcess();
     vi.mocked(spawn).mockReturnValue(mockChild);
+    vi.mocked(mkdtemp).mockResolvedValue('/tmp/storybook-symfony-roadrunner-test');
+    vi.mocked(rm).mockResolvedValue();
 
     vi.mocked(createServer).mockReturnValue({
       listen: vi.fn((port: number, host: string, callback: () => void) => {
@@ -63,14 +68,13 @@ describe('startRoadRunnerServer', () => {
 
     const memfs = await vi.importActual<typeof import('memfs')>('memfs');
     vi.mocked(writeFile).mockImplementation(memfs.fs.promises.writeFile as typeof writeFile);
-    vi.mocked(unlink).mockImplementation(memfs.fs.promises.unlink as typeof unlink);
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('writes a .rr.storybook.yaml config and spawns rr with the correct arguments', async () => {
+  it('writes a temporary config and spawns rr with the correct arguments', async () => {
     const server = await startRoadRunnerServer({
       environment: 'storybook',
       projectDir: '/project',
@@ -82,20 +86,24 @@ describe('startRoadRunnerServer', () => {
 
     expect(server.url).toBe('http://127.0.0.1:12345');
     const files = vol.toJSON();
-    expect(files).toHaveProperty('/project/.rr.storybook.yaml');
+    expect(files).toHaveProperty('/tmp/storybook-symfony-roadrunner-test/rr.yaml');
 
-    const config = files['/project/.rr.storybook.yaml'] as string;
+    const config = files['/tmp/storybook-symfony-roadrunner-test/rr.yaml'] as string;
     expect(config).toContain('version: "3"');
-    expect(config).toContain("command: 'php public/index.php'");
-    expect(config).toContain('APP_ENV: storybook');
+    expect(config).toContain("command: '''php'' ''/project/public/index.php'''");
+    expect(config).toContain("APP_ENV: 'storybook'");
     expect(config).toContain("APP_RUNTIME: 'Runtime\\RoadRunnerSymfonyNyholm\\Runtime'");
     expect(config).toContain('address: 127.0.0.1:12345');
 
-    expect(spawn).toHaveBeenCalledWith('rr', ['serve', '/project/.rr.storybook.yaml'], {
-      cwd: '/project',
-      env: expect.objectContaining({ APP_ENV: 'storybook' }),
-      stdio: 'ignore',
-    });
+    expect(spawn).toHaveBeenCalledWith(
+      'rr',
+      ['serve', '-c', '/tmp/storybook-symfony-roadrunner-test/rr.yaml'],
+      {
+        cwd: '/project',
+        env: expect.objectContaining({ APP_ENV: 'storybook' }),
+        stdio: 'ignore',
+      }
+    );
   });
 
   it('stops the child process and removes the config on stop()', async () => {
@@ -113,6 +121,9 @@ describe('startRoadRunnerServer', () => {
     await server.stop();
 
     expect(mockChild.kill).toHaveBeenCalledWith('SIGTERM');
-    expect(vol.toJSON()).not.toHaveProperty('/project/.rr.storybook.yaml');
+    expect(rm).toHaveBeenCalledWith('/tmp/storybook-symfony-roadrunner-test', {
+      recursive: true,
+      force: true,
+    });
   });
 });
