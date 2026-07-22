@@ -10,10 +10,10 @@ import type {
   StrictArgs,
 } from 'storybook/internal/types';
 
-import type { SymfonyRenderer } from './types.ts';
+import type { SymfonyParameters, SymfonyRenderer } from './types.ts';
 
 export type { Args, ArgTypes, Parameters, StrictArgs } from 'storybook/internal/types';
-export type { SymfonyRenderer };
+export type { SymfonyParameters, SymfonyRenderer };
 
 export type Meta<TArgs = Args> = ComponentAnnotations<SymfonyRenderer, TArgs> & {
   autodocs?: boolean;
