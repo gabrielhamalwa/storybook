@@ -15,6 +15,7 @@ import serverGenerator from './SERVER/index.ts';
 import solidGenerator from './SOLID/index.ts';
 import svelteGenerator from './SVELTE/index.ts';
 import svelteKitGenerator from './SVELTEKIT/index.ts';
+import symfonyGenerator from './SYMFONY/index.ts';
 import tanstackGenerator from './TANSTACK/index.ts';
 import vue3Generator from './VUE3/index.ts';
 import webComponentsGenerator from './WEB-COMPONENTS/index.ts';
@@ -32,6 +33,7 @@ const setOfGenerators = new Set<GeneratorModule>([
   nextjsGenerator,
   svelteGenerator,
   svelteKitGenerator,
+  symfonyGenerator,
   emberGenerator,
   htmlGenerator,
   webComponentsGenerator,
