@@ -91,9 +91,8 @@ module.exports = {
             'html',
             'svelte',
             'preact',
-            'symfony',
           ],
-          unsupported: ['ember'],
+          unsupported: ['ember', 'symfony'],
           path: 'writing-tests/test-coverage',
         },
         {
