@@ -10,6 +10,8 @@ import {
 import { getIntlExtensionPath, getPHPLoaderModule } from '@php-wasm/web-8-4';
 import { unzipSync } from 'fflate';
 
+import { SymfonyRendererError } from '../errors.ts';
+
 import type { WorkerRequest, WorkerResponse, WorkerUpload } from './protocol.ts';
 
 let handlerPromise: Promise<PHPRequestHandler> | undefined;
@@ -126,7 +128,7 @@ async function createHandler(archiveUrl: string): Promise<PHPRequestHandler> {
   const archiveResponse = await fetch(archiveUrl);
 
   if (!archiveResponse.ok) {
-    throw new Error(
+    throw new SymfonyRendererError(
       `Unable to load the Symfony static runtime (${archiveResponse.status} ${archiveResponse.statusText}).`
     );
   }
@@ -158,7 +160,7 @@ function normalizeArchiveEntry(name: string): string {
   const segments = normalized.split('/');
 
   if (normalized.startsWith('/') || segments.some((segment) => segment === '..')) {
-    throw new Error(`Unsafe path in Symfony static runtime archive: ${name}`);
+    throw new SymfonyRendererError(`Unsafe path in Symfony static runtime archive: ${name}`);
   }
 
   return normalized;
