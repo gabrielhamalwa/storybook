@@ -1,165 +1,91 @@
 /** @vitest-environment happy-dom */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- useEffect is referenced inside the manual mock below
-import { emitTransformCode, useEffect, useRef } from 'storybook/preview-api';
+import { emitTransformCode } from 'storybook/preview-api';
 
 import type { StoryContext } from '../public-types.ts';
-import { sourceDecorator } from './sourceDecorator.ts';
+import { generateTwigSource, sourceDecorator } from './sourceDecorator.ts';
 
 vi.mock('storybook/preview-api', () => ({
   emitTransformCode: vi.fn(),
-  useEffect: vi.fn((fn) => fn()),
-  useRef: vi.fn(),
+  useEffect: (effect: () => void) => effect(),
+  useRef: <T>(value: T) => ({ current: value }),
 }));
 
 const createContext = (overrides: Record<string, unknown> = {}) =>
   ({
     id: 'button--primary',
+    component: 'Button',
     viewMode: 'docs',
-    parameters: {
-      symfony: { serverUrl: 'http://localhost:8000' },
-    },
-    args: {},
-    unmappedArgs: {},
+    parameters: { __isArgsStory: true, symfony: {} },
+    args: { label: 'Save', disabled: false },
     ...overrides,
   }) as unknown as StoryContext;
+
+describe('generateTwigSource', () => {
+  it('generates a Twig component invocation with nested args', () => {
+    expect(
+      generateTwigSource('Button', {
+        label: 'Save',
+        disabled: false,
+        options: ['primary', { size: 2 }],
+      })
+    ).toBe(
+      '{{ component("Button", { "label": "Save", "disabled": false, "options": ["primary", { "size": 2 }] }) }}'
+    );
+  });
+
+  it('generates a template include', () => {
+    expect(generateTwigSource('components/Alert.html.twig', { message: 'Saved' })).toBe(
+      '{% include "components/Alert.html.twig" with { "message": "Saved" } %}'
+    );
+  });
+
+  it('generates a controller fragment invocation', () => {
+    expect(
+      generateTwigSource(
+        'Alert',
+        { message: 'Saved' },
+        {
+          adapter: 'controller',
+          controller: 'App\\Controller\\AlertController::fragment',
+        }
+      )
+    ).toBe(
+      '{{ render(controller("App\\\\Controller\\\\AlertController::fragment", { "message": "Saved" })) }}'
+    );
+  });
+});
 
 describe('sourceDecorator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useRef).mockReturnValue({ current: undefined });
   });
 
-  it('fetches source and attaches it to parameters.docs.source', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          template: '<button class="btn">{{ label }}</button>',
-          class: 'App\\\\Twig\\\\Components\\\\Button',
-        }),
-      } as unknown as Response)
-    );
-
+  it('emits dynamic Twig usage in docs mode', () => {
     const context = createContext();
-    sourceDecorator(() => ({}), context);
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    sourceDecorator(() => ({ componentId: 'Button' }), context);
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:8000/_storybook/source/button--primary'
-    );
-    expect(context.parameters.docs.source).toMatchObject({
-      template: '<button class="btn">{{ label }}</button>',
-      class: 'App\\\\Twig\\\\Components\\\\Button',
-      code: '<button class="btn">{{ label }}</button>',
-      language: 'twig',
-    });
     expect(emitTransformCode).toHaveBeenCalledWith(
-      '<button class="btn">{{ label }}</button>',
+      '{{ component("Button", { "label": "Save", "disabled": false }) }}',
       context
     );
-
-    vi.unstubAllGlobals();
   });
 
-  it('uses context.component as the source id when available', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          template: '<button class="btn">{{ label }}</button>',
-          class: 'App\\Twig\\Components\\Button',
-        }),
-      } as unknown as Response)
-    );
+  it('does not override explicitly configured source', () => {
+    const context = createContext({
+      parameters: { docs: { source: { code: 'custom source' } } },
+    });
 
-    const context = createContext({ component: 'Button' });
-    sourceDecorator(() => ({}), context);
-
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/_storybook/source/Button');
-
-    vi.unstubAllGlobals();
-  });
-
-  it('uses import.meta.env.STORYBOOK_SYMFONY_URL as fallback', async () => {
-    import.meta.env.STORYBOOK_SYMFONY_URL = 'http://localhost:9000';
-
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          template: '<div />',
-          class: 'App\\\\Twig\\\\Components\\\\Alert',
-        }),
-      } as unknown as Response)
-    );
-
-    const context = createContext({ parameters: { symfony: {} } });
-    sourceDecorator(() => ({}), context);
-
-    await Promise.resolve();
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:9000/_storybook/source/button--primary'
-    );
-
-    delete import.meta.env.STORYBOOK_SYMFONY_URL;
-    vi.unstubAllGlobals();
-  });
-
-  it('does not fetch source when not in docs mode', async () => {
-    const mockedFetch = vi.fn();
-    vi.stubGlobal('fetch', mockedFetch);
-
-    const context = createContext({ viewMode: 'story' });
-    sourceDecorator(() => ({}), context);
-
-    await Promise.resolve();
-
-    expect(mockedFetch).not.toHaveBeenCalled();
-    vi.unstubAllGlobals();
-  });
-
-  it('does not emit source when the endpoint fails', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-      } as unknown as Response)
-    );
-
-    const context = createContext();
-    sourceDecorator(() => ({}), context);
-
-    await Promise.resolve();
+    sourceDecorator(() => ({ componentId: 'Button' }), context);
 
     expect(emitTransformCode).not.toHaveBeenCalled();
-    vi.unstubAllGlobals();
   });
 
-  it('re-emits cached source on subsequent renders', async () => {
-    const template = '<span />';
-    vi.mocked(useRef).mockReturnValue({
-      current: { template, class: 'App\\\\Twig\\\\Components\\\\Icon' },
-    });
-    const mockedFetch = vi.fn();
-    vi.stubGlobal('fetch', mockedFetch);
+  it('does not generate source outside docs mode', () => {
+    sourceDecorator(() => ({ componentId: 'Button' }), createContext({ viewMode: 'story' }));
 
-    const context = createContext();
-    sourceDecorator(() => ({}), context);
-
-    await Promise.resolve();
-
-    expect(mockedFetch).not.toHaveBeenCalled();
-    expect(emitTransformCode).toHaveBeenCalledWith(template, context);
-    vi.unstubAllGlobals();
+    expect(emitTransformCode).not.toHaveBeenCalled();
   });
 });
