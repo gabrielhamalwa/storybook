@@ -1,9 +1,9 @@
-import { StorybookError } from 'storybook/internal/server-errors';
+import { Category, StorybookError } from 'storybook/internal/server-errors';
 
 export class SymfonyFrameworkError extends StorybookError {
   constructor(message: string) {
     super({
-      category: 'FRAMEWORK_SYMFONY_VITE',
+      category: Category.FRAMEWORK_SYMFONY_VITE,
       code: 1,
       message,
       name: 'SymfonyFrameworkError',
