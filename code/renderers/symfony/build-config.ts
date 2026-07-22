@@ -17,12 +17,20 @@ const config: BuildEntries = {
         entryPoint: './src/entry-preview-docs.ts',
         dts: false,
       },
+      {
+        entryPoint: './src/wasm/worker.ts',
+        dts: false,
+      },
     ],
     node: [
       {
         exportEntries: ['./preset'],
         entryPoint: './src/preset.ts',
         dts: false,
+      },
+      {
+        exportEntries: ['./indexer'],
+        entryPoint: './src/indexer.ts',
       },
     ],
   },
