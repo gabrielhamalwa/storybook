@@ -35,13 +35,24 @@ test.describe('Symfony/Twig kitchen sink', () => {
     await expect(button).toHaveAttribute('data-clicked', 'true');
   });
 
+  test('LiveCounter updates through the Symfony Live Component endpoint', async ({ page }) => {
+    await page.goto(storyUrl('kitchen-sink-livecounter--default'));
+    const iframe = page.locator('iframe#storybook-preview-iframe').contentFrame();
+    const count = iframe.locator('.live-count');
+
+    await expect(count).toHaveText('0');
+    await iframe.getByRole('button', { name: 'Increment' }).click();
+    await expect(count).toHaveText('1');
+  });
+
   test('docs page shows the Twig source', async ({ page }) => {
     await page.goto('/?path=/docs/kitchen-sink-button--docs');
     const iframe = page.locator('iframe#storybook-preview-iframe').contentFrame();
     const docsBody = iframe.locator('body');
     await expect(docsBody).not.toContainText('Loading source...');
-    await expect(docsBody).toContainText('data-controller="button"');
-    await expect(docsBody).toContainText('{{ label }}');
+    await iframe.locator('button').filter({ hasText: 'Show code' }).first().click();
+    await expect(docsBody).toContainText('component("Button"');
+    await expect(docsBody).toContainText('"label": "Primary Button"');
   });
 
   test('auto-discovered component appears in the sidebar', async ({ page }) => {
