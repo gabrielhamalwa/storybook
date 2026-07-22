@@ -6,26 +6,25 @@ import type { ServerType } from '../options.ts';
 
 export async function detectServerType(): Promise<ServerType> {
   if (isInPath('frankenphp')) {
-    logger.info('Detected FrankenPHP in PATH; using it as the Symfony server backend');
+    logger.info('Detected FrankenPHP; using its classic local server');
     return 'frankenphp';
   }
 
-  if (isInPath('rr')) {
-    logger.info('Detected RoadRunner in PATH; using it as the Symfony server backend');
-    return 'roadrunner';
-  }
-
   if (isInPath('symfony')) {
-    logger.info('Detected Symfony CLI in PATH; using it as the Symfony server backend');
+    logger.info('Detected Symfony CLI; using its local web server');
     return 'symfony-cli';
   }
 
-  logger.info('No fast Symfony server backend detected; falling back to php -S');
+  logger.info('Symfony CLI and FrankenPHP were not found; falling back to php -S');
   return 'php';
 }
 
 function isInPath(binary: string): boolean {
-  const command = process.platform === 'win32' ? 'where' : 'command -v';
-  const result = spawnSync(command, [binary], { shell: true, stdio: 'ignore' });
+  const result =
+    process.platform === 'win32'
+      ? spawnSync('where.exe', [binary], { stdio: 'ignore' })
+      : spawnSync('/bin/sh', ['-c', 'command -v "$1"', 'storybook-symfony', binary], {
+          stdio: 'ignore',
+        });
   return result.status === 0;
 }
