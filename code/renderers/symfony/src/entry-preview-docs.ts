@@ -1,6 +1,6 @@
 import { SourceType } from 'storybook/internal/docs-tools';
 
-import { sourceDecorator } from './docs/sourceDecorator.ts';
+import { generateTwigSource, sourceDecorator } from './docs/sourceDecorator.ts';
 import type { Parameters } from './types.ts';
 
 export const decorators = [sourceDecorator];
@@ -11,6 +11,10 @@ export const parameters: Parameters = {
     source: {
       type: SourceType.DYNAMIC,
       language: 'twig',
+      transform: (_source, context) =>
+        typeof context.component === 'string'
+          ? generateTwigSource(context.component, context.args, context.parameters.symfony)
+          : '',
     },
   },
 };
