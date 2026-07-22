@@ -1,138 +1,135 @@
-import { global } from '@storybook/global';
 import type { Plugin } from 'vite';
 
 import { logger } from 'storybook/internal/node-logger';
 
+import {
+  fetchComponentIndex,
+  generateCsfModule,
+  isVirtualComponentImport,
+  parseComponentIdFromVirtualImport,
+} from '@storybook/symfony/indexer';
+import { resolveSymfonyOptions } from './options.ts';
 import { getOrStartServer, stopServer } from './server/manager.ts';
-import type { ServerState } from './server/types.ts';
+import {
+  collectPublicAssets,
+  createStaticRuntimeArtifact,
+  type PublicAsset,
+  type StaticRuntimeArtifact,
+} from './static/package.ts';
 import type { SymfonyFrameworkOptions } from './types.ts';
 
-type ComponentMetadata = {
-  id: string;
-  type: 'twig_component' | 'live_component';
-  title: string;
-  template: string;
-  class: string;
-  props: { name: string; type?: string; required?: boolean; default?: unknown }[];
-};
+const SYMFONY_PROXY_PATH = '/__storybook_symfony';
 
 export function symfonyPlugin(options: SymfonyFrameworkOptions): Plugin {
-  let serverPromise: Promise<ServerState> | null = null;
+  let serverUrl: string | null = null;
+  let staticArtifact: StaticRuntimeArtifact | null = null;
+  let staticPublicAssets: PublicAsset[] = [];
 
   return {
     name: 'storybook-symfony',
-    async config() {
-      serverPromise = getOrStartServer(options.symfony);
-      const server = await serverPromise;
+    async config(_config, environment) {
+      const server = await getOrStartServer(options.symfony);
+      serverUrl = server.url;
+      const resolvedOptions = resolveSymfonyOptions(options.symfony);
+
+      if (environment.command === 'serve') {
+        const assetProxies = Object.fromEntries(
+          resolvedOptions.publicAssetPaths.map((path) => [
+            path,
+            { target: server.url, changeOrigin: true },
+          ])
+        );
+
+        return {
+          define: {
+            'import.meta.env.STORYBOOK_SYMFONY_URL': JSON.stringify(SYMFONY_PROXY_PATH),
+          },
+          server: {
+            proxy: {
+              ...assetProxies,
+              [SYMFONY_PROXY_PATH]: {
+                target: server.url,
+                changeOrigin: true,
+                rewrite: (path) => path.slice(SYMFONY_PROXY_PATH.length) || '/',
+              },
+              // Live Components derives this endpoint from Symfony's route rather than the
+              // render response, so it also needs a same-origin path in the preview iframe.
+              '/_components': {
+                target: server.url,
+                changeOrigin: true,
+              },
+            },
+          },
+        };
+      }
+
+      [staticArtifact, staticPublicAssets] = await Promise.all([
+        createStaticRuntimeArtifact(resolvedOptions),
+        collectPublicAssets(resolvedOptions),
+      ]);
+
+      logger.info(
+        `Packaged ${staticArtifact.fileCount} Symfony application files for the static PHP runtime`
+      );
 
       return {
+        assetsInclude: [/\.data$/, /\.la$/, /\.so$/, /\.wasm$/],
         define: {
-          'import.meta.env.STORYBOOK_SYMFONY_URL': JSON.stringify(server.url),
+          'import.meta.env.STORYBOOK_SYMFONY_URL': JSON.stringify(''),
+          'import.meta.env.STORYBOOK_SYMFONY_ARCHIVE_URL': JSON.stringify(
+            `./${staticArtifact.fileName}`
+          ),
+        },
+        worker: {
+          format: 'es',
         },
       };
     },
-    configureServer(viteServer) {
-      viteServer.httpServer?.on('close', async () => {
-        await stopServer();
+    buildStart() {
+      if (!staticArtifact) {
+        return;
+      }
+
+      this.emitFile({
+        type: 'asset',
+        fileName: staticArtifact.fileName,
+        source: staticArtifact.archive,
       });
-    },
-    async closeBundle() {
-      await stopServer();
+
+      for (const asset of staticPublicAssets) {
+        this.emitFile({ type: 'asset', fileName: asset.fileName, source: asset.source });
+      }
     },
     resolveId(id) {
       if (isVirtualComponentImport(id)) {
         return id;
       }
-
-      return null;
     },
     async load(id) {
+      if (!isVirtualComponentImport(id)) {
+        return;
+      }
+
       const componentId = parseComponentIdFromVirtualImport(id);
-
-      if (!componentId || !serverPromise) {
-        return null;
+      if (!componentId || !serverUrl) {
+        return;
       }
 
-      const server = await serverPromise;
-      const metadata = await fetchComponentMetadata(server.url, componentId);
+      const components = await fetchComponentIndex(serverUrl);
+      const component = components.find((c) => c.id === componentId);
 
-      if (!metadata) {
-        return null;
+      if (!component) {
+        logger.warn(`Auto-discovery: component "${componentId}" not found in Symfony index`);
+        return;
       }
 
-      return generateCsfModule(metadata);
+      return generateCsfModule(component);
+    },
+    configureServer(viteServer) {
+      viteServer.httpServer?.once('close', () => stopServer());
+    },
+    async closeBundle() {
+      await stopServer();
     },
   };
-}
-
-async function fetchComponentMetadata(
-  serverUrl: string,
-  componentId: string
-): Promise<ComponentMetadata | null> {
-  try {
-    const response = await global.fetch(`${serverUrl}/_storybook/index`);
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = (await response.json()) as { components?: ComponentMetadata[] };
-
-    return data.components?.find((component) => component.id === componentId) ?? null;
-  } catch (error) {
-    logger.warn(`Failed to fetch metadata for component ${componentId}: ${String(error)}`);
-
-    return null;
-  }
-}
-
-const VIRTUAL_PREFIX = 'virtual:storybook-symfony-component/';
-
-function isVirtualComponentImport(importPath: string): boolean {
-  return importPath.startsWith(VIRTUAL_PREFIX);
-}
-
-function parseComponentIdFromVirtualImport(importPath: string): string | undefined {
-  if (!isVirtualComponentImport(importPath)) {
-    return undefined;
-  }
-
-  return importPath.slice(VIRTUAL_PREFIX.length);
-}
-
-function generateCsfModule(component: ComponentMetadata): string {
-  const adapter = component.type === 'live_component' ? "adapter: 'live',\n" : '';
-
-  return `export default {
-  title: ${JSON.stringify(component.title)},
-  component: ${JSON.stringify(component.id)},
-  parameters: {
-    symfony: {
-      autoDiscovered: true,
-${adapter}    },
-  },
-};
-
-export const Default = {
-  args: ${buildDefaultArgs(component.props)},
-};
-`;
-}
-
-function buildDefaultArgs(
-  props: { name: string; type?: string; required?: boolean; default?: unknown }[]
-): string {
-  const defaults: Record<string, unknown> = {};
-
-  for (const prop of props) {
-    if (!prop.required && prop.default !== undefined) {
-      defaults[prop.name] = prop.default;
-    }
-  }
-
-  if (Object.keys(defaults).length === 0) {
-    return '{}';
-  }
-
-  return JSON.stringify(defaults, null, 2);
 }
