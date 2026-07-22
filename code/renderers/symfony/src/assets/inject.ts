@@ -1,6 +1,6 @@
 import { global } from '@storybook/global';
 
-import type { NormalizedAssets, ScriptAsset, StyleAsset } from './types.ts';
+import type { ImportMap, NormalizedAssets, ScriptAsset, StyleAsset } from './types.ts';
 
 const STORYBOOK_SYMFONY_ASSET_CONTAINER = 'storybook-symfony-assets';
 
@@ -9,26 +9,32 @@ export interface InjectedElements {
   cleanup: () => void;
 }
 
-export function injectAssets(assets: NormalizedAssets): InjectedElements {
+export function injectAssets(
+  assets: NormalizedAssets,
+  serverUrl?: string,
+  rebaseRootRelative = false
+): InjectedElements {
   const container = getAssetContainer();
   const elements: HTMLElement[] = [];
 
   if (assets.importmap) {
     const script = document.createElement('script');
     script.type = 'importmap';
-    script.textContent = JSON.stringify(assets.importmap);
+    script.textContent = JSON.stringify(
+      resolveImportMap(assets.importmap, serverUrl, rebaseRootRelative)
+    );
     container.appendChild(script);
     elements.push(script);
   }
 
   assets.styles.forEach((style) => {
-    const element = createStyleElement(style);
+    const element = createStyleElement(style, serverUrl, rebaseRootRelative);
     container.appendChild(element);
     elements.push(element);
   });
 
   assets.scripts.forEach((script) => {
-    const element = createScriptElement(script);
+    const element = createScriptElement(script, serverUrl, rebaseRootRelative);
     container.appendChild(element);
     elements.push(element);
   });
@@ -58,11 +64,15 @@ function getAssetContainer(): HTMLElement {
   return container;
 }
 
-function createStyleElement(style: StyleAsset): HTMLElement {
+function createStyleElement(
+  style: StyleAsset,
+  serverUrl?: string,
+  rebaseRootRelative = false
+): HTMLElement {
   if (style.url) {
     const link = global.document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = style.url;
+    link.href = resolveAssetUrl(style.url, serverUrl, rebaseRootRelative);
     return link;
   }
 
@@ -71,7 +81,11 @@ function createStyleElement(style: StyleAsset): HTMLElement {
   return styleElement;
 }
 
-function createScriptElement(script: ScriptAsset): HTMLElement {
+function createScriptElement(
+  script: ScriptAsset,
+  serverUrl?: string,
+  rebaseRootRelative = false
+): HTMLElement {
   const element = global.document.createElement('script');
 
   if (script.type === 'module') {
@@ -79,10 +93,63 @@ function createScriptElement(script: ScriptAsset): HTMLElement {
   }
 
   if (script.url) {
-    element.src = script.url;
+    element.src = resolveAssetUrl(script.url, serverUrl, rebaseRootRelative);
   } else {
     element.textContent = script.content ?? '';
   }
 
   return element;
+}
+
+function resolveImportMap(
+  importMap: ImportMap,
+  serverUrl?: string,
+  rebaseRootRelative = false
+): ImportMap {
+  return {
+    ...importMap,
+    imports: resolveImportEntries(importMap.imports, serverUrl, rebaseRootRelative),
+    scopes: importMap.scopes
+      ? Object.fromEntries(
+          Object.entries(importMap.scopes).map(([scope, entries]) => [
+            resolveAssetUrl(scope, serverUrl, rebaseRootRelative),
+            resolveImportEntries(entries, serverUrl, rebaseRootRelative) ?? {},
+          ])
+        )
+      : undefined,
+  };
+}
+
+function resolveImportEntries(
+  entries: Record<string, string> | undefined,
+  serverUrl?: string,
+  rebaseRootRelative = false
+): Record<string, string> | undefined {
+  return entries
+    ? Object.fromEntries(
+        Object.entries(entries).map(([specifier, url]) => [
+          specifier,
+          resolveAssetUrl(url, serverUrl, rebaseRootRelative),
+        ])
+      )
+    : undefined;
+}
+
+export function resolveAssetUrl(
+  url: string,
+  serverUrl?: string,
+  rebaseRootRelative = false
+): string {
+  if (!serverUrl || /^(?:[a-z]+:)?\/\//i.test(url) || /^(?:data|blob):/i.test(url)) {
+    return url;
+  }
+
+  if (serverUrl.startsWith('/')) {
+    if (url.startsWith('/') && !rebaseRootRelative) {
+      return url;
+    }
+    return `${serverUrl.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+  }
+
+  return new URL(url, `${serverUrl.replace(/\/$/, '')}/`).href;
 }
