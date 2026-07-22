@@ -275,27 +275,26 @@
             "dist": {
                 "type": "path",
                 "url": "../../../storybook-symfony-bundle",
-                "reference": "97422c4a93bd95b3dc55615de82b5b1a08352e16"
+                "reference": "833e201398ec8f193d166307506cbe9a8886e8ca"
             },
             "require": {
                 "php": ">=8.2",
-                "symfony/config": "^6.4 || ^7.0",
-                "symfony/dependency-injection": "^6.4 || ^7.0",
-                "symfony/http-foundation": "^6.4 || ^7.0",
-                "symfony/http-kernel": "^6.4 || ^7.0",
-                "symfony/routing": "^6.4 || ^7.0",
+                "symfony/config": "^6.4 || ^7.0 || ^8.0",
+                "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+                "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0",
+                "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+                "symfony/routing": "^6.4 || ^7.0 || ^8.0",
                 "symfony/ux-twig-component": "^2.0 || ^3.0",
                 "twig/twig": "^3.8"
             },
             "require-dev": {
                 "pentatrion/vite-bundle": "^8.0",
                 "phpunit/phpunit": "^10.0 || ^11.0",
-                "symfony/asset-mapper": "^6.4 || ^7.0",
-                "symfony/framework-bundle": "^6.4 || ^7.0",
-                "symfony/twig-bundle": "^6.4 || ^7.0",
-                "symfony/ux-live-component": "^2.0 || ^3.0",
+                "symfony/asset-mapper": "^6.4 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+                "symfony/twig-bundle": "^6.4 || ^7.0 || ^8.0",
                 "symfony/webpack-encore-bundle": "^2.0",
-                "symfony/yaml": "^6.4 || ^7.0"
+                "symfony/yaml": "^6.4 || ^7.0 || ^8.0"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -315,7 +314,7 @@
                 ]
             },
             "license": [
-                "MIT"
+                "Apache-2.0"
             ],
             "description": "Symfony bundle for Storybook's Symfony/Twig framework",
             "homepage": "https://github.com/storybookjs/storybook-symfony-bundle",
