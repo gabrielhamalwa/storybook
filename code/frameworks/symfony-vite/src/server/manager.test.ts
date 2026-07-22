@@ -3,41 +3,18 @@ import { existsSync } from 'node:fs';
 import { vol } from 'memfs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resolveSymfonyOptions } from '../options.ts';
-
 vi.mock('node:fs', { spy: true });
-vi.mock('./detect.ts', () => ({
-  detectServerType: vi.fn(),
-}));
+vi.mock('./detect.ts', () => ({ detectServerType: vi.fn() }));
+vi.mock('./php.ts', () => ({ startPhpServer: vi.fn() }));
+vi.mock('./frankenphp.ts', () => ({ startFrankenPhpServer: vi.fn() }));
+vi.mock('./roadrunner.ts', () => ({ startRoadRunnerServer: vi.fn() }));
+vi.mock('./symfony-cli.ts', () => ({ startSymfonyCliServer: vi.fn() }));
+vi.mock('./existing.ts', () => ({ startExistingServer: vi.fn() }));
+vi.mock('./prewarm.ts', () => ({ prewarmSymfonyCache: vi.fn() }));
 
-vi.mock('./php.ts', () => ({
-  startPhpServer: vi.fn(),
-}));
-
-vi.mock('./frankenphp.ts', () => ({
-  startFrankenPhpServer: vi.fn(),
-}));
-
-vi.mock('./roadrunner.ts', () => ({
-  startRoadRunnerServer: vi.fn(),
-}));
-
-vi.mock('./symfony-cli.ts', () => ({
-  startSymfonyCliServer: vi.fn(),
-}));
-
-vi.mock('./existing.ts', () => ({
-  startExistingServer: vi.fn(),
-}));
-
-vi.mock('./prewarm.ts', () => ({
-  prewarmSymfonyCache: vi.fn(),
-}));
-
-describe('getOrStartServer', () => {
+describe('Symfony server manager', () => {
   beforeEach(async () => {
     vi.resetModules();
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200 } as Response));
     vol.reset();
     vol.fromNestedJSON({ '/project/public/index.php': '' });
 
@@ -46,46 +23,85 @@ describe('getOrStartServer', () => {
   });
 
   afterEach(() => {
-    vi.unstubAllGlobals();
     vi.clearAllMocks();
     delete process.env.STORYBOOK_SYMFONY_URL;
   });
 
-  it('auto-detects FrankenPHP and delegates to it', async () => {
+  it('detects and starts a local backend once', async () => {
     const { detectServerType } = await import('./detect.ts');
-    const { startFrankenPhpServer } = await import('./frankenphp.ts');
+    const { startSymfonyCliServer } = await import('./symfony-cli.ts');
     const { getOrStartServer } = await import('./manager.ts');
 
-    vi.mocked(detectServerType).mockResolvedValue('frankenphp');
-    vi.mocked(startFrankenPhpServer).mockResolvedValue({
+    vi.mocked(detectServerType).mockResolvedValue('symfony-cli');
+    vi.mocked(startSymfonyCliServer).mockResolvedValue({
       url: 'http://127.0.0.1:8080',
       stop: vi.fn(),
     });
 
-    const state = await getOrStartServer({ projectDir: '/project', server: 'auto' });
+    const first = getOrStartServer({ projectDir: '/project' });
+    const second = getOrStartServer({ projectDir: '/project' });
 
-    expect(detectServerType).toHaveBeenCalled();
-    expect(startFrankenPhpServer).toHaveBeenCalled();
-    expect(state.url).toBe('http://127.0.0.1:8080');
+    await expect(first).resolves.toBe(await second);
+    expect(startSymfonyCliServer).toHaveBeenCalledOnce();
     expect(process.env.STORYBOOK_SYMFONY_URL).toBe('http://127.0.0.1:8080');
   });
 
-  it('uses an existing server without spawning a backend', async () => {
+  it('uses an existing backend without spawning a local process', async () => {
     const { startExistingServer } = await import('./existing.ts');
     const { getOrStartServer } = await import('./manager.ts');
 
     vi.mocked(startExistingServer).mockResolvedValue({
-      url: 'http://localhost:8000',
+      url: 'https://storybook-backend.example.com',
       stop: vi.fn(),
     });
 
-    const state = await getOrStartServer({
+    const server = await getOrStartServer({
       projectDir: '/project',
       server: 'existing',
-      serverUrl: 'http://localhost:8000',
+      serverUrl: 'https://storybook-backend.example.com',
     });
 
-    expect(startExistingServer).toHaveBeenCalledWith({ serverUrl: 'http://localhost:8000' });
-    expect(state.url).toBe('http://localhost:8000');
+    expect(startExistingServer).toHaveBeenCalledWith({
+      serverUrl: 'https://storybook-backend.example.com',
+    });
+    expect(server.url).toBe('https://storybook-backend.example.com');
+  });
+
+  it('retries after a server startup failure', async () => {
+    const { prewarmSymfonyCache } = await import('./prewarm.ts');
+    const { startPhpServer } = await import('./php.ts');
+    const { getOrStartServer } = await import('./manager.ts');
+
+    vi.mocked(prewarmSymfonyCache)
+      .mockRejectedValueOnce(new Error('warmup failed'))
+      .mockResolvedValueOnce(undefined);
+    vi.mocked(startPhpServer).mockResolvedValue({
+      url: 'http://127.0.0.1:8080',
+      stop: vi.fn(),
+    });
+
+    await expect(getOrStartServer({ projectDir: '/project', server: 'php' })).rejects.toThrow(
+      'warmup failed'
+    );
+    await expect(
+      getOrStartServer({ projectDir: '/project', server: 'php' })
+    ).resolves.toMatchObject({
+      url: 'http://127.0.0.1:8080',
+    });
+
+    expect(prewarmSymfonyCache).toHaveBeenCalledTimes(2);
+    expect(startPhpServer).toHaveBeenCalledOnce();
+  });
+
+  it('clears the published URL even when stopping fails', async () => {
+    const { startPhpServer } = await import('./php.ts');
+    const { getOrStartServer, stopServer } = await import('./manager.ts');
+    const stop = vi.fn().mockRejectedValue(new Error('stop failed'));
+
+    vi.mocked(startPhpServer).mockResolvedValue({ url: 'http://127.0.0.1:8080', stop });
+    await getOrStartServer({ projectDir: '/project', server: 'php' });
+
+    await expect(stopServer()).rejects.toThrow('stop failed');
+    expect(process.env.STORYBOOK_SYMFONY_URL).toBeUndefined();
   });
 });
