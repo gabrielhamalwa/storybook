@@ -1993,20 +1993,20 @@ __metadata:
 
 "@storybook/builder-vite@file:../../code/builders/builder-vite::locator=symfony-webpack-encore-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/builder-vite@file:../../code/builders/builder-vite#../../code/builders/builder-vite::hash=d7fae7&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/builder-vite@file:../../code/builders/builder-vite#../../code/builders/builder-vite::hash=997dee&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/csf-plugin": "workspace:*"
     ts-dedent: "npm:^2.0.0"
   peerDependencies:
     storybook: "workspace:^"
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-  checksum: 10c0/95b3afa7b70453cfe53bae57f3930708d9846eea549177ce26e34a8b87656bf56f6806590d035cf330ce385947833b6235835f0d0fcdbcfd96d5659801e9ee91
+  checksum: 10c0/bdea6d0953a087c45f6be307e15569c209fdc6e81c3b2b782656a0d56293ef9ea455ec18286eeea739c7b456476ae136c960e4a1c3806c663288082efacef9c2
   languageName: node
   linkType: hard
 
 "@storybook/csf-plugin@file:../../code/lib/csf-plugin::locator=symfony-webpack-encore-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/csf-plugin@file:../../code/lib/csf-plugin#../../code/lib/csf-plugin::hash=dda2f9&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/csf-plugin@file:../../code/lib/csf-plugin#../../code/lib/csf-plugin::hash=b162a6&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
   dependencies:
     unplugin: "npm:^2.3.5"
   peerDependencies:
@@ -2024,7 +2024,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/f66ae5d61c0745706d4299208f02890a661d0a04ab2bfc023e5f217313e0501659fa7e1ea62c6079b3216bb7faa382746629499abcb3011f8bfad54023c0d0bd
+  checksum: 10c0/05bd0bdc41b4c6688751aabce5d30e6f7e4f4e0bae0a7f2ba9ccdab195f2902c2208d5225581fb4620f88b5176a34fe85a9878bade33b87cbf6cd926b4bf4e79
   languageName: node
   linkType: hard
 
@@ -2046,7 +2046,7 @@ __metadata:
 
 "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite::locator=symfony-webpack-encore-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=b1e557&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=b288e8&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/builder-vite": "workspace:*"
     "@storybook/symfony": "workspace:*"
@@ -2055,19 +2055,19 @@ __metadata:
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
   bin:
     prewarm-symfony-storybook-cache: ./bin/prewarmCache.js
-  checksum: 10c0/96781af4066e858c26f08f6a05c04e5bdeea7472534d270e2c548d2ce28eaa48a0016455fd70ae0e21621b522287241fe2ef0a811a7455f78721d9d3dbe484b2
+  checksum: 10c0/63c25dadd72db3e6c21b2b51dbe1e947f34991ae2e4dc042eac001bf11f5fb610f655f7a21cfd843244ce65682c1018a3e003e05b84e1552d516522e0d1fb66c
   languageName: node
   linkType: hard
 
 "@storybook/symfony@file:../../code/renderers/symfony::locator=symfony-webpack-encore-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=348fff&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
+  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=49d46d&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     ts-dedent: "npm:^2.0.0"
   peerDependencies:
     storybook: "workspace:^"
-  checksum: 10c0/bc7f79a6bb5b44c30809e6d379448cb30115087e5ae1a122d97f404d53b4cc612e214f34341d40bb8b56c4f04aec854d4cf17dd8da0321e00a8bb8119a9c9ae7
+  checksum: 10c0/1d8b5c5edcf8d36feeb4698478dcc8f8045071436087608f7f6b358d7422dbb172a7e473613779831fb4b4abb49df7c4ed2b51643be6f169c9ce64acd5bd0453
   languageName: node
   linkType: hard
 
@@ -5294,7 +5294,7 @@ __metadata:
 
 "storybook@file:../../code/core::locator=symfony-webpack-encore-kitchen-sink%40workspace%3A.":
   version: 10.5.0-alpha.9
-  resolution: "storybook@file:../../code/core#../../code/core::hash=ff5c77&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
+  resolution: "storybook@file:../../code/core#../../code/core::hash=d1f94d&locator=symfony-webpack-encore-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     "@storybook/icons": "npm:^2.0.2"
@@ -5325,7 +5325,7 @@ __metadata:
       optional: true
   bin:
     storybook: ./dist/bin/dispatcher.js
-  checksum: 10c0/08c6d31ff4f7cd5e0d2a433edbcae06bb2d0a08a708b0fd476a233c10400b3139293e05a7402b6d8e61b5999c0234b0b2d35f8cf109cf3b88bf1dafa4e9765b5
+  checksum: 10c0/6b7fe53176f35c10bb871797b2223b1f7bbdf0bee035306748df435eee954fdb74ba03171460a7645ce3c231accb7af452504957579976f013d6f716878a4a83
   languageName: node
   linkType: hard
 
