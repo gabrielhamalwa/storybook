@@ -12,7 +12,7 @@ Storybook for Symfony & Vite is a [framework](../../contribute/framework.mdx) th
   versions={[
     {
       name: 'Symfony',
-      range: '6.4 || 7.0',
+      range: '6.4 || 7.x || 8.x',
       icon: '/images/logos/renderers/logo-symfony.svg',
     },
     {
@@ -41,18 +41,23 @@ To install Storybook in an existing Symfony project, run this command in your pr
   copyEvent="CreateCommandCopy"
 />
 
-This runs the Storybook `add` command, which installs the `@storybook/symfony-vite` framework and updates your `.storybook/main.ts`. You still need the `storybook/symfony-bundle` Composer package in your Symfony project:
+The initializer detects `symfony/framework-bundle` in `composer.json`, installs
+`@storybook/symfony-vite`, and creates the standard Storybook configuration. Install the companion
+Composer bundle as a development dependency:
 
 ```bash
 composer require --dev storybook/symfony-bundle
 ```
+
+The generated `.storybook/main.ts` configures `framework.name` as `@storybook/symfony-vite`. The
+initializer reports the Composer command but does not run Composer on your behalf.
 
 You can then get started [writing stories](../whats-a-story.mdx), [running tests](../../writing-tests/index.mdx), and [documenting your components](../../writing-docs/index.mdx). For more control over the installation process, refer to the [installation guide](../install.mdx).
 
 ### Requirements
 
 - PHP 8.2 or higher
-- Symfony 6.4 or 7.0 with Twig and Symfony UX TwigComponent installed
+- Symfony 6.4, 7.x, or 8.x with Twig and Symfony UX TwigComponent installed
 - Vite 5 or higher
 - The `storybook/symfony-bundle` Composer package installed and enabled
 
@@ -62,11 +67,51 @@ To run Storybook for a particular project, run the following:
 
 <CodeSnippets path="storybook-run-dev.md" />
 
-To build Storybook, run:
+To create a production build, run the standard Storybook build command:
 
 <CodeSnippets path="build-storybook-production-mode.md" />
 
 You will find the output in the configured `outputDir` (default is `storybook-static`).
+
+The output uses Storybook's normal `storybook-static` directory. It is self-contained and can be
+served by any static file host; no PHP or Symfony process is required after the build finishes.
+Rendering, controls, Stimulus, and Live Component actions run through PHP 8.4 WebAssembly in a
+dedicated browser worker. Hosting at a nested path such as `/design-system/` is supported.
+The static interaction suite runs in Chromium, Firefox, and WebKit. The runtime uses native
+WebAssembly JavaScript Promise Integration (JSPI) when the browser provides it and falls back to
+Asyncify otherwise; you don't need to enable browser flags.
+
+<Callout variant="warning" icon="⚠️">
+
+The static artifact contains the PHP source and Composer dependencies needed to boot the
+`storybook` Symfony environment. Anything delivered to a browser is inspectable. The framework
+excludes environment files, Symfony secrets, caches, logs, tests, and repository metadata by
+default, but you must not add secrets through `staticInclude` or application configuration.
+
+</Callout>
+
+Build your application assets for production before building Storybook. The framework rejects Vite
+or Encore manifests that still reference a local development server.
+
+Live Component actions, including file uploads submitted with Symfony UX's `files(...)` action
+modifier, work across the tested browser matrix. Storybook transfers selected files to the PHP-WASM
+worker and restores them as Symfony `UploadedFile` objects for the action. Files are temporary and
+exist only for the request.
+
+### Content Security Policy
+
+The static runtime doesn't require the `unsafe-eval` Content Security Policy (CSP) source. WebAssembly
+compilation uses the narrower `wasm-unsafe-eval` source. The following policy is the baseline tested
+by the Symfony static-build browser suite:
+
+```text
+default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; worker-src 'self'
+```
+
+Storybook's generated HTML includes inline bootstrap scripts and styles. You can replace
+`unsafe-inline` with hashes or nonces if your hosting pipeline rewrites the generated policy. Keep
+`worker-src 'self'`, `connect-src 'self'`, and `wasm-unsafe-eval` so the PHP worker can load its
+same-origin application archive, extension, and WebAssembly files.
 
 ## Writing Symfony stories
 
@@ -103,7 +148,7 @@ export const Secondary: Story = {
 };
 ```
 
-The component template is rendered by the PHP backend, so any Stimulus controllers declared with `data-controller` in the template connect automatically when the story is rendered.
+The component template is rendered by Symfony, so any Stimulus controllers declared with `data-controller` in the template connect automatically when the story is rendered.
 
 ```twig title="templates/components/Button.html.twig"
 <button
@@ -327,7 +372,11 @@ framework:
 
 ### Use a fast PHP server
 
-When `server` is omitted or set to `'auto'`, the framework detects FrankenPHP, RoadRunner, or the Symfony CLI and falls back to `php -S`. For the fastest day-to-day development, install FrankenPHP or the Symfony CLI and keep them in your `PATH`:
+When `server` is omitted or set to `'auto'`, the framework prefers FrankenPHP, then the Symfony
+CLI, and falls back to `php -S`. This gives projects with FrankenPHP installed the faster managed
+path while retaining a zero-configuration fallback anywhere PHP is available. RoadRunner remains an
+explicit advanced option because its worker runtime is application-specific; use `existing` when
+your project already manages its own PHP server.
 
 ```ts title=".storybook/main.ts"
 import type { StorybookConfig } from '@storybook/symfony-vite';
@@ -375,9 +424,14 @@ When managing the cache manually, warm it once after installing or changing conf
 APP_ENV=storybook bin/console cache:warmup
 ```
 
+Pre-warming applies only when Storybook starts a managed PHP backend, including the temporary
+backend used for build-time indexing. It is skipped for `server: 'existing'` and is unrelated to the
+PHP-WASM runtime in the emitted static Storybook. A warm-up failure is reported as a warning and the
+server still starts; Symfony can compile the cache on its first request instead.
+
 ## Stimulus
 
-Symfony UX [Stimulus](https://stimulus.hotwired.dev/) controllers work out of the box as long as the component's entrypoint assets are loaded. The renderer dispatches the same lifecycle events as the browser, so controllers connect when a story is rendered and disconnect before the next story replaces the canvas.
+Symfony UX [Stimulus](https://stimulus.hotwired.dev/) controllers work as long as the component's entrypoint assets are loaded. Stimulus observes the Storybook canvas and connects or disconnects controllers as rendered HTML changes.
 
 Make sure the component's template declares a controller:
 
@@ -495,17 +549,27 @@ Type: `object`
 
 Configures the Symfony PHP backend and server lifecycle.
 
-| Option         | Type      | Default                    | Description                                                                                                                               |
-| -------------- | --------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `environment`  | `string`  | `storybook`                | Symfony environment used to boot the kernel.                                                                                              |
-| `projectDir`   | `string`  | `process.cwd()`            | Path to the Symfony project root.                                                                                                         |
-| `publicDir`    | `string`  | `<projectDir>/public`      | Path to the public directory.                                                                                                             |
-| `server`       | `string`  | `auto`                     | PHP server backend: `php`, `frankenphp`, `roadrunner`, `symfony-cli`, `existing`, or `auto`.                                              |
-| `serverUrl`    | `string`  | —                          | URL to use when `server` is `existing`.                                                                                                   |
-| `port`         | `number`  | random free port           | Port for the PHP server.                                                                                                                  |
-| `phpBinary`    | `string`  | `php`                      | Path to the PHP binary.                                                                                                                   |
-| `console`      | `string`  | `<projectDir>/bin/console` | Path to the Symfony console.                                                                                                              |
-| `prewarmCache` | `boolean` | `true`                     | Run `cache:warmup` (and `asset-map:compile` when AssetMapper is available) for the configured environment before starting the PHP server. |
+| Option             | Type       | Default                             | Description                                                                                                                                |
+| ------------------ | ---------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `environment`      | `string`   | `storybook`                         | Symfony environment used to boot the kernel.                                                                                               |
+| `projectDir`       | `string`   | `process.cwd()`                     | Path to the Symfony project root.                                                                                                          |
+| `publicDir`        | `string`   | `<projectDir>/public`               | Path to the public directory.                                                                                                              |
+| `server`           | `string`   | `auto`                              | PHP server backend: `php`, `frankenphp`, `roadrunner`, `symfony-cli`, `existing`, or `auto`.                                               |
+| `serverUrl`        | `string`   | —                                   | URL to use when `server` is `existing`.                                                                                                    |
+| `port`             | `number`   | random free port                    | Port for the PHP server.                                                                                                                   |
+| `phpBinary`        | `string`   | `php`                               | Path to the PHP binary.                                                                                                                    |
+| `console`          | `string`   | `<projectDir>/bin/console`          | Path to the Symfony console.                                                                                                               |
+| `prewarmCache`     | `boolean`  | `true`                              | Run `cache:warmup` (and `asset-map:compile` when AssetMapper is available) for the configured environment before starting the PHP server.  |
+| `publicAssetPaths` | `string[]` | `['/assets', '/build', '/bundles']` | Public URL prefixes proxied during development and copied into static builds. Add your asset pipeline's prefix when it uses a custom path. |
+| `staticInclude`    | `string[]` | —                                   | Additional project-relative, non-secret files or directories to include in the static Symfony archive.                                     |
+| `staticExclude`    | `string[]` | —                                   | Additional project-relative files or directories to exclude from the static Symfony archive.                                               |
+
+`server` and `serverUrl` configure development and build-time indexing. They do not create a runtime
+backend dependency in `storybook-static`.
+
+Static builds require browser-compatible PHP dependencies. The build reports unsupported Composer
+extensions before emitting an artifact. Replace external databases, private services, native
+binaries, and other non-browser dependencies in the isolated `storybook` environment.
 
 #### `builder`
 
