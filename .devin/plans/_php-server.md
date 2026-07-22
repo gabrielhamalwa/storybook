@@ -13,9 +13,20 @@ Every implementation decision and code change in this sub-plan must be grounded 
 - **No guessing:** If a contract, API, or behavior is not verified by the docs or source, treat it as unknown and look it up before building on it.
 - **Checklists drive work:** Use the checklist in this sub-plan to track progress. Do not mark an item complete until it is actually implemented and verified.
 
-## Default: `php -S`
+## Default hierarchy
 
-The framework starts a PHP built-in server as a child process managed by the Vite plugin.
+The default `auto` mode prefers the managed backends in this order:
+
+1. FrankenPHP as the recommended fast path.
+2. Symfony CLI as the conventional Symfony development-server fallback.
+3. `php -S` as the zero-configuration baseline wherever PHP is installed.
+
+RoadRunner stays explicit because its long-lived worker runtime requires application-specific
+configuration. `existing` is the escape hatch for projects that manage their own backend.
+
+All managed backends are child processes owned by the Storybook session.
+
+### PHP built-in server
 
 ```bash
 php -S 127.0.0.1:<port> -t public/ public/index.php
@@ -40,15 +51,14 @@ php -S 127.0.0.1:<port> -t public/ public/index.php
 - Keep the PHP server alive for the whole Storybook session.
 - Use OPcache if available.
 
-## Opt-in fast servers
-
 ### FrankenPHP
 
 ```bash
-frankenphp php-server --worker public/index.php
+frankenphp php-server --root public --listen 127.0.0.1:<port>
 ```
 
-In worker mode, the Symfony kernel boots once and stays in memory across requests. This is the fastest practical option.
+The initial integration uses FrankenPHP classic mode. Worker mode can be added separately once its
+long-lived application lifecycle has dedicated compatibility coverage.
 
 ### RoadRunner
 
@@ -122,9 +132,11 @@ export type SymfonyServerOptions = {
 If `server` is not set, the framework auto-detects:
 
 1. If `frankenphp` is in `PATH` → use FrankenPHP.
-2. If `rr` is in `PATH` → use RoadRunner.
-3. If `symfony` is in `PATH` → use Symfony CLI.
-4. Otherwise → use `php -S`.
+2. If `symfony` is in `PATH` → use Symfony CLI.
+3. Otherwise → use `php -S`.
+
+RoadRunner is never auto-selected because merely finding `rr` does not prove that the application
+has a compatible worker runtime.
 
 ## Checklist
 
@@ -147,7 +159,7 @@ If `server` is not set, the framework auto-detects:
 - [x] Generate `.rr.storybook.yaml` config for RoadRunner on the fly.
 - [x] Create `src/server/symfony-cli.ts` with `startSymfonyCliServer()` and `stopSymfonyCliServer()`.
 - [x] Create `src/server/existing.ts` that validates `serverUrl` and skips start/stop.
-- [x] Create `src/server/detect.ts` that checks `PATH` for `frankenphp`, `rr`, `symfony`, and falls back to `php`.
+- [x] Create `src/server/detect.ts` that checks `PATH` for `frankenphp`, then `symfony`, and falls back to `php`.
 - [x] Create `src/server/health.ts` that polls `GET /_storybook/health` with timeout and retries.
 - [x] Implement server URL injection via Vite `define` (`import.meta.env.STORYBOOK_SYMFONY_URL`).
 - [x] Implement fallback to runtime environment variable if `define` is not available.
