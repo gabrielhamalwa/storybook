@@ -74,15 +74,7 @@ describe('startFrankenPhpServer', () => {
     expect(server.url).toBe('http://127.0.0.1:12345');
     expect(spawn).toHaveBeenCalledWith(
       'frankenphp',
-      [
-        'php-server',
-        '--worker',
-        '/project/public/index.php',
-        '--root',
-        '/project/public',
-        '--listen',
-        '127.0.0.1:12345',
-      ],
+      ['php-server', '--root', '/project/public', '--listen', '127.0.0.1:12345'],
       {
         cwd: '/project',
         env: expect.objectContaining({ APP_ENV: 'storybook' }),
