@@ -1,6 +1,6 @@
 {
   "name": "@storybook/symfony",
-  "version": "10.5.0-alpha.9",
+  "version": "10.6.0-alpha.2",
   "description": "Storybook Symfony renderer: Develop, document, and test Symfony/Twig components in isolation",
   "keywords": [
     "storybook",
@@ -57,7 +57,7 @@
     "ts-dedent": "^2.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
     "storybook": "workspace:^"

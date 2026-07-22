@@ -1,6 +1,6 @@
 {
   "name": "@storybook/symfony-vite",
-  "version": "10.5.0-alpha.9",
+  "version": "10.6.0-alpha.2",
   "description": "Storybook for Symfony and Vite: Develop, document, and test Symfony/Twig components in isolation",
   "keywords": [
     "storybook",
@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "vite": "^7.0.4"
   },
   "peerDependencies": {

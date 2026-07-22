@@ -635,6 +635,61 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@php-wasm/logger@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/logger@npm:3.1.46"
+  checksum: 10c0/75fbffeeda015d9cf7c905626f2da31f6a9d7756bc104b6b05c9ba1526a84dd5c4ec607f6f00aafb81c98c335fd5ba580f974e3e12e428b7d923eb4b96fc4647
+  languageName: node
+  linkType: hard
+
+"@php-wasm/progress@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/progress@npm:3.1.46"
+  dependencies:
+    "@php-wasm/logger": "npm:3.1.46"
+  checksum: 10c0/41f127871bcf75bb684e619c669d497d65209162d4837ddd4fe51ff9f6ac132a92d451950fff2a85fde53c35b4250bd90374c5f43a7a78c38210ccc732afefa6
+  languageName: node
+  linkType: hard
+
+"@php-wasm/stream-compression@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/stream-compression@npm:3.1.46"
+  dependencies:
+    "@php-wasm/util": "npm:3.1.46"
+  checksum: 10c0/c092fba9abff4f0c9441587261b9820f8b5b4c86345c8a5f39806aa9ad857b059bb07e04142abae0d0dda4db2dc81edab5b78916bb8226e752334e14a4300981
+  languageName: node
+  linkType: hard
+
+"@php-wasm/universal@npm:3.1.46, @php-wasm/universal@npm:^3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/universal@npm:3.1.46"
+  dependencies:
+    "@php-wasm/logger": "npm:3.1.46"
+    "@php-wasm/progress": "npm:3.1.46"
+    "@php-wasm/stream-compression": "npm:3.1.46"
+    "@php-wasm/util": "npm:3.1.46"
+    ini: "npm:4.1.2"
+  checksum: 10c0/c38b8576a12525ae2c5a7ebd3b4653b556520d27b2cc0f47e3f978668775c63d326400cd9cf1bd55378c1c794af94c73cd20f91db07b3df8d09ae63d988fbe5a
+  languageName: node
+  linkType: hard
+
+"@php-wasm/util@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/util@npm:3.1.46"
+  checksum: 10c0/f720266c03449b3a35d68800d4a1b211045d9e0b18166075ffd4c35839ee9865432613a03c4ce8f9a6423502ac8d2d04e83de488aecee267a3fe5036a7a480dc
+  languageName: node
+  linkType: hard
+
+"@php-wasm/web-8-4@npm:^3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/web-8-4@npm:3.1.46"
+  dependencies:
+    "@php-wasm/universal": "npm:3.1.46"
+    wasm-feature-detect: "npm:1.8.0"
+  checksum: 10c0/d1d3bfe1dbe4d46c27ee34c704928b8ddf09fc525e6e3da0c09157646ce4f8df6dde9d6281150474a721cba7d1668720830512816f64921bfef3b13f702351cd
+  languageName: node
+  linkType: hard
+
 "@rollup/rollup-android-arm-eabi@npm:4.62.2":
   version: 4.62.2
   resolution: "@rollup/rollup-android-arm-eabi@npm:4.62.2"
@@ -811,21 +866,21 @@ __metadata:
   linkType: hard
 
 "@storybook/builder-vite@file:../../code/builders/builder-vite::locator=symfony-asset-mapper-kitchen-sink%40workspace%3A.":
-  version: 10.5.0-alpha.9
-  resolution: "@storybook/builder-vite@file:../../code/builders/builder-vite#../../code/builders/builder-vite::hash=997dee&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
+  version: 10.6.0-alpha.2
+  resolution: "@storybook/builder-vite@file:../../code/builders/builder-vite#../../code/builders/builder-vite::hash=939b54&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/csf-plugin": "workspace:*"
     ts-dedent: "npm:^2.0.0"
   peerDependencies:
     storybook: "workspace:^"
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-  checksum: 10c0/bdea6d0953a087c45f6be307e15569c209fdc6e81c3b2b782656a0d56293ef9ea455ec18286eeea739c7b456476ae136c960e4a1c3806c663288082efacef9c2
+  checksum: 10c0/5bfc64475f6832afc50164f79752e2195e6e75aa6a0e9ac8fed43dbc9d93354b886ab67d59a8a9e110e6b3a970d3028e8bbab38d3e48fed7416a935abec36c37
   languageName: node
   linkType: hard
 
 "@storybook/csf-plugin@file:../../code/lib/csf-plugin::locator=symfony-asset-mapper-kitchen-sink%40workspace%3A.":
-  version: 10.5.0-alpha.9
-  resolution: "@storybook/csf-plugin@file:../../code/lib/csf-plugin#../../code/lib/csf-plugin::hash=b162a6&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
+  version: 10.6.0-alpha.2
+  resolution: "@storybook/csf-plugin@file:../../code/lib/csf-plugin#../../code/lib/csf-plugin::hash=7e31bf&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
   dependencies:
     unplugin: "npm:^2.3.5"
   peerDependencies:
@@ -843,7 +898,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/05bd0bdc41b4c6688751aabce5d30e6f7e4f4e0bae0a7f2ba9ccdab195f2902c2208d5225581fb4620f88b5176a34fe85a9878bade33b87cbf6cd926b4bf4e79
+  checksum: 10c0/cb4a2699956448936f7f84e0f45aabb4892aac62191280a613fb60a93076f7509cc78ebc8586e8135aa0f5241e0f58b03dac4978599cbb323af08bed708c5a52
   languageName: node
   linkType: hard
 
@@ -864,29 +919,33 @@ __metadata:
   linkType: hard
 
 "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite::locator=symfony-asset-mapper-kitchen-sink%40workspace%3A.":
-  version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=b288e8&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
+  version: 10.6.0-alpha.2
+  resolution: "@storybook/symfony-vite@file:../../code/frameworks/symfony-vite#../../code/frameworks/symfony-vite::hash=216402&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/builder-vite": "workspace:*"
     "@storybook/symfony": "workspace:*"
+    fflate: "npm:^0.8.2"
   peerDependencies:
     storybook: "workspace:^"
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
   bin:
     prewarm-symfony-storybook-cache: ./bin/prewarmCache.js
-  checksum: 10c0/63c25dadd72db3e6c21b2b51dbe1e947f34991ae2e4dc042eac001bf11f5fb610f655f7a21cfd843244ce65682c1018a3e003e05b84e1552d516522e0d1fb66c
+  checksum: 10c0/b85aa7b968324b52e2c06da583c2c446dd6a1ed704a76c3b8af0ca978f99339f773f6de87f971a8f289fb3b396ca4e2e2581a901abbc1cc6aadcf8358fc1663d
   languageName: node
   linkType: hard
 
 "@storybook/symfony@file:../../code/renderers/symfony::locator=symfony-asset-mapper-kitchen-sink%40workspace%3A.":
-  version: 10.5.0-alpha.9
-  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=49d46d&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
+  version: 10.6.0-alpha.2
+  resolution: "@storybook/symfony@file:../../code/renderers/symfony#../../code/renderers/symfony::hash=b5044d&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
   dependencies:
+    "@php-wasm/universal": "npm:^3.1.46"
+    "@php-wasm/web-8-4": "npm:^3.1.46"
     "@storybook/global": "npm:^5.0.0"
+    fflate: "npm:^0.8.2"
     ts-dedent: "npm:^2.0.0"
   peerDependencies:
     storybook: "workspace:^"
-  checksum: 10c0/1d8b5c5edcf8d36feeb4698478dcc8f8045071436087608f7f6b358d7422dbb172a7e473613779831fb4b4abb49df7c4ed2b51643be6f169c9ce64acd5bd0453
+  checksum: 10c0/c41473e1a1a18f547a5f82fab2c1da314089976e3429c69277035b60acff50468831e01ddb99543f46f85dba4dcd048161f78e89228eafd8aa117ef956d72304
   languageName: node
   linkType: hard
 
@@ -1300,6 +1359,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fflate@npm:^0.8.2":
+  version: 0.8.3
+  resolution: "fflate@npm:0.8.3"
+  checksum: 10c0/eab181ca37f5348ae76d4b6f840e0026e30220e33153289ac942222d8b9638237d486507dbcc09878d724095bd354993a2ee48bbee99c8f2c6440d4448719aa7
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:~2.3.2, fsevents@npm:~2.3.3":
   version: 2.3.3
   resolution: "fsevents@npm:2.3.3"
@@ -1330,6 +1396,13 @@ __metadata:
   version: 4.0.0
   resolution: "indent-string@npm:4.0.0"
   checksum: 10c0/1e1904ddb0cb3d6cce7cd09e27a90184908b7a5d5c21b92e232c93579d314f0b83c246ffb035493d0504b1e9147ba2c9b21df0030f48673fba0496ecd698161f
+  languageName: node
+  linkType: hard
+
+"ini@npm:4.1.2":
+  version: 4.1.2
+  resolution: "ini@npm:4.1.2"
+  checksum: 10c0/e0ffe587038e26ca1debfece6f5e52fd17f4e65be59bb481bb24b89cd2be31a71f619465918da215916b4deba7d1134c228c58fe5e0db66a71a472dee9b8f99c
   languageName: node
   linkType: hard
 
@@ -1373,6 +1446,13 @@ __metadata:
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
   checksum: 10c0/e248708d377aa058eacf2037b07ded847790e6de892bbad3dac0abba2e759cb9f121b00099a65195616badcb6eca8d14d975cb3e89eb1cfda644756402c8aeed
+  languageName: node
+  linkType: hard
+
+"jsonc-parser@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "jsonc-parser@npm:3.3.1"
+  checksum: 10c0/269c3ae0a0e4f907a914bf334306c384aabb9929bd8c99f909275ebd5c2d3bc70b9bcd119ad794f339dec9f24b6a4ee9cd5a8ab2e6435e730ad4075388fc2ab6
   languageName: node
   linkType: hard
 
@@ -1804,8 +1884,8 @@ __metadata:
   linkType: hard
 
 "storybook@file:../../code/core::locator=symfony-asset-mapper-kitchen-sink%40workspace%3A.":
-  version: 10.5.0-alpha.9
-  resolution: "storybook@file:../../code/core#../../code/core::hash=d1f94d&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
+  version: 10.6.0-alpha.2
+  resolution: "storybook@file:../../code/core#../../code/core::hash=cfc1f4&locator=symfony-asset-mapper-kitchen-sink%40workspace%3A."
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     "@storybook/icons": "npm:^2.0.2"
@@ -1816,6 +1896,7 @@ __metadata:
     "@vitest/spy": "npm:3.2.4"
     "@webcontainer/env": "npm:^1.1.1"
     esbuild: "npm:^0.18.0 || ^0.19.0 || ^0.20.0 || ^0.21.0 || ^0.22.0 || ^0.23.0 || ^0.24.0 || ^0.25.0 || ^0.26.0 || ^0.27.0 || ^0.28.0"
+    jsonc-parser: "npm:^3.3.1"
     open: "npm:^10.2.0"
     oxc-parser: "npm:^0.127.0"
     oxc-resolver: "npm:^11.19.1"
@@ -1836,7 +1917,7 @@ __metadata:
       optional: true
   bin:
     storybook: ./dist/bin/dispatcher.js
-  checksum: 10c0/6b7fe53176f35c10bb871797b2223b1f7bbdf0bee035306748df435eee954fdb74ba03171460a7645ce3c231accb7af452504957579976f013d6f716878a4a83
+  checksum: 10c0/65f8f1597025f9a100b07a2d121236e1812fcc5ed01687ee0d9e1da8735c6bee0bf9a809311765e9a056f5d073190ed7d52227ac095a809f52d78488933cb910
   languageName: node
   linkType: hard
 
@@ -2020,6 +2101,13 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/c6d359f84ad362f5c97ff7988b77c90add04162c60cdf6059375a7d9e3217848c53a8cb6b6c48517bef84b6bba4c9bc85319a889b5236acb7d5a2bc8cb7b9a8d
+  languageName: node
+  linkType: hard
+
+"wasm-feature-detect@npm:1.8.0":
+  version: 1.8.0
+  resolution: "wasm-feature-detect@npm:1.8.0"
+  checksum: 10c0/2cb43e91bbf7aa7c121bc76b3133de3ab6dc4f482acc1d2dc46c528e8adb7a51c72df5c2aacf1d219f113c04efd1706f18274d5790542aa5dd49e0644e3ee665
   languageName: node
   linkType: hard
 
