@@ -1,6 +1,4 @@
 import { spawn } from 'node:child_process';
-import { join } from 'node:path';
-
 import { logger } from 'storybook/internal/node-logger';
 
 import { waitForHealth } from './health.ts';
@@ -10,21 +8,12 @@ import type { ServerState, StartServerOptions } from './types.ts';
 export async function startFrankenPhpServer(options: StartServerOptions): Promise<ServerState> {
   const port = options.port === 0 ? await getFreePort() : options.port;
   const url = `http://127.0.0.1:${port}`;
-  const router = join(options.publicDir, 'index.php');
 
   logger.info(`Starting FrankenPHP server at ${url} in ${options.environment} environment`);
 
   const child = spawn(
     'frankenphp',
-    [
-      'php-server',
-      '--worker',
-      router,
-      '--root',
-      options.publicDir,
-      '--listen',
-      `127.0.0.1:${port}`,
-    ],
+    ['php-server', '--root', options.publicDir, '--listen', `127.0.0.1:${port}`],
     {
       cwd: options.projectDir,
       env: {
