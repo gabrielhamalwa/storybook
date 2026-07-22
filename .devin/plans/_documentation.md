@@ -24,7 +24,7 @@ Every implementation decision and code change in this sub-plan must be grounded 
 - Installation instructions:
   - `composer require storybook/symfony-bundle`
   - `yarn add -D @storybook/symfony-vite`
-  - `npx storybook add @storybook/symfony-vite`
+  - the accepted `storybook init` flow once Symfony detection is added
 - Quick start example.
 - Configuration reference.
 - Troubleshooting.
@@ -57,10 +57,8 @@ For users coming from existing Symfony/Storybook iframe integrations:
 
 ## Release plan
 
-1. **Alpha** — foundation slice works in the kitchen-sink.
-2. **Beta** — all asset pipelines and component adapters.
-3. **RC** — auto-discovery, docs, and test coverage.
-4. **Stable** — merge into `next` and ship as official.
+Release phases and stability criteria are proposed through the RFC. Dates should be set with the
+Storybook champion and maintainers after the RFC is accepted, not invented in the implementation.
 
 ## Checklist
 
@@ -76,7 +74,7 @@ For users coming from existing Symfony/Storybook iframe integrations:
 - [x] Write `code/renderers/symfony/README.md` with renderer API and advanced usage.
 - [x] Write `storybook-symfony-bundle/README.md` with Composer install, Symfony config, and endpoints.
 - [x] Write `docs/get-started/frameworks/symfony-vite.mdx` matching Storybook docs style.
-- [x] Add installation snippet for `npx storybook add @storybook/symfony-vite`.
+- [x] Document Symfony detection through `storybook init` and the explicit companion Composer step.
 - [x] Add `.storybook/main.ts` configuration example.
 - [x] Add `.stories.ts` example with args and controls.
 - [x] Add auto-discovery example with feature flag.
@@ -86,10 +84,13 @@ For users coming from existing Symfony/Storybook iframe integrations:
 - [x] Document how to remove custom iframe patches.
 - [x] Document how to migrate `.stories.json` to `.stories.ts`.
 - [x] Document how to configure the `storybook` Symfony environment.
-- [x] Add framework to `docs/get-started/frameworks/index.mdx` or equivalent framework list.
+- [x] Add the canonical page under `docs/get-started/frameworks/`; the index renders the shared
+      `HomeRenderers` catalog rather than a repository-local list.
+- [x] Classify Symfony as a core framework in the repository-local feature support matrix.
+- [ ] Add Symfony to the external `HomeRenderers` supported-framework catalog.
+- [x] Document the standard `storybook build` / `storybook-static` contract, source visibility,
+      compatibility limits, nested paths, and static hosting requirements.
 - [x] Add package metadata: keywords, homepage, bugs, repository, funding to all three packages.
-- [x] Plan alpha release date and scope.
-- [x] Plan beta release date and scope.
-- [x] Plan RC release date and scope.
-- [x] Prepare RFC for the Storybook core team with architecture overview.
+- [ ] Agree preview and stable release criteria with the RFC champion.
+- [x] Prepare an RFC draft using Storybook's current GitHub discussion template.
 - [ ] Announce alpha in Storybook Discord `#showcase` channel.
