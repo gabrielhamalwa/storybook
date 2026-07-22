@@ -1,7 +1,6 @@
 import type { Preview } from '@storybook/symfony';
 
 const preview: Preview = {
-  tags: ['autodocs'],
   parameters: {
     controls: {
       matchers: {
