@@ -33,6 +33,11 @@
     },
     "./entry-preview": "./dist/entry-preview.js",
     "./entry-preview-docs": "./dist/entry-preview-docs.js",
+    "./indexer": {
+      "types": "./dist/indexer.d.ts",
+      "code": "./src/indexer.ts",
+      "default": "./dist/indexer.js"
+    },
     "./package.json": "./package.json",
     "./preset": "./dist/preset.js"
   },
@@ -45,7 +50,10 @@
     "!src/**/*"
   ],
   "dependencies": {
+    "@php-wasm/universal": "^3.1.46",
+    "@php-wasm/web-8-4": "^3.1.46",
     "@storybook/global": "^5.0.0",
+    "fflate": "^0.8.2",
     "ts-dedent": "^2.0.0"
   },
   "devDependencies": {
