@@ -194,6 +194,7 @@ We build everything, but in order so each slice is end-to-end and testable.
 - [`_assets.md`](./_assets.md) — Asset pipeline strategy for Pentatrion Vite, Webpack Encore, AssetMapper, and none.
 - [`_stories.md`](./_stories.md) — Story format, CSF types, experimental auto-discovery indexer.
 - [`_php-server.md`](./_php-server.md) — PHP server options, default, fast paths, lifecycle management.
+- [`_static-build.md`](./_static-build.md) — Self-contained PHP-WASM builds for static hosting.
 - [`_documentation.md`](./_documentation.md) — README, user docs, release plan, migration path.
 - [`_testing.md`](./_testing.md) — Unit tests, kitchen-sink, E2E, test-runner, and CI.
 
