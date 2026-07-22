@@ -18,10 +18,15 @@ export async function prewarmSymfonyCache(options: ResolvedSymfonyOptions): Prom
   );
 
   await runConsoleCommand(options, ['cache:warmup', `--env=${options.environment}`]);
+  await runConsoleCommand(options, ['asset-map:compile', `--env=${options.environment}`], true);
 }
 
-async function runConsoleCommand(options: ResolvedSymfonyOptions, args: string[]): Promise<void> {
-  return new Promise((resolve, reject) => {
+async function runConsoleCommand(
+  options: ResolvedSymfonyOptions,
+  args: string[],
+  silentFailure = false
+): Promise<void> {
+  return new Promise((resolve) => {
     const child = spawn(options.phpBinary, [options.console, ...args], {
       cwd: options.projectDir,
       env: {
@@ -32,13 +37,19 @@ async function runConsoleCommand(options: ResolvedSymfonyOptions, args: string[]
     });
 
     child.on('error', (error) => {
-      reject(new Error(`Symfony console command failed: ${error.message}`));
+      if (!silentFailure) {
+        logger.warn(
+          `Symfony command "${args.join(' ')}" could not start: ${error.message}. ` +
+            `The server will still start, but the first request may be slower.`
+        );
+      }
+      resolve();
     });
 
     child.on('exit', (code) => {
-      if (code !== null && code !== 0) {
+      if (code !== null && code !== 0 && !silentFailure) {
         logger.warn(
-          `Symfony cache pre-warm command exited with code ${code}. ` +
+          `Symfony command "${args.join(' ')}" exited with code ${code}. ` +
             `The server will still start, but the first request may be slower.`
         );
       }
