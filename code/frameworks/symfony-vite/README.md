@@ -13,16 +13,16 @@ Learn more about Storybook at [storybook.js.org](https://storybook.js.org/?ref=r
 
 ## Installation
 
-The easiest way to add Storybook to an existing Symfony project is the `add` command:
+Run the standard Storybook initializer from the Symfony project root:
 
 ```bash
-npx storybook add @storybook/symfony-vite
+npx storybook@latest init
 ```
 
-You can also install the packages manually:
+It detects `symfony/framework-bundle`, installs the Symfony/Vite framework, and generates the
+standard Storybook configuration. Then install the companion Composer bundle:
 
 ```bash
-yarn add -D @storybook/symfony-vite storybook
 composer require --dev storybook/symfony-bundle
 ```
 
@@ -361,14 +361,20 @@ The framework can start a PHP backend for you, or connect to one that is already
 | `environment` | `string` | `'storybook'` | Symfony environment used to boot the kernel. |
 | `projectDir` | `string` | `process.cwd()` | Path to the Symfony project root. |
 | `publicDir` | `string` | `<projectDir>/public` | Path to the public directory. |
-| `server` | `'php' \| 'frankenphp' \| 'roadrunner' \| 'symfony-cli' \| 'existing'` | `'auto'` | PHP server backend. |
+| `server` | `'php' \| 'frankenphp' \| 'roadrunner' \| 'symfony-cli' \| 'existing' \| 'auto'` | `'auto'` | PHP server backend. |
 | `serverUrl` | `string` | — | URL to use when `server` is `'existing'`. |
 | `port` | `number` | random free port | Port for the PHP server. |
 | `phpBinary` | `string` | `'php'` | Path to the PHP binary. |
 | `console` | `string` | `<projectDir>/bin/console` | Path to the Symfony console. |
 | `prewarmCache` | `boolean` | `true` | Run `cache:warmup` (and `asset-map:compile` when AssetMapper is available) for the configured environment before starting the PHP server. |
+| `publicAssetPaths` | `string[]` | `['/assets', '/build', '/bundles']` | Public URL prefixes proxied during development and copied into static builds. |
+| `staticInclude` | `string[]` | — | Additional project-relative, non-secret paths to include in the static runtime. |
+| `staticExclude` | `string[]` | — | Additional project-relative paths to exclude from the static runtime. |
 
-When `server` is omitted or set to `'auto'`, the framework detects the best available backend in this order: FrankenPHP, RoadRunner, Symfony CLI, then `php -S`.
+When `server` is omitted or set to `'auto'`, the framework prefers FrankenPHP, then the Symfony
+CLI, and falls back to `php -S`. FrankenPHP is the recommended managed backend, Symfony CLI and
+`php -S` are supported fallbacks, and `existing` connects to a server managed by the application.
+RoadRunner is an explicit advanced option because its worker runtime is application-specific.
 
 ### Connect to an existing server
 
@@ -383,6 +389,9 @@ framework: {
   },
 },
 ```
+
+This override applies to development and build-time indexing. Production output still uses the
+self-contained browser runtime and does not call the existing server after deployment.
 
 ### Use a random free port
 
@@ -405,10 +414,59 @@ When you run `storybook dev`, the framework:
 1. Pre-warms the Symfony container cache for the configured environment (unless `prewarmCache` is `false` or `server` is `existing`).
 2. Starts the configured PHP server in the `storybook` environment.
 3. Polls `GET /_storybook/health` until the backend is ready.
-4. Injects the server URL into the preview bundle as `import.meta.env.STORYBOOK_SYMFONY_URL`.
+4. Proxies the backend through the Vite dev server and injects that same-origin path into the preview bundle.
 5. Stops the PHP server when the Vite dev server shuts down.
 
+Cache pre-warming is a startup-latency optimization, not a rendering requirement. It also runs for
+the temporary managed backend used during build-time indexing, but it does not affect the PHP-WASM
+runtime emitted by a static build. Failures warn and continue so Symfony can compile the cache on
+the first request.
+
 When you select a story, the renderer calls `POST /_storybook/render/{storyId}` with the component ID, optional adapter, template, controller, and story args, then injects the returned HTML and assets into the preview canvas.
+
+## Static builds
+
+Run Storybook's standard build command:
+
+```bash
+storybook build
+```
+
+Like every other framework, the default output is `storybook-static/`. The directory is a
+self-contained static web application: it can be copied to any static file server or object host and
+does not need PHP, Symfony, Node.js, or a render API after the build completes. The browser lazily
+starts PHP 8.4 WebAssembly in a dedicated worker and uses the real Symfony kernel for initial renders,
+control updates, and Live Component actions.
+
+The static interaction suite covers Chromium, Firefox, and WebKit. The runtime selects native JSPI
+when available and Asyncify otherwise; no browser flags are required. Live Component actions,
+including uploads submitted with Symfony UX's `files(...)` action modifier, work across that matrix.
+Selected files are staged only for the action and are restored as Symfony `UploadedFile` objects.
+
+The build packages application code, templates, configuration, translations, Composer dependencies,
+the front controller, and configured public asset roots. It excludes `.env*`, Symfony secrets,
+repository metadata, tests, caches, logs, and unverified external symlinks. The archive contains PHP
+source and is inspectable by anyone who can download the Storybook.
+
+Build application assets in production mode first. A manifest that references `localhost` fails the
+Storybook build. Composer requirements for PHP extensions unavailable in the browser runtime also
+fail with the missing extension names.
+
+Static assets are rebased to the Storybook deployment directory, so the same output works at `/` or
+a nested path such as `/design-system/`. The host should serve `.wasm` as `application/wasm` and make
+the emitted `.zip`, JavaScript, shared-object, and WASM files publicly readable.
+
+The supported static runtime does not require the `unsafe-eval` Content Security Policy source. It
+does require the narrower `wasm-unsafe-eval` source for WebAssembly compilation, plus same-origin
+worker and connection permissions. The static E2E suite enforces this policy and records CSP
+violations while rendering controls, Stimulus, and Live Components. Storybook's generated HTML also
+contains inline bootstrap scripts and styles, which require `unsafe-inline` unless the hosting
+pipeline supplies hashes or nonces.
+
+The upstream PHP-WASM packages still contain dormant dynamic-execution branches for generic APIs
+outside the supported Symfony runtime path. Whether those branches must be removed from distributed
+code remains a stable-release security-review question. The runtime's GPL-2.0-or-later distribution
+terms are a separate stable-release gate tracked in the RFC.
 
 ### Pre-warm cache on install
 
@@ -483,10 +541,6 @@ export const Clickable = {
 ## Migration
 
 If you are migrating from an iframe-based Symfony/Storybook integration such as `sensiolabs/StorybookBundle`, follow the [migration guide](https://github.com/storybookjs/storybook/blob/next/docs/get-started/frameworks/symfony-vite-migration.mdx). It covers removing iframe patches, migrating `.stories.json` files to `.stories.ts`, and configuring the `storybook` environment.
-
-## RFC and release plan
-
-The high-level architecture, server backends, and proposed release timeline are documented in the [RFC](https://github.com/storybookjs/storybook/blob/next/.devin/plans/RFC.md). The project is targeting an alpha, beta, RC, and stable release path once the core slices are validated in the kitchen-sink.
 
 ## Troubleshooting
 
