@@ -6418,6 +6418,61 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@php-wasm/logger@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/logger@npm:3.1.46"
+  checksum: 10c0/75fbffeeda015d9cf7c905626f2da31f6a9d7756bc104b6b05c9ba1526a84dd5c4ec607f6f00aafb81c98c335fd5ba580f974e3e12e428b7d923eb4b96fc4647
+  languageName: node
+  linkType: hard
+
+"@php-wasm/progress@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/progress@npm:3.1.46"
+  dependencies:
+    "@php-wasm/logger": "npm:3.1.46"
+  checksum: 10c0/41f127871bcf75bb684e619c669d497d65209162d4837ddd4fe51ff9f6ac132a92d451950fff2a85fde53c35b4250bd90374c5f43a7a78c38210ccc732afefa6
+  languageName: node
+  linkType: hard
+
+"@php-wasm/stream-compression@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/stream-compression@npm:3.1.46"
+  dependencies:
+    "@php-wasm/util": "npm:3.1.46"
+  checksum: 10c0/c092fba9abff4f0c9441587261b9820f8b5b4c86345c8a5f39806aa9ad857b059bb07e04142abae0d0dda4db2dc81edab5b78916bb8226e752334e14a4300981
+  languageName: node
+  linkType: hard
+
+"@php-wasm/universal@npm:3.1.46, @php-wasm/universal@npm:^3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/universal@npm:3.1.46"
+  dependencies:
+    "@php-wasm/logger": "npm:3.1.46"
+    "@php-wasm/progress": "npm:3.1.46"
+    "@php-wasm/stream-compression": "npm:3.1.46"
+    "@php-wasm/util": "npm:3.1.46"
+    ini: "npm:4.1.2"
+  checksum: 10c0/c38b8576a12525ae2c5a7ebd3b4653b556520d27b2cc0f47e3f978668775c63d326400cd9cf1bd55378c1c794af94c73cd20f91db07b3df8d09ae63d988fbe5a
+  languageName: node
+  linkType: hard
+
+"@php-wasm/util@npm:3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/util@npm:3.1.46"
+  checksum: 10c0/f720266c03449b3a35d68800d4a1b211045d9e0b18166075ffd4c35839ee9865432613a03c4ce8f9a6423502ac8d2d04e83de488aecee267a3fe5036a7a480dc
+  languageName: node
+  linkType: hard
+
+"@php-wasm/web-8-4@npm:^3.1.46":
+  version: 3.1.46
+  resolution: "@php-wasm/web-8-4@npm:3.1.46"
+  dependencies:
+    "@php-wasm/universal": "npm:3.1.46"
+    wasm-feature-detect: "npm:1.8.0"
+  checksum: 10c0/d1d3bfe1dbe4d46c27ee34c704928b8ddf09fc525e6e3da0c09157646ce4f8df6dde9d6281150474a721cba7d1668720830512816f64921bfef3b13f702351cd
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -9817,6 +9872,8 @@ __metadata:
     "@storybook/server": "workspace:*"
     "@storybook/server-webpack5": "workspace:*"
     "@storybook/svelte": "workspace:*"
+    "@storybook/symfony": "workspace:*"
+    "@storybook/symfony-vite": "workspace:*"
     "@storybook/vue3": "workspace:*"
     "@storybook/vue3-vite": "workspace:*"
     "@storybook/web-components": "workspace:*"
@@ -10589,18 +10646,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@storybook/symfony-vite@workspace:code/frameworks/symfony-vite":
+"@storybook/symfony-vite@workspace:*, @storybook/symfony-vite@workspace:code/frameworks/symfony-vite":
   version: 0.0.0-use.local
   resolution: "@storybook/symfony-vite@workspace:code/frameworks/symfony-vite"
   dependencies:
     "@storybook/builder-vite": "workspace:*"
     "@storybook/symfony": "workspace:*"
     "@types/node": "npm:^22.19.1"
+    fflate: "npm:^0.8.2"
     typescript: "npm:^5.9.3"
     vite: "npm:^7.0.4"
   peerDependencies:
     storybook: "workspace:^"
     vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+  bin:
+    prewarm-symfony-storybook-cache: ./bin/prewarmCache.js
   languageName: unknown
   linkType: soft
 
@@ -10608,7 +10668,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@storybook/symfony@workspace:code/renderers/symfony"
   dependencies:
+    "@php-wasm/universal": "npm:^3.1.46"
+    "@php-wasm/web-8-4": "npm:^3.1.46"
     "@storybook/global": "npm:^5.0.0"
+    fflate: "npm:^0.8.2"
     ts-dedent: "npm:^2.0.0"
     typescript: "npm:^5.8.3"
   peerDependencies:
@@ -19531,6 +19594,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fflate@npm:^0.8.2":
+  version: 0.8.3
+  resolution: "fflate@npm:0.8.3"
+  checksum: 10c0/eab181ca37f5348ae76d4b6f840e0026e30220e33153289ac942222d8b9638237d486507dbcc09878d724095bd354993a2ee48bbee99c8f2c6440d4448719aa7
+  languageName: node
+  linkType: hard
+
 "figures@npm:3.2.0":
   version: 3.2.0
   resolution: "figures@npm:3.2.0"
@@ -21627,6 +21697,13 @@ __metadata:
   version: 2.0.3
   resolution: "inherits@npm:2.0.3"
   checksum: 10c0/6e56402373149ea076a434072671f9982f5fad030c7662be0332122fe6c0fa490acb3cc1010d90b6eff8d640b1167d77674add52dfd1bb85d545cf29e80e73e7
+  languageName: node
+  linkType: hard
+
+"ini@npm:4.1.2":
+  version: 4.1.2
+  resolution: "ini@npm:4.1.2"
+  checksum: 10c0/e0ffe587038e26ca1debfece6f5e52fd17f4e65be59bb481bb24b89cd2be31a71f619465918da215916b4deba7d1134c228c58fe5e0db66a71a472dee9b8f99c
   languageName: node
   linkType: hard
 
@@ -34354,6 +34431,13 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.0.0"
   checksum: 10c0/aebab445129f3e104c271f1637fa38e55eb25f968593e3825bd2f7a12bd58dc3738bb70dc8ec85826621d80b4acfed5a29ebc9da17397c6125864d72301b937e
+  languageName: node
+  linkType: hard
+
+"wasm-feature-detect@npm:1.8.0":
+  version: 1.8.0
+  resolution: "wasm-feature-detect@npm:1.8.0"
+  checksum: 10c0/2cb43e91bbf7aa7c121bc76b3133de3ab6dc4f482acc1d2dc46c528e8adb7a51c72df5c2aacf1d219f113c04efd1706f18274d5790542aa5dd49e0644e3ee665
   languageName: node
   linkType: hard
 
