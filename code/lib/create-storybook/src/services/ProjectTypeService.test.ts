@@ -68,6 +68,18 @@ describe('ProjectTypeService', () => {
       expect(result).toBe(ProjectType.NEXTJS);
     });
 
+    it('detects a Symfony project before JavaScript framework detection', async () => {
+      const service = new ProjectTypeService(pm);
+      // @ts-expect-error private method spy
+      vi.spyOn(service, 'isNxProject').mockReturnValue(false);
+      // @ts-expect-error private method spy
+      vi.spyOn(service, 'isSymfonyProject').mockReturnValue(true);
+
+      const result = await service.autoDetectProjectType({ html: false } as CommandOptions);
+
+      expect(result).toBe(ProjectType.SYMFONY);
+    });
+
     it('detects VUE3 when vue major is 3', async () => {
       (pm as any).primaryPackageJson.packageJson = {
         dependencies: { vue: '^3.2.0' },
