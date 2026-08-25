@@ -1,4 +1,4 @@
-# Sub-plan: Composer Bundle `storybook/symfony-bundle`
+# Sub-plan: Composer Bundle `phloom/storybook-symfony-bundle`
 
 ## Goal
 
@@ -21,7 +21,7 @@ Every implementation decision and code change in this sub-plan must be grounded 
 
 The Composer bundle needs these files at minimum:
 
-- `composer.json` — package name `storybook/symfony-bundle`, PSR-4 autoloading, Symfony version constraints, dev dependencies.
+- `composer.json` — package name `phloom/storybook-symfony-bundle`, PSR-4 autoloading, Symfony version constraints, dev dependencies.
 - `phpunit.xml` — PHPUnit configuration.
 - `README.md` — installation, configuration, and endpoint documentation.
 - `src/StorybookBundle.php` — bundle class.
