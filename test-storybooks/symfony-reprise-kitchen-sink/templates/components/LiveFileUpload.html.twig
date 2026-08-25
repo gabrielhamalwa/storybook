@@ -1,0 +1,11 @@
+<div {{ attributes }}>
+  <input type="file" name="my_file">
+  <button
+    type="button"
+    data-action="live#action"
+    data-live-action-param="files(my_file)|upload"
+  >
+    Upload
+  </button>
+  <span class="uploaded-file">{{ uploadedFile }}</span>
+</div>
