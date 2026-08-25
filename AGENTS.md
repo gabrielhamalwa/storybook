@@ -194,6 +194,12 @@ Common templates:
 - `svelte-vite/default-ts`
 - `vue3-vite/default-ts`
 - `nextjs/default-ts`
+- `symfony-vite/default-ts` (Pentatrion Vite)
+- `symfony-vite/reprise-ts` (Symfony Reprise)
+
+Symfony sandboxes require the companion bundle at `../storybook-symfony-bundle` and the
+`STORYBOOK_SYMFONY_KITCHEN_SINK` and `STORYBOOK_SYMFONY_REPRISE_KITCHEN_SINK` environment
+variables, which are set automatically by the task runner.
 
 ## How To Work In This Repo
 
@@ -302,13 +308,16 @@ Avoid `console.log`, `console.warn`, and `console.error` unless the file is isol
 
 ## Environment Variables
 
-| Variable                      | Purpose                                         |
-| ----------------------------- | ----------------------------------------------- |
-| `IN_STORYBOOK_SANDBOX`        | Set during sandbox creation                     |
-| `STORYBOOK_DISABLE_TELEMETRY` | Disable telemetry                               |
-| `STORYBOOK_TELEMETRY_DEBUG`   | Log telemetry events                            |
-| `DEBUG`                       | Enable debug logging                            |
-| `FIX_ON_COMMIT`               | Force autofix for fmt & lint in pre-commit hook |
+| Variable                                | Purpose                                                      |
+| --------------------------------------- | ------------------------------------------------------------ |
+| `IN_STORYBOOK_SANDBOX`                  | Set during sandbox creation                                  |
+| `STORYBOOK_SYMFONY_KITCHEN_SINK`        | Path to the Pentatrion Vite Symfony kitchen sink             |
+| `STORYBOOK_SYMFONY_REPRISE_KITCHEN_SINK`| Path to the Symfony Reprise kitchen sink                     |
+| `STORYBOOK_SYMFONY_BUNDLE`              | Path to the companion `phloom/storybook-symfony-bundle`      |
+| `STORYBOOK_DISABLE_TELEMETRY`           | Disable telemetry                                            |
+| `STORYBOOK_TELEMETRY_DEBUG`             | Log telemetry events                                         |
+| `DEBUG`                                 | Enable debug logging                                         |
+| `FIX_ON_COMMIT`                         | Force autofix for fmt & lint in pre-commit hook            |
 
 ## Commands To Avoid
 
