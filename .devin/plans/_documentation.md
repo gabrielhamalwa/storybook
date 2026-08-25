@@ -22,7 +22,7 @@ Every implementation decision and code change in this sub-plan must be grounded 
 - What the framework does.
 - Requirements (PHP, Symfony, Node, Vite).
 - Installation instructions:
-  - `composer require storybook/symfony-bundle`
+  - `composer require phloom/storybook-symfony-bundle`
   - `yarn add -D @storybook/symfony-vite`
   - the accepted `storybook init` flow once Symfony detection is added
 - Quick start example.
