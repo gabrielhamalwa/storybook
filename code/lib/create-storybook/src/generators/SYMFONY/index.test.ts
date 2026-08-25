@@ -26,6 +26,8 @@ describe('Symfony generator', () => {
     });
 
     symfonyGenerator.postConfigure?.();
-    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('storybook/symfony-bundle'));
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.stringContaining('phloom/storybook-symfony-bundle')
+    );
   });
 });
