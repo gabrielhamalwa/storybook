@@ -8,7 +8,14 @@ import type { ResolvedSymfonyOptions } from '../options.ts';
 /**
  * Directories to include in the PHP-WASM zip.
  */
-const INCLUDE_DIRS = ['src', 'templates', 'config', 'vendor', 'public/assets', 'var/cache/storybook'];
+const INCLUDE_DIRS = [
+  'src',
+  'templates',
+  'config',
+  'vendor',
+  'public/assets',
+  'var/cache/storybook',
+];
 
 /**
  * Patterns to exclude from the zip (security-sensitive or unnecessary files).
