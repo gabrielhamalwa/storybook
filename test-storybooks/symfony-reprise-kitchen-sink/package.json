@@ -1,0 +1,41 @@
+{
+  "name": "symfony-reprise-kitchen-sink",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prebuild-storybook": "vite build",
+    "build-storybook": "storybook build",
+    "dev": "concurrently \"yarn vite\" \"yarn storybook\"",
+    "e2e": "playwright test",
+    "e2e:ci": "bash scripts/e2e-ci.sh",
+    "e2e:static": "playwright test --config playwright.static.config.ts",
+    "postinstall": "prewarm-symfony-storybook-cache",
+    "storybook": "storybook dev -p 6006",
+    "test-storybook": "storybook test"
+  },
+  "resolutions": {
+    "@storybook/addon-docs": "file:../../code/addons/docs",
+    "@storybook/builder-vite": "file:../../code/builders/builder-vite",
+    "@storybook/csf-plugin": "file:../../code/lib/csf-plugin",
+    "@storybook/react-dom-shim": "file:../../code/lib/react-dom-shim",
+    "@storybook/symfony": "file:../../code/renderers/symfony",
+    "@storybook/symfony-vite": "file:../../code/frameworks/symfony-vite",
+    "storybook": "file:../../code/core"
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@storybook/addon-docs": "*",
+    "@storybook/symfony": "*",
+    "@storybook/symfony-vite": "*",
+    "@symfony/reprise": "^0.8.0",
+    "@symfony/ux-live-component": "file:vendor/symfony/ux-live-component/assets",
+    "concurrently": "^10.0.3",
+    "storybook": "*",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.4"
+  }
+}
