@@ -10,6 +10,7 @@ export const SUPPORTED_FRAMEWORKS: readonly SupportedFramework[] = [
   SupportedFramework.SOLID,
   SupportedFramework.SVELTE_VITE,
   SupportedFramework.SVELTEKIT,
+  SupportedFramework.SYMFONY_VITE,
   SupportedFramework.VUE3_VITE,
   SupportedFramework.WEB_COMPONENTS_VITE,
   SupportedFramework.TANSTACK_REACT,
