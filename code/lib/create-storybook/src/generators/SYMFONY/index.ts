@@ -16,7 +16,7 @@ export default defineGeneratorModule({
   }),
   postConfigure: () => {
     logger.info(
-      'Symfony setup requires the companion bundle. Run: composer require --dev storybook/symfony-bundle'
+      'Symfony setup requires the companion bundle. Run: composer require --dev phloom/storybook-symfony-bundle'
     );
   },
 });
