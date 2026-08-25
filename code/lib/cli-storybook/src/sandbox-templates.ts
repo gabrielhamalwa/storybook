@@ -941,6 +941,104 @@ export const baseTemplates = {
       type: ProjectType.REACT_NATIVE_WEB,
     },
   },
+  'symfony-vite/default-ts': {
+    name: 'Symfony Pentatrion Latest (Vite | TypeScript)',
+    script:
+      'cp -R "$STORYBOOK_SYMFONY_KITCHEN_SINK" {{beforeDir}} && cd {{beforeDir}} && \
+      node -e \'const fs=require("fs"); const p=JSON.parse(fs.readFileSync("package.json","utf8")); delete p.resolutions; fs.writeFileSync("package.json", JSON.stringify(p,null,2));\' && \
+      node -e \'const fs=require("fs"); const c=JSON.parse(fs.readFileSync("composer.json","utf8")); c.repositories[0].url=process.env.STORYBOOK_SYMFONY_BUNDLE; fs.writeFileSync("composer.json", JSON.stringify(c,null,2));\' && \
+      rm -f composer.lock && \
+      mv stories src/stories && \
+      rm -rf .storybook && \
+      composer install --no-interaction --no-scripts',
+    expected: {
+      framework: '@storybook/symfony-vite',
+      renderer: '@storybook/symfony',
+      builder: '@storybook/builder-vite',
+    },
+    inDevelopment: true,
+    skipTasks: [
+      'smoke-test',
+      'e2e-tests',
+      'e2e-tests-dev',
+      'test-runner',
+      'test-runner-dev',
+      'vitest-integration',
+      'chromatic',
+      'bench',
+    ],
+    initOptions: {
+      type: ProjectType.SYMFONY,
+      builder: SupportedBuilder.VITE,
+      features: [],
+    },
+    modifications: {
+      skipTemplateStories: true,
+      skipMocking: true,
+      mainConfig: {
+        features: {
+          experimental_symfonyAutoDiscovery: true,
+        },
+        framework: {
+          name: '@storybook/symfony-vite',
+          options: {
+            symfony: {
+              server: 'php',
+            },
+          },
+        },
+      },
+    },
+  },
+  'symfony-vite/reprise-ts': {
+    name: 'Symfony Reprise Latest (Vite | TypeScript)',
+    script:
+      'cp -R "$STORYBOOK_SYMFONY_REPRISE_KITCHEN_SINK" {{beforeDir}} && cd {{beforeDir}} && \
+      node -e \'const fs=require("fs"); const p=JSON.parse(fs.readFileSync("package.json","utf8")); delete p.resolutions; fs.writeFileSync("package.json", JSON.stringify(p,null,2));\' && \
+      node -e \'const fs=require("fs"); const c=JSON.parse(fs.readFileSync("composer.json","utf8")); c.repositories[0].url=process.env.STORYBOOK_SYMFONY_BUNDLE; fs.writeFileSync("composer.json", JSON.stringify(c,null,2));\' && \
+      rm -f composer.lock && \
+      mv stories src/stories && \
+      rm -rf .storybook && \
+      composer install --no-interaction --no-scripts',
+    expected: {
+      framework: '@storybook/symfony-vite',
+      renderer: '@storybook/symfony',
+      builder: '@storybook/builder-vite',
+    },
+    inDevelopment: true,
+    skipTasks: [
+      'smoke-test',
+      'e2e-tests',
+      'e2e-tests-dev',
+      'test-runner',
+      'test-runner-dev',
+      'vitest-integration',
+      'chromatic',
+      'bench',
+    ],
+    initOptions: {
+      type: ProjectType.SYMFONY,
+      builder: SupportedBuilder.VITE,
+      features: [],
+    },
+    modifications: {
+      skipTemplateStories: true,
+      skipMocking: true,
+      mainConfig: {
+        features: {
+          experimental_symfonyAutoDiscovery: true,
+        },
+        framework: {
+          name: '@storybook/symfony-vite',
+          options: {
+            symfony: {
+              server: 'php',
+            },
+          },
+        },
+      },
+    },
+  },
 } satisfies Record<string, BaseTemplates>;
 
 /**
@@ -1139,6 +1237,8 @@ export const normal: TemplateKey[] = [
   'react-rsbuild/default-ts',
   'tanstack-react-router/default-ts',
   'tanstack-react-start/default-ts',
+  // TODO: Promote 'symfony-vite/default-ts' from inDevelopment once sandbox generation is stable
+  // 'symfony-vite/default-ts',
 ];
 
 export const merged: TemplateKey[] = [
