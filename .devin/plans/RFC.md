@@ -51,7 +51,7 @@ the Storybook monorepo.
 | --- | --- |
 | `@storybook/symfony` | Story rendering, canvas lifecycle, assets, Twig source, and browser runtime bridge |
 | `@storybook/symfony-vite` | Vite builder integration, local PHP lifecycle, indexing, and static packaging |
-| `storybook/symfony-bundle` | Symfony routes, component adapters, indexing metadata, and asset extraction |
+| `phloom/storybook-symfony-bundle` | Symfony routes, component adapters, indexing metadata, and asset extraction |
 
 ### Development flow
 
