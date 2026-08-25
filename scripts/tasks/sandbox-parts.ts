@@ -11,6 +11,7 @@ import { join, relative, resolve, sep } from 'path';
 // eslint-disable-next-line depend/ban-dependencies
 import slash from 'slash';
 
+import { SupportedLanguage } from 'storybook/internal/types';
 import { babelParse, types as t, traverse } from '../../code/core/src/babel/index.ts';
 import { JsPackageManagerFactory } from '../../code/core/src/common/js-package-manager/index.ts';
 import storybookPackages from '../../code/core/src/common/versions.ts';
@@ -20,7 +21,6 @@ import {
   formatConfig,
   writeConfig,
 } from '../../code/core/src/csf-tools/index.ts';
-import { SupportedLanguage } from 'storybook/internal/types';
 
 import type { TemplateKey } from '../../code/lib/cli-storybook/src/sandbox-templates.ts';
 import { ProjectTypeService } from '../../code/lib/create-storybook/src/services/ProjectTypeService.ts';
@@ -52,8 +52,8 @@ async function ensureSymlink(src: string, dest: string): Promise<void> {
   try {
     await lstat(dest);
     return;
-  } catch (e: any) {
-    if (e?.code !== 'ENOENT') {
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException)?.code !== 'ENOENT') {
       throw e;
     }
   }
@@ -73,9 +73,12 @@ async function ensureSymlinkOrCopy(source: string, target: string): Promise<void
   }
   try {
     await ensureSymlink(source, target);
-  } catch (error: any) {
+  } catch (error) {
     // If symlink fails (typically on Windows without admin privileges), fall back to cp
-    if (error.code === 'EPERM' || error.code === 'EEXIST') {
+    if (
+      (error as NodeJS.ErrnoException).code === 'EPERM' ||
+      (error as NodeJS.ErrnoException).code === 'EEXIST'
+    ) {
       logger.info(`Symlink failed for ${target}, falling back to cp`);
       await cp(source, target, { recursive: true, force: true });
     } else {
@@ -724,7 +727,7 @@ export const addStories: Task['run'] = async (
   const packageManager = JsPackageManagerFactory.getPackageManager({}, sandboxDir);
 
   // Package manager types differ slightly due to private methods and compilation differences of types
-  const projectTypeService = new ProjectTypeService(packageManager as any);
+  const projectTypeService = new ProjectTypeService(packageManager);
 
   // Ensure that we match the right stories in the stories directory
   updateStoriesField(
@@ -742,20 +745,23 @@ export const addStories: Task['run'] = async (
   if (isCoreRenderer) {
     // Link in the template/components/index.js from preview-api, the renderer and the addons
     const rendererPath = await workspacePath('renderer', template.expected.renderer);
-    await ensureSymlinkOrCopy(
-      join(CODE_DIRECTORY, rendererPath, 'template', 'components'),
-      resolve(cwd, storiesPath, 'components')
-    );
-    addPreviewAnnotations(mainConfig, [`.${sep}${join(storiesPath, 'components')}`]);
+    const rendererComponentsPath = join(CODE_DIRECTORY, rendererPath, 'template', 'components');
+    if (await pathExists(rendererComponentsPath)) {
+      await ensureSymlinkOrCopy(rendererComponentsPath, resolve(cwd, storiesPath, 'components'));
+      addPreviewAnnotations(mainConfig, [`.${sep}${join(storiesPath, 'components')}`]);
+    }
 
     // Add stories for the renderer. NOTE: these *do* need to be processed by the framework build system
-    await linkPackageStories(rendererPath, {
-      mainConfig,
-      cwd,
-      linkInDir: resolve(cwd, storiesPath),
-      disableDocs,
-      skipMocking,
-    });
+    const rendererStoriesPath = join(CODE_DIRECTORY, rendererPath, 'template', 'stories');
+    if (await pathExists(rendererStoriesPath)) {
+      await linkPackageStories(rendererPath, {
+        mainConfig,
+        cwd,
+        linkInDir: resolve(cwd, storiesPath),
+        disableDocs,
+        skipMocking,
+      });
+    }
 
     if (
       await pathExists(
@@ -829,25 +835,24 @@ export const addStories: Task['run'] = async (
     });
   }
 
-  const mainAddons = (mainConfig.getSafeFieldValue(['addons']) || []).reduce(
-    (acc: string[], addon: any) => {
-      const name = typeof addon === 'string' ? addon : addon.name;
-      const match = /@storybook\/addon-(.*)/.exec(name);
+  const mainAddons = (
+    (mainConfig.getSafeFieldValue(['addons']) as (string | { name: string })[]) || []
+  ).reduce((acc: string[], addon: string | { name: string }) => {
+    const name = typeof addon === 'string' ? addon : addon.name;
+    const match = /@storybook\/addon-(.*)/.exec(name);
 
-      if (!match) {
-        return acc;
-      }
-      const suffix = match[1];
-      if (suffix === 'essentials') {
-        const essentials = disableDocs
-          ? essentialsAddons.filter((a) => a !== 'docs')
-          : essentialsAddons;
-        return [...acc, ...essentials];
-      }
-      return [...acc, suffix];
-    },
-    []
-  );
+    if (!match) {
+      return acc;
+    }
+    const suffix = match[1];
+    if (suffix === 'essentials') {
+      const essentials = disableDocs
+        ? essentialsAddons.filter((a) => a !== 'docs')
+        : essentialsAddons;
+      return [...acc, ...essentials];
+    }
+    return [...acc, suffix];
+  }, []);
 
   const addonDirs = await Promise.all(
     [...mainAddons, ...extraAddons]
@@ -888,9 +893,15 @@ export const extendMain: Task['run'] = async ({ template, sandboxDir, key }, { d
   logger.log('📝 Extending main.js');
   const mainConfig = await readConfig({ fileName: 'main', cwd: sandboxDir });
 
-  const templateConfig: any = isFunction(template.modifications?.mainConfig)
-    ? template.modifications?.mainConfig(mainConfig)
-    : template.modifications?.mainConfig || {};
+  type MainConfigSnippet = Record<string, unknown> & {
+    features?: Record<string, unknown>;
+    core?: Record<string, unknown>;
+    previewHead?: string;
+  };
+
+  const templateConfig: MainConfigSnippet = isFunction(template.modifications?.mainConfig)
+    ? (template.modifications?.mainConfig(mainConfig) as MainConfigSnippet)
+    : (template.modifications?.mainConfig as MainConfigSnippet) || {};
   const configToAdd = {
     ...templateConfig,
     features: {
@@ -939,8 +950,10 @@ export const extendMain: Task['run'] = async ({ template, sandboxDir, key }, { d
 
   // Simulate Storybook Lite
   if (disableDocs) {
-    const addons = mainConfig.getFieldValue(['addons']);
-    const addonsNoDocs = addons.filter((addon: any) => addon !== '@storybook/addon-docs');
+    const addons = (mainConfig.getFieldValue(['addons']) as (string | { name: string })[]) || [];
+    const addonsNoDocs = addons.filter((addon: string | { name: string }) =>
+      typeof addon === 'string' ? addon !== '@storybook/addon-docs' : true
+    );
     mainConfig.setFieldValue(['addons'], addonsNoDocs);
 
     // remove the docs options so that docs tags are ignored
