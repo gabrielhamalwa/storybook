@@ -25,7 +25,7 @@ The renderer is installed automatically when you add the framework:
 
 ```bash
 yarn add -D @storybook/symfony-vite storybook
-composer require --dev storybook/symfony-bundle
+composer require --dev phloom/storybook-symfony-bundle
 ```
 
 If you are building a custom framework on top of this renderer, install it directly:
