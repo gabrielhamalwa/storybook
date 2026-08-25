@@ -1,0 +1,12 @@
+import { Canvas, Meta, Source, Story, Title } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from './Button.stories.ts';
+
+<Meta of={ButtonStories} />
+
+<Title />
+
+<Canvas>
+  <Story of={ButtonStories.Primary} />
+</Canvas>
+
+<Source of={ButtonStories.Primary} />
