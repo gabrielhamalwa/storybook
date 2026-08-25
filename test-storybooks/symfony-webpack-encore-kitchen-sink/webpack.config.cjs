@@ -11,6 +11,7 @@ Encore.setOutputPath('public/build/')
   .enableSingleRuntimeChunk()
   .cleanupOutputBeforeBuild()
   .enableSourceMaps(!Encore.isProduction())
-  .enableVersioning(Encore.isProduction());
+  .enableVersioning(Encore.isProduction())
+  .enableStimulusBridge('./assets/controllers.json');
 
 module.exports = Encore.getWebpackConfig();
