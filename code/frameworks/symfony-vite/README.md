@@ -6,9 +6,9 @@ Learn more about Storybook at [storybook.js.org](https://storybook.js.org/?ref=r
 
 ## Requirements
 
-- PHP 8.2 or higher
+- PHP 8.4 or higher
 - A Symfony project with Twig and Symfony UX TwigComponent installed
-- The `storybook/symfony-bundle` Composer package installed and enabled
+- The `phloom/storybook-symfony-bundle` Composer package installed and enabled
 - Vite 5, 6, 7, or 8
 
 ## Installation
@@ -23,7 +23,7 @@ It detects `symfony/framework-bundle`, installs the Symfony/Vite framework, and 
 standard Storybook configuration. Then install the companion Composer bundle:
 
 ```bash
-composer require --dev storybook/symfony-bundle
+composer require --dev phloom/storybook-symfony-bundle
 ```
 
 Then enable the bundle in `config/bundles.php` if Symfony Flex did not register it:
