@@ -1,5 +1,4 @@
-import { cp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
-import { readFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import * as ghActions from '@actions/core';
@@ -24,6 +23,7 @@ import {
   BEFORE_DIR_NAME,
   LOCAL_REGISTRY_URL,
   REPROS_DIRECTORY,
+  ROOT_DIRECTORY,
   SCRIPT_TIMEOUT,
 } from '../utils/constants.ts';
 import { esMain } from '../utils/esmain.ts';
@@ -33,6 +33,18 @@ import { getStackblitzUrl, renderTemplate } from './utils/template.ts';
 import { localizeYarnConfigFiles, setupYarn } from './utils/yarn.ts';
 
 const isCI = process.env.GITHUB_ACTIONS === 'true' || process.env.CI === 'true';
+
+const STORYBOOK_SYMFONY_KITCHEN_SINK = join(
+  ROOT_DIRECTORY,
+  'test-storybooks',
+  'symfony-vite-kitchen-sink'
+);
+const STORYBOOK_SYMFONY_REPRISE_KITCHEN_SINK = join(
+  ROOT_DIRECTORY,
+  'test-storybooks',
+  'symfony-reprise-kitchen-sink'
+);
+const STORYBOOK_SYMFONY_BUNDLE = join(ROOT_DIRECTORY, '..', 'storybook-symfony-bundle');
 
 class BeforeScriptExecutionError extends Error {}
 class StorybookInitError extends Error {}
@@ -53,7 +65,7 @@ const sbInit = async (
 type LocalRegistryProps = {
   action: () => Promise<void>;
   cwd: string;
-  env: Record<string, any>;
+  env: Record<string, string | undefined>;
   debug: boolean;
 };
 
@@ -166,7 +178,7 @@ const addDocumentation = async (
   await writeFile(join(afterDir, 'README.md'), contents);
 };
 
-const toFlags = (opts: Record<string, any>): string[] => {
+const toFlags = (opts: Record<string, unknown>): string[] => {
   const result: string[] = [];
   for (const [key, value] of Object.entries(opts)) {
     if (value === undefined || value === null) {
@@ -177,8 +189,12 @@ const toFlags = (opts: Record<string, any>): string[] => {
         result.push(`--${key}`);
       }
     } else if (Array.isArray(value)) {
-      for (const v of value) {
-        result.push(`--${key} ${String(v)}`);
+      if (key === 'features' && value.length === 0) {
+        result.push('--no-features');
+      } else {
+        for (const v of value) {
+          result.push(`--${key} ${String(v)}`);
+        }
       }
     } else if (typeof value === 'string') {
       // Normalize ProjectType-like values to lower-case for CLI
@@ -216,7 +232,7 @@ const runGenerators = async (
           let flags: string[] = ['--no-dev'];
 
           if (initOptions && typeof initOptions === 'object') {
-            flags = [...flags, ...toFlags(initOptions as Record<string, any>)];
+            flags = [...flags, ...toFlags(initOptions as Record<string, unknown>)];
           }
 
           const time = process.hrtime();
@@ -232,7 +248,7 @@ const runGenerators = async (
               const message = `❌ Failed to setup yarn in template: ${name} (${dirName})`;
               if (isCI) {
                 ghActions.error(dedent`${message}
-                  ${(error as any).stack}`);
+                  ${error instanceof Error ? error.stack : ''}`);
               } else {
                 console.error(message);
                 console.error(error);
@@ -258,6 +274,9 @@ const runGenerators = async (
                   env: {
                     ...env,
                     CI: 'true',
+                    STORYBOOK_SYMFONY_KITCHEN_SINK,
+                    STORYBOOK_SYMFONY_REPRISE_KITCHEN_SINK,
+                    STORYBOOK_SYMFONY_BUNDLE,
                   },
                   timeout: SCRIPT_TIMEOUT,
                 },
@@ -271,7 +290,7 @@ const runGenerators = async (
             const message = `❌ Failed to execute before-script for template: ${name} (${dirName})`;
             if (isCI) {
               ghActions.error(dedent`${message}
-                ${(error as any).stack}`);
+                ${error instanceof Error ? error.stack : ''}`);
             } else {
               console.error(message);
               console.error(error);
@@ -293,7 +312,7 @@ const runGenerators = async (
             const message = `❌ Failed to initialize Storybook in template: ${name} (${dirName})`;
             if (isCI) {
               ghActions.error(dedent`${message}
-                ${(error as any).stack}`);
+                ${error instanceof Error ? error.stack : ''}`);
             } else {
               console.error(message);
               console.error(error);
