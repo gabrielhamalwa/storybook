@@ -6,7 +6,7 @@
   "minimum-stability": "stable",
   "prefer-stable": true,
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.4",
     "symfony/console": "^7.0",
     "symfony/dotenv": "^7.0",
     "symfony/flex": "^2.4",
@@ -15,7 +15,7 @@
     "symfony/twig-bundle": "^7.0",
     "symfony/ux-twig-component": "^2.0",
     "symfony/yaml": "^7.0",
-    "storybook/symfony-bundle": "@dev"
+    "phloom/storybook-symfony-bundle": "@dev"
   },
   "require-dev": {},
   "config": {
