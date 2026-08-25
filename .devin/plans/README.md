@@ -40,7 +40,7 @@ The Storybook contribute docs recommend writing documentation before code. We fo
 | Repository location | Storybook monorepo | Goal is official support; reuse existing tooling, test kitchens, and release process. |
 | Builder (first) | Vite | Modern default; aligns with Pentatrion Vite and future Storybook test tooling. Webpack5 later. |
 | Renderer/framework names | `@storybook/symfony` + `@storybook/symfony-vite` | Matches monorepo naming conventions. |
-| Composer bundle name | `storybook/symfony-bundle` | Standard Composer namespace. |
+| Composer bundle name | `phloom/storybook-symfony-bundle` | Standard Composer namespace. |
 | PHP server default | `php -S` | Zero dependencies beyond PHP. Fast paths: FrankenPHP / RoadRunner. |
 | Symfony environment | Isolated `storybook` environment | Avoids compiling the full application container. Drop-in config scaffolded by the framework. |
 | Story format default | `.stories.ts` | Full CSF/TypeScript support, controls, play functions, docs. |
